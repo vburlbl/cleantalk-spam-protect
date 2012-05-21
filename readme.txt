@@ -9,14 +9,21 @@ Cleantalk plugin v1.1.0 for antispam protection and automoderation.
 
 == Description ==
 
-Plugin for spam protection and automoderation. It use several tests
-to stop spam. Like,
+Plugin for spam protection and automoderation. It use several tests to stop spam. Like,
+
 1. Blacklists with over 9 billions records,
-2. Compare comment with posts on blog,
-3. Javascript availability,
-4. Comment submit time.
+1. Compare comment with posts on blog,
+1. Javascript availability,
+1. Comment submit time.
 
 Cleantalk plugin dramatically reduce spam activity at your blog.
+
+You can use plugin 31 days for free. After that you can choose a convenient for you tariff plan.
+
+== Screenshots ==
+
+1. Cleantalk in action
+2. Cleantalk admin panel
 
 = Translation =
 
