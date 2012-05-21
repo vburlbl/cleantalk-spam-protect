@@ -23,7 +23,7 @@ You can use plugin 31 days for free. After that you can choose a convenient for 
 == Screenshots ==
 
 1. Cleantalk in action
-2. Cleantal admin panel
+2. Cleantalk admin panel
 
 = Translation =
 
