@@ -20,11 +20,6 @@ Cleantalk plugin dramatically reduce spam activity at your blog.
 
 You can use plugin 31 days for free. After that you can choose a convenient for you tariff plan.
 
-== Screenshots ==
-
-1. Cleantalk in action
-2. Cleantalk admin panel
-
 = Translation =
 
 * English (en_EN)
@@ -43,7 +38,8 @@ Because this is automoderation too.
 
 == Screenshots ==
 
-There are no screenshots yet.
+1. Cleantalk in action
+2. Cleantalk admin panel
 
 == Changelog ==
 
