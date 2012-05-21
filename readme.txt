@@ -9,7 +9,7 @@ Cleantalk plugin v1.1.0 for antispam protection and automoderation.
 
 == Description ==
 
-Plugin for spam protection and automoderation. It use several tests to stop spam. Like,
+Plugin for spam protection and automoderation. It use several tests to stop spam. Like:
 
 1. Blacklists with over 9 billions records,
 1. Compare comment with posts on blog,
