@@ -2,7 +2,7 @@
 Contributors: Cleantalk
 Tags: comments, spam, blocking, automoderation, cleantalk
 Requires at least: 3.1.2
-Tested up to: 3.1.2
+Tested up to: 3.4
 Stable tag: 1.1.1
 
 Cleantalk plugin v1.1.1 for antispam protection and automoderation.
@@ -47,7 +47,7 @@ Because this is automoderation too.
 First version
 
 = 1.1.1 =
-Added user locale support
+Added user locale support, tested up to WP 3.4
 
 == Upgrade Notice ==
 
@@ -55,4 +55,4 @@ Added user locale support
 First version
 
 = 1.1.1 =
-Added user locale support
+Added user locale support, tested up to WP 3.4
