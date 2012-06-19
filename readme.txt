@@ -5,7 +5,7 @@ Requires at least: 3.1.2
 Tested up to: 3.1.2
 Stable tag: 1.1.1
 
-Cleantalk plugin v1.1.0 for antispam protection and automoderation.
+Cleantalk plugin v1.1.1 for antispam protection and automoderation.
 
 == Description ==
 
@@ -45,6 +45,9 @@ Because this is automoderation too.
 
 = 1.1.0 =
 First version
+
+= 1.1.1 =
+Added user locale support
 
 == Upgrade Notice ==
 
