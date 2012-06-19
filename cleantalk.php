@@ -3,7 +3,7 @@
 Plugin Name: Cleantalk. Spam protect
 Plugin URI: http://cleantalk.ru/wordpress
 Description: Plugin for automoderation and spam protection. It use several tests to stop spam. Like, 1) Blacklists with over 9 billions records, 2) Compare comment with posts on blog, 3) Javascript availability, 4) Comment submit time. Cleantalk plugin dramatically reduce spam activity at your blog.
-Version: 1.1.0
+Version: 1.1.1
 Author: Сleantalk team
 Author URI: http://cleantalk.ru
 */
@@ -70,7 +70,7 @@ function ct_def_options(){
     return array(
 	'stopwords'	=> '1',
 	'allowlinks'	=> '0',
-	'language'	=> 'ru',
+	'language'	=> 'en',
 	'server'	=> 'http://moderate.cleantalk.ru',
 	'apikey'	=> __('enter key', 'cleantalk')
     );
@@ -116,7 +116,7 @@ function ct_send_request($method, $params){
 				$params['base_text'],
 				$options['apikey'],
 				$ENGINE,
-				$params['url'],
+				$params['user_info'],
 				$options['stopwords'],
 				$options['language'],
 				$params['session_ip'],
@@ -328,6 +328,18 @@ function ct_check($comment) {
         $submit_time = NULL;
     }
 
+    $user_info = '';
+    if(function_exists('json_encode')){
+	$blog_lang = substr(get_locale(),0,2);
+	$arr = array(
+	    'cms_lang' => $blog_lang,
+	    'REFFERRER' => $_SERVER['HTTP_REFFERRER'],
+	    'USER_AGENT' => $_SERVER['HTTP_USER_AGENT']
+	);
+	$user_info = json_encode($arr);
+	if($user_info === FALSE) $user_info = '';
+    }
+
     $ctResponse = ct_send_request(
 				'check_message', 
 				array(
@@ -335,7 +347,7 @@ function ct_check($comment) {
 				    'user_name'=>$comment['comment_author'],
 				    'user_email'=>$comment['comment_author_email'],
 				    'message'=>$comment['comment_content'],
-				    'url'=>'',
+				    'user_info'=>$user_info,
 				    'session_ip'=>preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']),
 				    'checkjs'=>$checkjs,
 				    'submit_time'=>$submit_time
