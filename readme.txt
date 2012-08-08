@@ -9,14 +9,29 @@ Cleantalk plugin v1.1.1 for antispam protection and automoderation.
 
 == Description ==
 
-Plugin for spam protection and automoderation. It use several tests to stop spam. Like,
+This plugin use several simple tests to stop spam in comments. For example,
 
-1. Blacklists with over 9 billions records,
-1. Compare comment with posts on blog,
+1. Blacklists checks by Email, IP in lists with several billions records,
 1. Javascript availability,
 1. Comment submit time.
 
-Cleantalk plugin dramatically reduce spam activity at your blog.
+The most important feature is a blocking 100% spam comments without move to yours trash. That’s why
+Cleantalk dramatically reduce spam activity at your blog.
+
+And another main feature of plugin is an automatic publication of good posts. Every new comment
+plugin compare with article and previous comments. If the relevance of the comment is good enough it
+will be automatically published at the blog. Without move to manual moderation queue.
+
+All features ot the plugin
+
+1. Stop spam in comments.
+1. Not using CAPTCHA.
+1. Stop comments with swear, negative words.
+1. Automatic publication of good posts.
+1. Automatic education of good authors in comments.
+
+This plugin is a client application for spam protection service cleantalk.ru. This service use a thousands
+blogs, forums and community sites in Russia and in the World.
 
 You can use plugin 31 days for free. After that you can choose a convenient for you tariff plan.
 
