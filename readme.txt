@@ -33,7 +33,7 @@ All features ot the plugin
 This plugin is a client application for spam protection service cleantalk.ru. This service use a thousands
 blogs, forums and community sites in Russia and in the World.
 
-You can use plugin 31 days for free. After that you can choose a convenient for you tariff plan.
+It is free to use for small and medium sized blogs.
 
 = Translation =
 
