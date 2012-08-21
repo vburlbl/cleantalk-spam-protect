@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: Cleantalk
+Contributors: znaeff, default.asp
 Tags: comments, spam, blocking, automoderation, cleantalk
 Requires at least: 3.1.2
 Tested up to: 3.4
