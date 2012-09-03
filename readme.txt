@@ -64,6 +64,9 @@ First version
 = 1.1.1 =
 Added user locale support, tested up to WP 3.4
 
+= 1.1.1 =
+HTTP_REFERER bug fixed
+
 == Upgrade Notice ==
 
 = 1.1.0 =

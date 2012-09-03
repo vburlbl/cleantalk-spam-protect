@@ -333,7 +333,7 @@ function ct_check($comment) {
 	$blog_lang = substr(get_locale(),0,2);
 	$arr = array(
 	    'cms_lang' => $blog_lang,
-	    'REFFERRER' => $_SERVER['HTTP_REFFERRER'],
+	    'REFFERRER' => $_SERVER['HTTP_REFERER'],
 	    'USER_AGENT' => $_SERVER['HTTP_USER_AGENT']
 	);
 	$user_info = json_encode($arr);
