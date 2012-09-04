@@ -3,7 +3,7 @@
 Plugin Name: Cleantalk. Spam protect
 Plugin URI: http://cleantalk.ru/wordpress
 Description: Plugin for automoderation and spam protection. It use several tests to stop spam. Like, 1) Blacklists with over 9 billions records, 2) Compare comment with posts on blog, 3) Javascript availability, 4) Comment submit time. Cleantalk plugin dramatically reduce spam activity at your blog.
-Version: 1.1.1
+Version: 1.1.2
 Author: Сleantalk team
 Author URI: http://cleantalk.ru
 */
@@ -103,7 +103,7 @@ function ct_send_request($method, $params){
     /**
     * Plugin version string for server
     */
-    $ENGINE = 'wordpress-110';
+    $ENGINE = 'wordpress-112';
     
     $CT = ct_get_instance();
     $options = ct_get_options();
@@ -311,7 +311,11 @@ function ct_check($comment) {
     $comment_post_id = $comment['comment_post_ID'];
         
     $post = get_post($comment_post_id);
-    $baseText = ($post !== NULL) ? $post->post_content : '';
+    if($post !== NULL){
+        $baseText = $post->post_title . '<br>' . $post->post_content;
+    }else{
+        $baseText = '';
+    }
 
     $prevComments = $wpdb->get_col("SELECT comment_content FROM $wpdb->comments WHERE comment_post_ID = '$comment_post_id' AND comment_approved = 1 ORDER BY comment_id DESC LIMIT 10", 0);
     $prevComments = implode("\n\n", $prevComments);

@@ -1,11 +1,11 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov
-Tags: comments, spam, blocking, automoderation, cleantalk
+Tags: comments, spam, blocking, automoderation, autopublication, cleantalk
 Requires at least: 3.1.2
 Tested up to: 3.4
-Stable tag: 1.1.1
+Stable tag: trunk
 
-Cleantalk plugin v1.1.1 for antispam protection and automoderation.
+Cleantalk plugin v1.1.2 for antispam protection and automatic publication of the comments.
 
 == Description ==
 
@@ -18,7 +18,7 @@ This plugin use several simple tests to stop spam in comments. For example,
 The most important feature is a blocking 100% spam comments without move to yours trash. That’s why
 Cleantalk dramatically reduce spam activity at your blog.
 
-And another main feature of plugin is an automatic publication of good posts. Every new comment
+And another main feature of plugin is an automatic publication of good comments. Every new comment
 plugin compare with article and previous comments. If the relevance of the comment is good enough it
 will be automatically published at the blog. Without move to manual moderation queue.
 
@@ -49,7 +49,7 @@ It is free to use for small and medium sized blogs.
 
 = Why do I need one more anti-spam plugin? =
 
-Because this is automoderation too.
+Because this plugin has comments auto publication tool.
 
 == Screenshots ==
 
@@ -58,19 +58,27 @@ Because this is automoderation too.
 
 == Changelog ==
 
-= 1.1.0 =
-First version
-
-= 1.1.1 =
-Added user locale support, tested up to WP 3.4
+= 1.1.2 =
+Addition: Titile of the post attached to the example text in auto publication tool.
+Tested with WordPress 3.4.1.
 
 = 1.1.1 =
 HTTP_REFERER bug fixed
 
-== Upgrade Notice ==
+= 1.1.1 =
+Added user locale support, tested up to WP 3.4
 
 = 1.1.0 =
 First version
 
+== Upgrade Notice ==
+
+= 1.1.2 =
+Addition: Titile of the post attached to the example text in auto publication tool.
+Tested with WordPress 3.4.1.
+
 = 1.1.1 =
 Added user locale support, tested up to WP 3.4
+
+= 1.1.0 =
+First version
