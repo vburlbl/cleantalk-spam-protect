@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov
-Tags: comments, spam, blocking, automoderation, autopublication, cleantalk
+Tags: comments, spam, blocking, automoderation, autopublication, cleantalk, anti-spam, automatic, captcha, comment, performance
 Requires at least: 3.1.2
 Tested up to: 3.4
 Stable tag: trunk
