@@ -5,7 +5,7 @@ Requires at least: 3.1.2
 Tested up to: 3.4
 Stable tag: trunk
 
-Cleantalk plugin v1.1.2 for antispam protection and automatic publication of the comments.
+Cleantalk plugin v1.2.2 for antispam protection and automatic publication of the comments.
 
 == Description ==
 
@@ -57,6 +57,16 @@ Because this plugin has comments auto publication tool.
 2. Cleantalk admin panel
 
 == Changelog ==
+
+= 1.2.2 =
+Plugin rename to CleanTalk. Spam prevent plugin
+Integration Base Class verion 0.7
+Added fast submit check
+Added check website in form
+Added fedbacks for change comment status (Not spam, unapprove)
+Added function move comment in spam folder if Cleantalk say is spam
+Disable checking for user groups Administrator, Author, Editor
+Marked red color bad words
 
 = 1.1.2 =
 Addition: Titile of the post attached to the example text in auto publication tool.
