@@ -4,7 +4,7 @@ error_reporting(E_ALL);
   Plugin Name: CleanTalk. Spam prevent plugin
   Plugin URI: http://cleantalk.ru/wordpress
   Description: Plugin for automoderation and spam protection. It use several tests to stop spam. Like, 1) Blacklists with over 9 billions records, 2) Compare comment with posts on blog, 3) Javascript availability, 4) Comment submit time. Cleantalk plugin dramatically reduce spam activity at your blog.
-  Version: 1.2.2
+  Version: 1.2.3
   Author: Сleantalk team
   Author URI: http://cleantalk.ru
  */
@@ -165,8 +165,10 @@ function ct_set_session() {
     // this action is called AFTER wp-comments-post.php executing and AFTER ct_check calling so we can create new session value here
     // it can be any action between init and send_headers, see http://codex.wordpress.org/Plugin_API/Action_Reference
     session_name('cleantalksession');
-    session_start();
-    $_SESSION['formtime'] = time();
+    if (!isset($_SESSION)) {
+        session_start();
+        $_SESSION['formtime'] = time();
+    }
 }
 
 /**
@@ -224,7 +226,9 @@ function ct_check($comment) {
         $checkjs = 0;
 
     session_name('cleantalksession');
-    session_start();
+    if (!isset($_SESSION)) {
+        session_start();
+    }
     if (array_key_exists('formtime', $_SESSION)) {
         $submit_time = time() - (int) $_SESSION['formtime'];
     } else {
