@@ -1,12 +1,12 @@
 <?php
 error_reporting(E_ALL);
 /*
-  Plugin Name: CleanTalk. Spam prevent plugin
-  Plugin URI: http://cleantalk.ru/wordpress
-  Description: Plugin for automoderation and spam protection. It use several tests to stop spam. Like, 1) Blacklists with over 9 billions records, 2) Compare comment with posts on blog, 3) Javascript availability, 4) Comment submit time. Cleantalk plugin dramatically reduce spam activity at your blog.
-  Version: 1.2.3
-  Author: Сleantalk team
-  Author URI: http://cleantalk.ru
+  Plugin Name: CleanTalk. Spam protection
+  Plugin URI: http://cleantalk.org/wordpress
+  Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
+  Version: 1.3.3
+  Author: СleanTalk team
+  Author URI: http://cleantalk.org
  */
 
 // Сleantalk team (shagimuratov@cleantalk.ru), coder Alexey Znaev (znaeff@mail.ru)
@@ -15,6 +15,7 @@ add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
 add_action('comment_form', 'ct_add_hidden_fields');
 add_action('parse_request', 'ct_set_session');
+add_action('admin_notices', 'admin_notice_message');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
 
 if (is_admin()) {
@@ -29,7 +30,6 @@ if (is_admin()) {
     add_filter('get_comment_text', 'ct_get_comment_text');   // param - current comment text
     add_filter('unspam_comment', 'ct_unspam_comment');
 }
-
 
 /**
  * Inner function - Current Cleantalk options
@@ -48,7 +48,7 @@ function ct_get_options() {
  */
 function ct_def_options() {
     return array(
-        'stopwords' => '1',
+        'stopwords' => '0',
         'allowlinks' => '0',
         'language' => 'en',
         'server' => 'http://moderate.cleantalk.ru',
@@ -136,11 +136,6 @@ function ct_delete_comment_meta($comment_id) {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = 0) {
-    ?>
-    <a target="__blank" href="http://cleantalk.ru/wordpress" style="font-size: 8pt;">
-        <b style="color: #009900;">Clean</b><b style="color: #777;">Talk</b>
-    </a>
-    <?
     if (ct_is_user_enable() === false) {
             return false;
         }
@@ -289,7 +284,7 @@ function ct_check($comment) {
 
     if ($ct_result->blacklisted > 0 || $ct_result->fast_submit == 1 ||
             $ct_result->js_disabled == 1) {
-        $err_text = '<center><b style="color: #009900;">Clean</b><b style="color: #777;">Talk.</b> ' . __('Spam prevent plugin', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
+        $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
         wp_die($err_text, 'Blacklisted', array('back_link' => TRUE));
     } else {
@@ -318,12 +313,12 @@ function ct_check($comment) {
 /**
  * Set die page with Cleantalk comment.
  * @global type $ct_comment
- * @param type $comment_id
+    $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
  * @param type $comment_status
  */
 function ct_die($comment_id, $comment_status) {
     global $ct_comment;
-    $err_text = '<center><b style="color: #009900;">Clean</b><b style="color: #777;">Talk.</b> ' . __('Spam prevent plugin', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
+    $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
         wp_die($err_text, 'Blacklisted', array('back_link' => TRUE));
 }
@@ -456,7 +451,7 @@ function ct_enqueue_scripts($hook) {
  * Admin action 'admin_menu' - Add the admin options page
  */
 function ct_admin_add_page() {
-    add_options_page(__('CleanTalk settings', 'cleantalk'), '<b style="color: #009900;">Clean</b><b style="color: #777;">Talk</b>. Spam prevent plugin', 'manage_options', 'cleantalk', 'ct_settings_page');
+    add_options_page(__('CleanTalk settings', 'cleantalk'), '<b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>. Spam protection', 'manage_options', 'cleantalk', 'ct_settings_page');
 }
 
 /**
@@ -466,14 +461,11 @@ function ct_admin_init() {
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
 
     add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
-    add_settings_section('cleantalk_settings_server', __('Server settings', 'cleantalk'), 'ct_section_settings_server', 'cleantalk');
 
     add_settings_field('cleantalk_stopwords', __('Stop words checking', 'cleantalk'), 'ct_input_stopwords', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_allowlinks', __('Allow links', 'cleantalk'), 'ct_input_allowlinks', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_language', __('System messages language', 'cleantalk'), 'ct_input_language', 'cleantalk', 'cleantalk_settings_main');
 
-    add_settings_field('cleantalk_server', __('<b style="color: #009900;">Clean</b><b style="color: #777;">Talk</b> server URL', 'cleantalk'), 'ct_input_server', 'cleantalk', 'cleantalk_settings_server');
-    add_settings_field('cleantalk_apikey', __('Autorization key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_server');
+    add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
 }
 
 /**
@@ -484,21 +476,14 @@ function ct_section_settings_main() {
 }
 
 /**
- * Admin callback function - Displays description of 'server' plugin parameters section
- */
-function ct_section_settings_server() {
-
-}
-
-/**
  * Admin callback function - Displays inputs of 'stopwords' plugin parameter
  */
 function ct_input_stopwords() {
     $options = ct_get_options();
     $value = $options['stopwords'];
-    echo "<input type='radio' id='cleantalk_stopwords0' name='cleantalk_settings[stopwords]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_stopwords0'>" . __('No') . "</label>";
+    echo "<input type='radio' id='cleantalk_stopwords0' name='cleantalk_settings[stopwords]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_stopwords0'> " . __('No') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_stopwords1' name='cleantalk_settings[stopwords]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_stopwords1'>" . __('Yes') . "</label>";
+    echo "<input type='radio' id='cleantalk_stopwords1' name='cleantalk_settings[stopwords]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_stopwords1'> " . __('Yes') . "</label>";
 }
 
 /**
@@ -507,9 +492,9 @@ function ct_input_stopwords() {
 function ct_input_allowlinks() {
     $options = ct_get_options();
     $value = $options['allowlinks'];
-    echo "<input type='radio' id='cleantalk_allowlinks0' name='cleantalk_settings[allowlinks]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_allowlinks0'>" . __('No') . "</label>";
+    echo "<input type='radio' id='cleantalk_allowlinks0' name='cleantalk_settings[allowlinks]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_allowlinks0'> " . __('No') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_allowlinks1' name='cleantalk_settings[allowlinks]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_allowlinks1'>" . __('Yes') . "</label>";
+    echo "<input type='radio' id='cleantalk_allowlinks1' name='cleantalk_settings[allowlinks]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_allowlinks1'> " . __('Yes') . "</label>";
 }
 
 /**
@@ -518,18 +503,9 @@ function ct_input_allowlinks() {
 function ct_input_language() {
     $options = ct_get_options();
     $value = $options['language'];
-    echo "<input type='radio' id='cleantalk_language0' name='cleantalk_settings[language]' value='en' " . ($value == 'en' ? 'checked' : '') . " /><label for='cleantalk_language0'>" . __('English', 'cleantalk') . "</label>";
+    echo "<input type='radio' id='cleantalk_language0' name='cleantalk_settings[language]' value='en' " . ($value == 'en' ? 'checked' : '') . " /><label for='cleantalk_language0'> " . __('English', 'cleantalk') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_language1' name='cleantalk_settings[language]' value='ru' " . ($value == 'ru' ? 'checked' : '') . " /><label for='cleantalk_language1'>" . __('Russian', 'cleantalk') . "</label>";
-}
-
-/**
- * Admin callback function - Displays inputs of 'server' plugin parameter
- */
-function ct_input_server() {
-    $options = ct_get_options();
-    $value = $options['server'];
-    echo "<input id='cleantalk_server' name='cleantalk_settings[server]' size='50' type='text' value='$value' />";
+    echo "<input type='radio' id='cleantalk_language1' name='cleantalk_settings[language]' value='ru' " . ($value == 'ru' ? 'checked' : '') . " /><label for='cleantalk_language1'> " . __('Russian', 'cleantalk') . "</label>";
 }
 
 /**
@@ -556,14 +532,14 @@ function ct_settings_validate($input) {
 function ct_settings_page() {
     ?>
     <div>
-        <h2><b style="color: #009900;">Clean</b><b style="color: #777;">Talk</b>. Spam prevent plugin
+        <h2><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>. Spam protection 
 
         </h2>
         <form action="options.php" method="post">
             <?php settings_fields('cleantalk_settings'); ?>
             <?php do_settings_sections('cleantalk'); ?>
             <br>
-            <a target='__blank' href='https://cleantalk.ru/install/wordpress?step=2'><?php _e('Click here to get autorization key', 'cleantalk'); ?></a>
+            <a target='__blank' href='http://cleantalk.org/install/wordpress?step=2'><?php _e('Click here to get access key', 'cleantalk'); ?></a>
             <br>
             <br>
             <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
@@ -602,4 +578,36 @@ function ct_unmark_red($message) {
 
     return $message;
 }
+
+/**
+ * Notice blog owner if plugin using without Access key 
+ * @return bool 
+ */
+function admin_notice_message(){    
+
+	if (ct_active() === false)
+		return false;
+
+    $options = ct_get_options();
+	if ($options['apikey'] === 'enter key' || $options['apikey'] === '')
+		echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
+	
+	return true;
+}
+
+/**
+	* Tests plugin activation status
+	* @return bool 
+*/
+
+function ct_active(){
+	$ct_active = false;
+	foreach (get_option('active_plugins') as $k => $v) {
+	if (preg_match("/cleantalk.php$/", $v))
+		$ct_active = true;
+	}
+
+	return $ct_active;
+}
+
 ?>

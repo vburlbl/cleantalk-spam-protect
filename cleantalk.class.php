@@ -292,7 +292,7 @@ class Cleantalk {
             $response = new CleantalkResponse(
                             array(
                                 'allow' => 0,
-                                'comment' => 'Params error: ' . implode(', ', $error_params)
+                                'comment' => 'Cleantalk. Spam protect. Request params error: ' . implode(', ', $error_params)
                             ), null);
 
             return $response;
@@ -314,7 +314,7 @@ class Cleantalk {
             $response = new CleantalkResponse(
                             array(
                                 'allow' => 0,
-                                'comment' => 'Params error: ' . implode(', ', $error_params)
+                                'comment' => 'Cleantalk. Spam protect. Request params error: ' . implode(', ', $error_params)
                             ), null);
 
             return $response;
@@ -337,7 +337,7 @@ class Cleantalk {
             $response = new CleantalkResponse(
                             array(
                                 'allow' => 0,
-                                'comment' => 'Params error: ' . implode(', ', $error_params)
+                                'comment' => 'Cleantalk. Spam protect. Request params error: ' . implode(', ', $error_params)
                             ), null);
 
             return $response;
