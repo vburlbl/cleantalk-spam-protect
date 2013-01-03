@@ -1,15 +1,14 @@
 <?php
-error_reporting(E_ALL);
 /*
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
   Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
-  Version: 1.3.3
+  Version: 1.3.4
   Author: СleanTalk team
   Author URI: http://cleantalk.org
  */
 
-// Сleantalk team (shagimuratov@cleantalk.ru), coder Alexey Znaev (znaeff@mail.ru)
+// Сleantalk team noc@cleantalk.ru
 
 add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
@@ -261,7 +260,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->example = $baseText . "\n\n\n\n" . $prevComments;
-    $ct_request->agent = 'wordpress-122';
+    $ct_request->agent = 'wordpress-134';
     $ct_request->url = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];

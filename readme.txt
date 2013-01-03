@@ -5,7 +5,7 @@ Requires at least: 3.1.2
 Tested up to: 3.5
 Stable tag: trunk
 
-CleanTalk plugin v1.3.3. Spam protection of the blog comments
+CleanTalk plugin v1.3.4. Spam protection of the blog comments
 
 == Description ==
 
@@ -53,6 +53,9 @@ Because CleanTalk approves relevant and not spam comments.
 2. Cleantalk admin panel
 
 == Changelog ==
+
+= 1.3.4 =
+Removed PHP debugging.
 
 = 1.3.3 =
 Added notice at admin panel about empty Access key in plugin settings
