@@ -3,7 +3,7 @@
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
   Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
-  Version: 1.3.4
+  Version: 1.4.4
   Author: СleanTalk team
   Author URI: http://cleantalk.org
  */
@@ -47,7 +47,7 @@ function ct_get_options() {
  */
 function ct_def_options() {
     return array(
-        'stopwords' => '0',
+        'stopwords' => '1',
         'allowlinks' => '0',
         'language' => 'en',
         'server' => 'http://moderate.cleantalk.ru',
@@ -209,13 +209,8 @@ function ct_check($comment) {
     $comment_post_id = $comment['comment_post_ID'];
 
     $post = get_post($comment_post_id);
-    $baseText = ($post !== NULL) ? $post->post_content : '';
-    $baseText = ($post->post_title !== NULL) ? $post->post_title . ' ' . $baseText : $baseText;
-
-    $prevComments = $wpdb->get_col("SELECT comment_content FROM $wpdb->comments WHERE comment_post_ID = '$comment_post_id' AND comment_approved = 1 ORDER BY comment_id DESC LIMIT 10", 0);
-    $prevComments = implode("\n\n", $prevComments);
-
-    $checkjs = (int) substr($_POST['ct_checkjs'], 0, 1);
+    
+	$checkjs = (int) substr($_POST['ct_checkjs'], 0, 1);
     if ($checkjs !== 0 && $checkjs !== 1)
         $checkjs = 0;
 
@@ -230,17 +225,53 @@ function ct_check($comment) {
     }
 
     $user_info = '';
+	$post_info = '';
+	$example = null;
     if (function_exists('json_encode')) {
         $blog_lang = substr(get_locale(), 0, 2);
         $arr = array(
             'cms_lang' => $blog_lang,
             'REFFERRER' => @$_SERVER['HTTP_REFFERRER'],
-            'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT']
+            'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
+			'sender_url' => $comment['comment_author_url'],
         );
         $user_info = json_encode($arr);
         if ($user_info === FALSE)
             $user_info = '';
+			
+		$arr = array();
+		$arr['comment_type'] = $comment['comment_type']; 
+		
+		$last_comment = get_comments('number=1');
+		$new_comment_ID = isset($last_comment[0]->comment_ID) ? (int) $last_comment[0]->comment_ID + 1 : 1;
+		
+		$permalink = get_permalink($comment_post_id) !== NULL ? get_permalink($comment_post_id) : null;
+		
+		$arr['post_url'] = $permalink !== NULL ? $permalink . '#comment-' . $new_comment_ID : null; 
+
+		$post_info = json_encode($arr);
+        if ($post_info === FALSE)
+			$post_info = '';
+		
+		if ($post !== NULL){
+			$example['title'] = $post->post_title;
+			$example['body'] = $post->post_content;
+			$example['comments'] = null; 
+			
+			$last_comments = get_comments(array('status' => 'approve', 'number' >= 10, 'post_id' => $comment_post_id));
+			foreach ($last_comments as $post_comment){
+				$example['comments'] .= "\n\n" . $post_comment->comment_content;
+			}
+
+			$example = json_encode($example);
+		}
     }
+	
+	// Use plain string format if've failed with JSON
+	if ($example === FALSE || $example === NULL){
+		$example = ($post !== NULL) ? $post->post_content : '';
+		$example = ($post->post_title !== NULL) ? $post->post_title . ' ' . $baseText : $baseText;
+	}
 
     require_once('cleantalk.class.php');
     $options = ct_get_options();
@@ -256,18 +287,19 @@ function ct_check($comment) {
     $ct_request = new CleantalkRequest();
 
     $ct_request->auth_key = $options['apikey'];
-    $ct_request->message = $comment['comment_content'] . "\n\n" . $comment['comment_author_url'];
+    $ct_request->message = $comment['comment_content'];
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
-    $ct_request->example = $baseText . "\n\n\n\n" . $prevComments;
-    $ct_request->agent = 'wordpress-134';
-    $ct_request->url = $user_info;
+    $ct_request->example = $example; 
+    $ct_request->agent = 'wordpress-144';
+    $ct_request->sender_info = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];
     $ct_request->response_lang = $options['language'];
     $ct_request->allow_links = $options['allowlinks'];
     $ct_request->submit_time = $submit_time;
     $ct_request->js_on = $checkjs;
+    $ct_request->post_info = $post_info;
 
     $ct_result = $ct->isAllowMessage($ct_request);
 

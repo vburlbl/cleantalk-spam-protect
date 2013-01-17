@@ -3,7 +3,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.6
+ * @version 0.7
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (shagimuratov@cleantalk.ru)
@@ -153,10 +153,10 @@ class CleantalkRequest {
     public $agent = null;
 
     /**
-     * Page url
+     * Sender info JSON string 
      * @var string
      */
-    public $url = null;
+    public $sender_info = null;
 
     /**
      * Is check for stoplist,
@@ -189,6 +189,12 @@ class CleantalkRequest {
      * @var string
      */
     public $sender_nickname = null;
+
+	/**
+     * Post info JSON string
+     * @var string
+     */
+    public $post_info = null;
 
     /**
      * Is allow links, email and icq,
@@ -358,7 +364,7 @@ class Cleantalk {
         // general
         foreach ($request as $param => $value) {
             if (in_array($param, array('message', 'example', 'agent',
-                        'url', 'sender_nickname', 'sender_id')) && !empty($value)) {
+                        'sender_info', 'sender_nickname', 'post_info')) && !empty($value)) {
                 if (!is_string($value) && !is_integer($value)) {
                     $error_params[] = $param;
                 }
@@ -442,13 +448,13 @@ class Cleantalk {
                     'base_text' => $request->example,
                     'auth_key' => $request->auth_key,
                     'engine' => $request->agent,
-                    'url' => $request->url,
+                    'sender_info' => $request->sender_info,
                     'ct_stop_words' => $request->stoplist_check,
                     'response_lang' => $request->response_lang,
                     'session_ip' => $request->sender_ip,
                     'user_email' => $request->sender_email,
                     'user_name' => $request->sender_nickname,
-                    'sender_id' => $this->getSenderId(),
+                    'ponst_info' => $request->post_info,
                     'ct_links' => $request->allow_links,
                     'submit_time' => $request->submit_time,
                     'checkjs' => $request->js_on);
@@ -577,23 +583,6 @@ class Cleantalk {
         }
 
         return $response;
-    }
-
-    /**
-     * Function to get the SenderID
-     * @return string
-     */
-    public function getSenderId() {
-        return ( isset($_COOKIE['ct_sender_id']) && !empty($_COOKIE['ct_sender_id']) ) ? $_COOKIE['ct_sender_id'] : '';
-    }
-
-    /**
-     * Function to change the SenderID
-     * @param $senderId
-     * @return bool
-     */
-    private function setSenderId($senderId) {
-        return @setcookie('ct_sender_id', $senderId);
     }
 
     /**
