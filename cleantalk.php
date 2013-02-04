@@ -3,7 +3,7 @@
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
   Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
-  Version: 1.4.4
+  Version: 1.5.4
   Author: СleanTalk team
   Author URI: http://cleantalk.org
  */
@@ -135,14 +135,17 @@ function ct_delete_comment_meta($comment_id) {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = 0) {
+    $conf = ct_get_options();
+    $ct_checkjs_def = 0;
+    $ct_checkjs_key = md5($conf['apikey'] . $_SERVER['REMOTE_ADDR']);
     if (ct_is_user_enable() === false) {
-            return false;
-        }
+        return false;
+    }
     ?>
     <input type="hidden" id="ct_checkjs" name="ct_checkjs" value="0">
     <script type="text/javascript">
         // <![CDATA[
-        document.getElementById("ct_checkjs").value = 1;
+        document.getElementById("ct_checkjs").value = document.getElementById("ct_checkjs").value.replace("<?php echo $ct_checkjs_def ?>", "<?php echo $ct_checkjs_key ?>");
         // ]]>
     </script>
     <?php
@@ -205,14 +208,20 @@ function ct_check($comment) {
     if (ct_is_user_enable() === false) {
         return $comment;
     }
+    $options = ct_get_options();
 
     $comment_post_id = $comment['comment_post_ID'];
 
     $post = get_post($comment_post_id);
     
-	$checkjs = (int) substr($_POST['ct_checkjs'], 0, 1);
-    if ($checkjs !== 0 && $checkjs !== 1)
+	$checkjs = $_POST['ct_checkjs'];
+    if (!isset($_POST['ct_checkjs'])) {
+        $checkjs = null;
+    } elseif($checkjs == md5($options['apikey'].$_SERVER['REMOTE_ADDR'])) {
+        $checkjs = 1;
+    } elseif ($checkjs !== 0) {
         $checkjs = 0;
+    }
 
     session_name('cleantalksession');
     if (!isset($_SESSION)) {
@@ -231,7 +240,7 @@ function ct_check($comment) {
         $blog_lang = substr(get_locale(), 0, 2);
         $arr = array(
             'cms_lang' => $blog_lang,
-            'REFFERRER' => @$_SERVER['HTTP_REFFERRER'],
+            'REFFERRER' => @$_SERVER['HTTP_REFERER'],
             'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
 			'sender_url' => $comment['comment_author_url'],
         );
@@ -269,12 +278,11 @@ function ct_check($comment) {
 	
 	// Use plain string format if've failed with JSON
 	if ($example === FALSE || $example === NULL){
-		$example = ($post !== NULL) ? $post->post_content : '';
-		$example = ($post->post_title !== NULL) ? $post->post_title . ' ' . $baseText : $baseText;
+		$example = ($post->post_title !== NULL) ? $post->post_title : '';
+		$example .= ($post->post_content !== NULL) ? "\n\n" . $post->post_content : '';
 	}
 
     require_once('cleantalk.class.php');
-    $options = ct_get_options();
 
     $config = get_option('cleantalk_server');
 
@@ -291,7 +299,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-144';
+    $ct_request->agent = 'wordpress-154';
     $ct_request->sender_info = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];
@@ -313,8 +321,7 @@ function ct_check($comment) {
         );
     }
 
-    if ($ct_result->blacklisted > 0 || $ct_result->fast_submit == 1 ||
-            $ct_result->js_disabled == 1) {
+    if ($ct_result->stop_queue == 1) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
         wp_die($err_text, 'Blacklisted', array('back_link' => TRUE));
@@ -548,6 +555,7 @@ function ct_input_apikey() {
     $value = $options['apikey'];
     $def_value = $def_options['apikey'];
     echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' onfocus=\"if(this.value=='$def_value') this.value='';\"/>";
+    echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
 }
 
 /**
@@ -556,6 +564,7 @@ function ct_input_apikey() {
 function ct_settings_validate($input) {
     return $input;
 }
+
 
 /**
  * Admin callback function - Displays plugin options page
@@ -570,7 +579,6 @@ function ct_settings_page() {
             <?php settings_fields('cleantalk_settings'); ?>
             <?php do_settings_sections('cleantalk'); ?>
             <br>
-            <a target='__blank' href='http://cleantalk.org/install/wordpress?step=2'><?php _e('Click here to get access key', 'cleantalk'); ?></a>
             <br>
             <br>
             <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />

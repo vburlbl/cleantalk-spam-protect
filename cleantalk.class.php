@@ -1,27 +1,26 @@
 <?php
-
 /**
  * Cleantalk base class
  *
- * @version 0.7
+ * @version 0.12
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (shagimuratov@cleantalk.ru)
  * @copyright (C) 2011 - 2012 Сleantalk team (http://cleantalk.ru)
  * @license GNU/GPL: http://www.gnu.org/copyleft/gpl.html
+ * @see http://cleantalk.ru/wiki/doku.php/api
  *
- * */
-require(dirname(__FILE__) . '/cleantalk.xmlrpc.php');
+ */
+
+/**
+* @ignore
+*/
+require_once(dirname(__FILE__) . '/cleantalk.xmlrpc.php');
 
 /**
  * Response class
  */
 class CleantalkResponse {
-    /**
-     * Class version
-     */
-
-    const VERSION = '0.8';
 
     /**
      * Unique user ID
@@ -90,6 +89,36 @@ class CleantalkResponse {
     public $js_disabled = null;
 
     /**
+     * Sms check
+     * @var type 
+     */
+    public $sms_allow = null;
+
+    /**
+     * Sms code result
+     * @var type 
+     */
+    public $sms = null;
+	
+    /**
+     * Sms error code
+     * @var type 
+     */
+    public $sms_error_code = null;
+	
+    /**
+     * Sms error code
+     * @var type 
+     */
+    public $sms_error_text = null;
+    
+	/**
+     * Stop queue message, 1|0
+     * @var string
+     */
+    public $stop_queue = null;
+
+    /**
      * Create server response
      *
      * @param type $response
@@ -101,10 +130,12 @@ class CleantalkResponse {
                 $this->{$param} = $value;
             }
         } else {
-            // Разбираем xmlrpcresp ответ с клинтолка
             $this->errno = $obj->errno;
             $this->errstr = $obj->errstr;
 
+			$this->errstr = preg_replace("/.+(\*\*\*.+\*\*\*).+/", "$1", $this->errstr);
+
+            // Разбираем xmlrpcresp ответ с клинтолка
             if ($obj->val !== 0) {
                 $this->sender_id = (isset($obj->val['sender_id'])) ? $obj->val['sender_id'] : null;
                 $this->stop_words = isset($obj->val['stop_words']) ? $obj->val['stop_words'] : null;
@@ -115,6 +146,11 @@ class CleantalkResponse {
                 $this->fast_submit = (isset($obj->val['fast_submit'])) ? $obj->val['fast_submit'] : 0;
                 $this->spam = (isset($obj->val['spam'])) ? $obj->val['spam'] : 0;
                 $this->js_disabled = (isset($obj->val['js_disabled'])) ? $obj->val['js_disabled'] : 0;
+                $this->sms_allow = (isset($obj->val['sms_allow'])) ? $obj->val['sms_allow'] : null;
+                $this->sms = (isset($obj->val['sms'])) ? $obj->val['sms'] : null;
+                $this->sms_error_code = (isset($obj->val['sms_error_code'])) ? $obj->val['sms_error_code'] : null;
+                $this->sms_error_text = (isset($obj->val['sms_error_text'])) ? $obj->val['sms_error_text'] : null;
+                $this->stop_queue = (isset($obj->val['stop_queue'])) ? $obj->val['stop_queue'] : 0;
             }
         }
     }
@@ -125,8 +161,6 @@ class CleantalkResponse {
  * Request class
  */
 class CleantalkRequest {
-
-    const VERSION = '0.6';
 
     /**
      * User message
@@ -151,12 +185,6 @@ class CleantalkRequest {
      * @var string
      */
     public $agent = null;
-
-    /**
-     * Sender info JSON string 
-     * @var string
-     */
-    public $sender_info = null;
 
     /**
      * Is check for stoplist,
@@ -190,7 +218,13 @@ class CleantalkRequest {
      */
     public $sender_nickname = null;
 
-	/**
+    /**
+     * Sender info JSON string
+     * @var string
+     */
+    public $sender_info = null;
+
+    /**
      * Post info JSON string
      * @var string
      */
@@ -211,7 +245,11 @@ class CleantalkRequest {
 
     /**
      * Is enable Java Script,
-     * valid are 1|0
+     * valid are 0|1|2
+	 * Status:
+	 *  null - JS html code not inserted into phpBB templates
+	 *  0 - JS disabled at the client browser
+	 *  1 - JS enabled at the client broswer
      * @var int
      */
     public $js_on = null;
@@ -228,6 +266,12 @@ class CleantalkRequest {
      * @var string
      */
     public $feedback = null;
+
+    /**
+     * Phone number
+     * @var type 
+     */
+    public $phone = null;
 
     /**
      * Fill params with constructor
@@ -247,8 +291,6 @@ class CleantalkRequest {
  * Cleantalk class create request
  */
 class Cleantalk {
-
-    const VERSION = '0.8';
 
     /**
      * Debug level
@@ -285,6 +327,12 @@ class Cleantalk {
      * @var bool
      */
     public $server_change = false;
+
+    /**
+     * Use TRUE when need stay on server. Example: send feedback
+     * @var bool
+     */
+    public $stay_on_server = false;
 
     /**
      * Function checks whether it is possible to publish the message
@@ -361,17 +409,22 @@ class Cleantalk {
     private function filterRequest($method, CleantalkRequest $request) {
         $error_params = array();
 
-        // general
+        // general and optional
         foreach ($request as $param => $value) {
             if (in_array($param, array('message', 'example', 'agent',
-                        'sender_info', 'sender_nickname', 'post_info')) && !empty($value)) {
+                        'sender_info', 'sender_nickname', 'post_info', 'phone')) && !empty($value)) {
                 if (!is_string($value) && !is_integer($value)) {
                     $error_params[] = $param;
                 }
             }
 
-            if (in_array($param, array('stoplist_check', 'allow_links', 'js_on')) && !empty($value)) {
+            if (in_array($param, array('stoplist_check', 'allow_links')) && !empty($value)) {
                 if (!in_array($value, array(1, 2))) {
+                    $error_params[] = $param;
+                }
+            }
+            if (in_array($param, array('js_on')) && !empty($value)) {
+                if (!is_integer($value)) {
                     $error_params[] = $param;
                 }
             }
@@ -395,14 +448,11 @@ class Cleantalk {
             }
         }
 
-        // special
+        // special and must be
         switch ($method) {
             case 'check_message':
                 if (empty($request->message)) {
                     $error_params[] = 'message';
-                }
-                if (empty($request->auth_key)) {
-                    $error_params[] = 'auth_key';
                 }
                 if (!in_array($request->response_lang, array('ru', 'en'))) {
                     $error_params[] = 'response_lang';
@@ -410,9 +460,6 @@ class Cleantalk {
                 break;
 
             case 'check_newuser':
-                if (empty($request->auth_key)) {
-                    $error_params[] = 'auth_key';
-                }
                 if (empty($request->sender_nickname)) {
                     $error_params[] = 'sender_nickname';
                 }
@@ -447,30 +494,32 @@ class Cleantalk {
                     'message' => $request->message,
                     'base_text' => $request->example,
                     'auth_key' => $request->auth_key,
-                    'engine' => $request->agent,
+                    'agent' => $request->agent,
                     'sender_info' => $request->sender_info,
                     'ct_stop_words' => $request->stoplist_check,
                     'response_lang' => $request->response_lang,
                     'session_ip' => $request->sender_ip,
                     'user_email' => $request->sender_email,
                     'user_name' => $request->sender_nickname,
-                    'ponst_info' => $request->post_info,
+                    'post_info' => $request->post_info,
                     'ct_links' => $request->allow_links,
                     'submit_time' => $request->submit_time,
-                    'checkjs' => $request->js_on);
+                    'js_on' => $request->js_on);
                 break;
 
             case 'check_newuser':
                 $params = array(
-                    'auth_key' => $request->auth_key, // !
-                    'engine' => $request->agent,
+                    'auth_key' => $request->auth_key,
+                    'agent' => $request->agent,
                     'response_lang' => $request->response_lang,
                     'session_ip' => $request->sender_ip,
                     'user_email' => $request->sender_email,
                     'user_name' => $request->sender_nickname,
                     'tz' => $request->tz,
                     'submit_time' => $request->submit_time,
-                    'checkjs' => $request->js_on);
+                    'js_on' => $request->js_on,
+                    'phone' => $request->phone,
+                    'sender_info' => $request->sender_info);
                 break;
 
             case 'send_feedback':
@@ -505,16 +554,18 @@ class Cleantalk {
      * @return boolean|\CleantalkResponse
      */
     private function xmlRequest(xmlrpcmsg $msg) {
-        if ((isset($this->work_url) && $this->work_url !== '') && ($this->server_changed + $this->server_ttl > time())) {
-            $ct_request = new xmlrpc_client($this->work_url);
+        if (((isset($this->work_url) && $this->work_url !== '') && ($this->server_changed + $this->server_ttl > time()))
+				|| $this->stay_on_server == true) {
+	    $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
+            $ct_request = new xmlrpc_client($url);
             $ct_request->request_charset_encoding = 'utf-8';
             $ct_request->return_type = 'phpvals';
             $ct_request->setDebug($this->debug);
-
+					
             $result = $ct_request->send($msg);
         }
 
-        if (!isset($result)) {
+        if (empty($result) && $this->stay_on_server == false) {
             $matches = array();
             preg_match("#^(http://|https://)([a-z\.\-0-9]+):?(\d*)$#i", $this->server_url, $matches);
             $url_prefix = $matches[1];
@@ -534,6 +585,7 @@ class Cleantalk {
                     $work_url = ($port !== '') ? $work_url . ':' . $port : $work_url;
 
                     $this->work_url = $work_url;
+                    $this->ttl = $server['ttl'];
                     $ct_request = new xmlrpc_client($this->work_url);
                     $ct_request->request_charset_encoding = 'utf-8';
                     $ct_request->return_type = 'phpvals';
@@ -583,6 +635,23 @@ class Cleantalk {
         }
 
         return $response;
+    }
+
+    /**
+     * Function to get the SenderID
+     * @return string
+     */
+    public function getSenderId() {
+        return ( isset($_COOKIE['ct_sender_id']) && !empty($_COOKIE['ct_sender_id']) ) ? $_COOKIE['ct_sender_id'] : '';
+    }
+
+    /**
+     * Function to change the SenderID
+     * @param $senderId
+     * @return bool
+     */
+    private function setSenderId($senderId) {
+        return @setcookie('ct_sender_id', $senderId);
     }
 
     /**

@@ -6,7 +6,7 @@ License: GPLv2
 Tested up to: 3.5
 Stable tag: trunk
 
-Spam protection of the WordPress blog comments
+Spam protection of the WordPress comments
 
 == Description ==
 
@@ -28,10 +28,7 @@ All features ot the plugin
 1. Stop comments with swear, negative words.
 1. Automatic approval not spam comments.
 
-This plugin is a client application for spam protection service cleantalk.org. This service use a thousands
-blogs, forums and community sites in the World.
-
-It is free to use for small and medium sized blogs.
+This plugin is a client application for spam protection service cleantalk.org. It is free to use for small and medium sized blogs.
 
 = Translation =
 
@@ -54,6 +51,11 @@ Because CleanTalk automatically approves relevant, not spam comments.
 2. Cleantalk admin panel
 
 == Changelog ==
+
+= 1.5.4 =
+  * Fixed HTTP_REFERER transmition to the servers 
+  * Improved JavaScript spam test
+  * Optimized PHP code
 
 = 1.4.4 =
   * Pingback, trackback comments has moved to manual moderataion
