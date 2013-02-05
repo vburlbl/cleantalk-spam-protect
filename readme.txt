@@ -1,9 +1,9 @@
 === Plugin Name ===
-Contributors: znaeff, default.asp, shagimuratov
+Contributors: znaeff, default.asp, shagimuratov, aleontiev
 Tags: comments, spam, blocking, automoderation, autopublication, cleantalk, anti-spam, captcha, comment, performance, approve
 Requires at least: 3.1.2
 License: GPLv2 
-Tested up to: 3.5
+Tested up to: 3.5.1
 Stable tag: trunk
 
 Spam protection of the WordPress comments
