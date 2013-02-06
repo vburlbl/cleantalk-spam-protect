@@ -1,28 +1,29 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: comments, spam, blocking, automoderation, autopublication, cleantalk, anti-spam, captcha, comment, performance, approve
+Tags: comments, spam, blocking, automoderation, autopublication, cleantalk, anti-spam, captcha, comment, performance, approve, blog, spambot, recaptcha
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.5.1
 Stable tag: trunk
 
-Spam protection of the WordPress comments
+Spam protection of the WordPress comments. With CleanTalk you can remove a CAPTCHA and forget about spam in the blog
 
 == Description ==
 
-This plugin use several simple tests to stop spam in comments. For example,
+Plugin use several simple tests to stop spam in comments.
 
-1. Blacklists checks by Email, IP in lists with several billions records,
-1. Javascript availability,
+1. Blacklists checks by Email, IP in lists with several billions records.
+1. Javascript availability.
 1. Comment submit time.
+1. Relevance test for the comment.
+1. Spam templates in comments
 
 The plugin stops 99% spam in comments without move to yours trash or manual approval queue.
 
-Main feature of the plugin is an automatic approval realevant, not spam comments. Every new comment
+Main feature of the plugin is an automatic approval relevant, not spam comments. Every new comment
 plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-All features ot the plugin
-
+= All features ot the plugin =
 1. Stop spam in comments.
 1. Not using CAPTCHA.
 1. Stop comments with swear, negative words.
@@ -47,8 +48,8 @@ Because CleanTalk automatically approves relevant, not spam comments.
 
 == Screenshots ==
 
-1. Cleantalk in action
-2. Cleantalk admin panel
+1. CleanTalk stops spam comment
+1. CleanTalk settings to filter spam in the blog 
 
 == Changelog ==
 
