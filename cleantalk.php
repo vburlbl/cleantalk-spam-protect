@@ -3,7 +3,7 @@
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
   Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
-  Version: 1.5.4
+  Version: 2.0.1
   Author: СleanTalk team
   Author URI: http://cleantalk.org
  */
@@ -46,12 +46,14 @@ function ct_get_options() {
  * @return 	mixed[] Array of default options
  */
 function ct_def_options() {
+    $lang = get_bloginfo('language');
     return array(
         'stopwords' => '1',
         'allowlinks' => '0',
         'language' => 'en',
         'server' => 'http://moderate.cleantalk.ru',
-        'apikey' => __('enter key', 'cleantalk')
+        'apikey' => __('enter key', 'cleantalk'),
+        'autoPubRevelantMess' => '1' 
     );
 }
 
@@ -119,7 +121,7 @@ function ct_feedback($hash, $message, $allow) {
  * Public action 'init' - Inits locale
  */
 function ct_init_locale() {
-    load_plugin_textdomain('cleantalk', FALSE, basename(dirname(__FILE__)) . '/i18n');
+    load_plugin_textdomain('cleantalk', false, basename(dirname(__FILE__)) . '/i18n');
 }
 
 /**
@@ -230,7 +232,7 @@ function ct_check($comment) {
     if (array_key_exists('formtime', $_SESSION)) {
         $submit_time = time() - (int) $_SESSION['formtime'];
     } else {
-        $submit_time = NULL;
+        $submit_time = null;
     }
 
     $user_info = '';
@@ -245,7 +247,7 @@ function ct_check($comment) {
 			'sender_url' => $comment['comment_author_url'],
         );
         $user_info = json_encode($arr);
-        if ($user_info === FALSE)
+        if ($user_info === false)
             $user_info = '';
 			
 		$arr = array();
@@ -254,18 +256,18 @@ function ct_check($comment) {
 		$last_comment = get_comments('number=1');
 		$new_comment_ID = isset($last_comment[0]->comment_ID) ? (int) $last_comment[0]->comment_ID + 1 : 1;
 		
-		$permalink = get_permalink($comment_post_id) !== NULL ? get_permalink($comment_post_id) : null;
+		$permalink = get_permalink($comment_post_id) !== null ? get_permalink($comment_post_id) : null;
 		
-		$arr['post_url'] = $permalink !== NULL ? $permalink . '#comment-' . $new_comment_ID : null; 
+		$arr['post_url'] = $permalink !== null ? $permalink . '#comment-' . $new_comment_ID : null;
 
 		$post_info = json_encode($arr);
-        if ($post_info === FALSE)
+        if ($post_info === false)
 			$post_info = '';
 		
-		if ($post !== NULL){
+		if ($post !== null){
 			$example['title'] = $post->post_title;
 			$example['body'] = $post->post_content;
-			$example['comments'] = null; 
+			$example['comments'] = null;
 			
 			$last_comments = get_comments(array('status' => 'approve', 'number' >= 10, 'post_id' => $comment_post_id));
 			foreach ($last_comments as $post_comment){
@@ -277,9 +279,9 @@ function ct_check($comment) {
     }
 	
 	// Use plain string format if've failed with JSON
-	if ($example === FALSE || $example === NULL){
-		$example = ($post->post_title !== NULL) ? $post->post_title : '';
-		$example .= ($post->post_content !== NULL) ? "\n\n" . $post->post_content : '';
+	if ($example === false || $example === null){
+		$example = ($post->post_title !== null) ? $post->post_title : '';
+		$example .= ($post->post_content !== null) ? "\n\n" . $post->post_content : '';
 	}
 
     require_once('cleantalk.class.php');
@@ -299,7 +301,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-154';
+    $ct_request->agent = 'wordpress-201';
     $ct_request->sender_info = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];
@@ -324,10 +326,12 @@ function ct_check($comment) {
     if ($ct_result->stop_queue == 1) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
-        wp_die($err_text, 'Blacklisted', array('back_link' => TRUE));
+        wp_die($err_text, 'Blacklisted', array('back_link' => true));
     } else {
         ct_hash($ct_result->id);
-        if ($ct_result->allow == 0) {
+        if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
+            add_filter('pre_comment_approved', 'ct_set_approved');
+        } elseif($ct_result->allow == 0) {
             if (!empty($ct_result->stop_words)) {
                 global $ct_stop_words;
                 $ct_stop_words = $ct_result->stop_words;
@@ -358,7 +362,7 @@ function ct_die($comment_id, $comment_status) {
     global $ct_comment;
     $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
-        wp_die($err_text, 'Blacklisted', array('back_link' => TRUE));
+        wp_die($err_text, 'Blacklisted', array('back_link' => true));
 }
 /**
  * Public filter 'pre_comment_approved' - Mark comment unapproved always
@@ -366,6 +370,15 @@ function ct_die($comment_id, $comment_status) {
  */
 function ct_set_not_approved() {
     return 0;
+}
+
+/**
+ * @author Artem Leontiev
+ * Public filter 'pre_comment_approved' - Mark comment approved always
+ * @return 	int 1
+ */
+function ct_set_approved() {
+    return 1;
 }
 
 /**
@@ -397,12 +410,12 @@ function ct_set_meta($comment_id, $comment_status) {
  */
 function ct_comment_approved($comment_object) {
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
-    $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', TRUE);
+    $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
     $comment['comment_content'] = ct_unmark_red($comment['comment_content']);
     $comment['comment_content'] = ct_feedback($hash, $comment['comment_content'], 1);
     $comment['comment_approved'] = 1;
     wp_update_comment($comment);
-    return TRUE;
+    return true;
 }
 
 /**
@@ -412,11 +425,11 @@ function ct_comment_approved($comment_object) {
  */
 function ct_comment_unapproved($comment_object) {
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
-    $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', TRUE);
+    $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
     ct_feedback($hash, $comment['comment_content'], 0);
     $comment['comment_approved'] = 0;
     wp_update_comment($comment);
-    return TRUE;
+    return true;
 }
 
 /**
@@ -426,11 +439,11 @@ function ct_comment_unapproved($comment_object) {
  */
 function ct_comment_spam($comment_object) {
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
-    $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', TRUE);
+    $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
     ct_feedback($hash, $comment['comment_content'], 0);
     $comment['comment_approved'] = 'spam';
     wp_update_comment($comment);
-    return TRUE;
+    return true;
 }
 
 
@@ -441,7 +454,7 @@ function ct_comment_spam($comment_object) {
 function ct_unspam_comment($comment_id) {
     update_comment_meta($comment_id, '_wp_trash_meta_status', 1);
     $comment = get_comment($comment_id, 'ARRAY_A');
-    $hash = get_comment_meta($comment_id, 'ct_hash', TRUE);
+    $hash = get_comment_meta($comment_id, 'ct_hash', true);
     $comment['comment_content'] = ct_unmark_red($comment['comment_content']);
     $comment['comment_content'] = ct_feedback($hash, $comment['comment_content'], 1);
     wp_update_comment($comment);
@@ -454,9 +467,9 @@ function ct_unspam_comment($comment_id) {
  */
 function ct_comment_trash($comment_id) {
     $comment = get_comment($comment_id, 'ARRAY_A');
-    $hash = get_comment_meta($comment_id, 'ct_hash', TRUE);
+    $hash = get_comment_meta($comment_id, 'ct_hash', true);
     ct_feedback($hash, $comment['comment_content'], 0);
-    return TRUE;
+    return true;
 }
 
 /**
@@ -468,7 +481,7 @@ function ct_get_comment_text($current_text) {
     global $comment;
     $new_text = $current_text;
     if (isset($comment) && is_object($comment)) {
-        $hash = get_comment_meta($comment->comment_ID, 'ct_hash', TRUE);
+        $hash = get_comment_meta($comment->comment_ID, 'ct_hash', true);
         if (!empty($hash)) {
             $new_text .= '<hr>Cleantalk ID = ' . $hash;
         }
@@ -497,12 +510,10 @@ function ct_admin_add_page() {
  */
 function ct_admin_init() {
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
-
     add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
-
     add_settings_field('cleantalk_stopwords', __('Stop words checking', 'cleantalk'), 'ct_input_stopwords', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_language', __('System messages language', 'cleantalk'), 'ct_input_language', 'cleantalk', 'cleantalk_settings_main');
-
+    add_settings_field('cleantalk_autoPubRevelantMess', __('Publicate relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
 }
 
@@ -522,6 +533,22 @@ function ct_input_stopwords() {
     echo "<input type='radio' id='cleantalk_stopwords0' name='cleantalk_settings[stopwords]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_stopwords0'> " . __('No') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_stopwords1' name='cleantalk_settings[stopwords]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_stopwords1'> " . __('Yes') . "</label>";
+    admin_addDescriptionsFields(__('Comments with rude and swear words will be moved to manual moderation.', 'cleantalk'));
+}
+
+/**
+ * @author Artem Leontiev
+ * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
+ *
+ * @return null
+ */
+function ct_input_autoPubRevelantMess () {
+    $options = ct_get_options();
+    $value = $options['autoPubRevelantMess'];
+    echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
+    admin_addDescriptionsFields(__('Relevant comments will be automatic publicated at the blog.', 'cleantalk'));
 }
 
 /**
@@ -544,6 +571,7 @@ function ct_input_language() {
     echo "<input type='radio' id='cleantalk_language0' name='cleantalk_settings[language]' value='en' " . ($value == 'en' ? 'checked' : '') . " /><label for='cleantalk_language0'> " . __('English', 'cleantalk') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_language1' name='cleantalk_settings[language]' value='ru' " . ($value == 'ru' ? 'checked' : '') . " /><label for='cleantalk_language1'> " . __('Russian', 'cleantalk') . "</label>";
+    admin_addDescriptionsFields(__('This language will be used to notice blogs owner and commentators.', 'cleantalk'));
 }
 
 /**
@@ -632,6 +660,15 @@ function admin_notice_message(){
 		echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
 	
 	return true;
+}
+
+/**
+ * @author Artem Leontiev
+ *
+ * Add descriptions for field
+ */
+function admin_addDescriptionsFields($descr = '') {
+    echo "<p style='color: #666 !important'>$descr</p>";
 }
 
 /**

@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: comments, spam, blocking, automoderation, autopublication, cleantalk, anti-spam, captcha, comment, performance, approve, blog, spambot, recaptcha
+Tags: comments, spam, blocking, filter, autopublication, cleantalk, anti-spam, antispam, captcha, comment, approve, spambot, recaptcha
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.5.1
@@ -11,9 +11,8 @@ Spam protection of the WordPress comments. With CleanTalk you can remove a CAPTC
 == Description ==
 
 Plugin use several simple tests to stop spam in comments.
-
 1. Blacklists checks by Email, IP in lists with several billions records.
-1. Javascript availability.
+1. JavaScript availability.
 1. Comment submit time.
 1. Relevance test for the comment.
 1. Spam templates in comments
@@ -44,23 +43,29 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 = Why do I need one more anti-spam plugin? =
 
-Because CleanTalk automatically approves relevant, not spam comments.
+1. This plugin use several tests to filter spam, that's why it have the best performance.
+1. CleanTalk automatically approves relevant, not spam comments.
 
 == Screenshots ==
 
 1. CleanTalk stops spam comment
 1. CleanTalk settings to filter spam in the blog 
+1. Service Control panel at cleantalk.org 
 
 == Changelog ==
 
+= 2.0.1 =
+  * Added option "Publicate relevant comments" to plugin's options. 
+  * Added descriptions to plugin options
+
 = 1.5.4 =
-  * Fixed HTTP_REFERER transmition to the servers 
+  * Fixed HTTP_REFERER transmission to the servers 
   * Improved JavaScript spam test
   * Optimized PHP code
 
 = 1.4.4 =
   * Pingback, trackback comments has moved to manual moderataion
-  * Added transmition to the serves comment type and URL
+  * Added transmission to the serves comment type and URL
   * Post title, body and comments separated into individual data elements
   * Added priority for matched words in the comment with post title
   * Enabled stop words filtration as default option 
@@ -79,16 +84,16 @@ Because CleanTalk automatically approves relevant, not spam comments.
 
 = 1.2.2 =
   * Plugin rename to CleanTalk. Spam prevent plugin
-  * Integration Base Class verion 0.7
+  * Integration Base Class version 0.7
   * Added fast submit check
   * Added check website in form
-  * Added fedbacks for change comment status (Not spam, unapprove)
-  * Added function move comment in spam folder if Cleantalk say is spam
+  * Added feedbacks for change comment status (Not spam, unapprove)
+  * Added function move comment in spam folder if CleanTalk say is spam
   * Disable checking for user groups Administrator, Author, Editor
   * Marked red color bad words
 
 = 1.1.2 =
-  * Addition: Titile of the post attached to the example text in auto publication tool.
+  * Addition: Title of the post attached to the example text in auto publication tool.
   * Tested with WordPress 3.4.1.
 
 = 1.1.1 =
@@ -103,7 +108,7 @@ Because CleanTalk automatically approves relevant, not spam comments.
 == Upgrade Notice ==
 
 = 1.1.2 =
-* Addition: Titile of the post attached to the example text in auto publication tool.
+* Addition: Title of the post attached to the example text in auto publication tool.
 * Tested with WordPress 3.4.1.
 
 = 1.1.1 =
