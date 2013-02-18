@@ -10,7 +10,7 @@ Spam protection of the WordPress comments. With CleanTalk you can remove a CAPTC
 
 == Description ==
 
- Plugin use several simple tests to stop spam in comments
+Plugin use several simple tests to stop spam in comments
 
 1. Blacklists checks by Email, IP in lists with several billions records.
 1. JavaScript availability.
