@@ -3,7 +3,7 @@
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
   Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
-  Version: 2.0.1
+  Version: 2.0.2
   Author: СleanTalk team
   Author URI: http://cleantalk.org
  */
@@ -139,7 +139,8 @@ function ct_delete_comment_meta($comment_id) {
 function ct_add_hidden_fields($post_id = 0) {
     $conf = ct_get_options();
     $ct_checkjs_def = 0;
-    $ct_checkjs_key = md5($conf['apikey'] . $_SERVER['REMOTE_ADDR']);
+    $ct_checkjs_key = md5($conf['apikey']);
+        
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -216,12 +217,12 @@ function ct_check($comment) {
 
     $post = get_post($comment_post_id);
     
-	$checkjs = $_POST['ct_checkjs'];
+	$checkjs = null; 
     if (!isset($_POST['ct_checkjs'])) {
         $checkjs = null;
-    } elseif($checkjs == md5($options['apikey'].$_SERVER['REMOTE_ADDR'])) {
+    } elseif($_POST['ct_checkjs'] == md5($options['apikey'])) {
         $checkjs = 1;
-    } elseif ($checkjs !== 0) {
+    } elseif ($_POST['ct_checkjs'] !== 0) {
         $checkjs = 0;
     }
 
@@ -301,7 +302,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-201';
+    $ct_request->agent = 'wordpress-202';
     $ct_request->sender_info = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];

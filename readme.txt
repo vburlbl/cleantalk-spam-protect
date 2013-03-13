@@ -55,6 +55,9 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 == Changelog ==
 
+= 2.0.2 =
+  * Fixed bug with JavaScript test and WordPress cache plugins 
+
 = 2.0.1 =
   * Added option "Publicate relevant comments" to plugin's options. 
   * Added descriptions to plugin options
