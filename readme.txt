@@ -20,8 +20,7 @@ Plugin use several simple tests to stop spam in comments
 
 The plugin stops 99% spam in comments without move to yours trash or manual approval queue.
 
-Main feature of the plugin is an automatic approval relevant, not spam comments. Every new comment
-plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+Main feature of the plugin is an automatic approval relevant, not spam comments. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 = All features ot the plugin =
 1. Stop spam in comments.
@@ -54,6 +53,11 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 1. Service Control panel at cleantalk.org 
 
 == Changelog ==
+
+= 2.1.2 =
+  * Improved perfomance for processing large comments (over 32kb size)
+  * Improved perfomance for bulk operations with comments in Comments panel 
+  * Added feedback request with URL to approved comment 
 
 = 2.0.2 =
   * Fixed bug with JavaScript test and WordPress cache plugins 

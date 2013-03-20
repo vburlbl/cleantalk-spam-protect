@@ -1,12 +1,12 @@
 <?php
 /**
- * Cleantalk base class
+ * CleanTalk base class
  *
- * @version 0.12
- * @package Cleantalk
+ * @version 0.14
+ * @package CleanTalk
  * @subpackage Base
- * @author Сleantalk team (shagimuratov@cleantalk.ru)
- * @copyright (C) 2011 - 2012 Сleantalk team (http://cleantalk.ru)
+ * @author СleanTalk team (welcome@cleantalk.ru)
+ * @copyright (C) 2011 - 2012 СleanTalk team (http://cleantalk.ru)
  * @license GNU/GPL: http://www.gnu.org/copyleft/gpl.html
  * @see http://cleantalk.ru/wiki/doku.php/api
  *
@@ -132,7 +132,7 @@ class CleantalkResponse {
         } else {
             $this->errno = $obj->errno;
             $this->errstr = $obj->errstr;
-
+			
 			$this->errstr = preg_replace("/.+(\*\*\*.+\*\*\*).+/", "$1", $this->errstr);
 
             // Разбираем xmlrpcresp ответ с клинтолка
@@ -151,7 +151,9 @@ class CleantalkResponse {
                 $this->sms_error_code = (isset($obj->val['sms_error_code'])) ? $obj->val['sms_error_code'] : null;
                 $this->sms_error_text = (isset($obj->val['sms_error_text'])) ? $obj->val['sms_error_text'] : null;
                 $this->stop_queue = (isset($obj->val['stop_queue'])) ? $obj->val['stop_queue'] : 0;
-            }
+            } else {
+                $this->comment = $this->errstr . '. Automoderator cleantalk.org';
+			}
         }
     }
 
@@ -298,6 +300,18 @@ class Cleantalk {
      */
     public $debug = 0;
 
+	/**
+	* Maximum data size in bytes
+	* @var int
+	*/
+	private $dataMaxSise = 32768;
+	
+	/**
+	* Data compression rate 
+	* @var int
+	*/
+	private $compressRate = 6;
+	
     /**
      * Cleantalk server url
      * @var string
@@ -451,26 +465,17 @@ class Cleantalk {
         // special and must be
         switch ($method) {
             case 'check_message':
-                if (empty($request->message)) {
-                    $error_params[] = 'message';
-                }
                 if (!in_array($request->response_lang, array('ru', 'en'))) {
                     $error_params[] = 'response_lang';
                 }
+				$request->message = $this->compressData($request->message);
+				$request->example = $this->compressData($request->example);
                 break;
-
             case 'check_newuser':
-                if (empty($request->sender_nickname)) {
-                    $error_params[] = 'sender_nickname';
-                }
-                if (empty($request->sender_email)) {
-                    $error_params[] = 'sender_email';
-                }
                 if (!in_array($request->response_lang, array('ru', 'en'))) {
                     $error_params[] = 'response_lang';
                 }
                 break;
-
             case 'send_feedback':
                 if (empty($request->feedback)) {
                     $error_params[] = 'feedback';
@@ -480,6 +485,31 @@ class Cleantalk {
 
         return $error_params;
     }
+    
+	/**
+     * Compress data and encode to base64 
+     * @param type string
+     * @return string 
+     */
+	private function compressData($data = null){
+		
+		if (strlen($data) > $this->dataMaxSise && function_exists('gzencode') && function_exists('base64_encode')){
+
+			$localData = gzencode($data, $this->compressRate, FORCE_GZIP);
+
+			if ($localData === false)
+				return $data;
+			
+			$localData = base64_encode($localData);
+			
+			if ($localData === false)
+				return $data;
+			
+			return $localData;
+		}
+
+		return $data;
+	} 
 
     /**
      * Create msg for cleantalk server
@@ -692,5 +722,22 @@ class Cleantalk {
     }
 
 }
+
+/*
+  Get user IP
+ */
+function ct_session_ip( $data_ip )
+{
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+        {
+                $forwarded_for = (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? htmlentities($_SERVER['HTTP_X_FORWARDED_FOR']) : '';
+        }
+
+        // 127.0.0.1 usually used at reverse proxy
+        $session_ip = ($data_ip == '127.0.0.1' && !empty($forwarded_for)) ? $forwarded_for : $data_ip;
+
+        return $session_ip;
+}
+
 
 ?>

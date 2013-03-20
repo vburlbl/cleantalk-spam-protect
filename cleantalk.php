@@ -3,7 +3,7 @@
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
   Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
-  Version: 2.0.2
+  Version: 2.1.2
   Author: СleanTalk team
   Author URI: http://cleantalk.org
  */
@@ -75,7 +75,7 @@ function ct_hash($new_hash = '') {
 }
 
 /**
- * Inner function - Sends the results of moderation and delete cleantalk resume
+ * Inner function - Write manual moderation results to PHP sessions 
  * @param 	string $hash Cleantalk comment hash
  * @param 	string $message comment_content
  * @param 	int $allow flag good comment (1) or bad (0)
@@ -84,7 +84,7 @@ function ct_hash($new_hash = '') {
 function ct_feedback($hash, $message, $allow) {
     require_once('cleantalk.class.php');
     $options = ct_get_options();
-
+	
     $config = get_option('cleantalk_server');
 
     $ct = new Cleantalk();
@@ -93,28 +93,64 @@ function ct_feedback($hash, $message, $allow) {
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
 
-    if (empty($hash)) {
-        $hash = $ct->getCleantalkCommentHash($message);
-    }
-    $resultMessage = $ct->delCleantalkComment($message);
+	if (empty($hash)) {
+		$hash = $ct->getCleantalkCommentHash($message);
+	}
+	$resultMessage = $ct->delCleantalkComment($message);
+	
+	$ct_feedback = $hash . ':' . $allow . ';';
+	if (empty($_SESSION['feedback_request'])) {
+		$_SESSION['feedback_request'] = $ct_feedback; 
+	} else {
+		$_SESSION['feedback_request'] .= $ct_feedback; 
+	}
+	
+	return $resultMessage;
+}
 
-    $ct_request = new CleantalkRequest();
-    $ct_request->auth_key = $options['apikey'];
-    $ct_request->feedback = $hash . ':' . $allow;
+/**
+ * Inner function - Sends the results of moderation
+ * @param string $feedback_request
+ * @return bool
+ */
+function ct_send_feedback($feedback_request = null) {
+	
+	if (empty($feedback_request) && isset($_SESSION['feedback_request']) && preg_match("/^[a-z0-9\;\:]+$/", $_SESSION['feedback_request'])) { 
+		$feedback_request = $_SESSION['feedback_request'];
+		unset($_SESSION['feedback_request']);
+	}
+	
+	if ($feedback_request !== null) {
+		require_once('cleantalk.class.php');
+		$options = ct_get_options();
+		
+		$config = get_option('cleantalk_server');
 
-    $ct->sendFeedback($ct_request);
+		$ct = new Cleantalk();
+		$ct->work_url = $config['ct_work_url'];
+		$ct->server_url = $options['server'];
+		$ct->server_ttl = $config['ct_server_ttl'];
+		$ct->server_changed = $config['ct_server_changed'];
 
-    if ($ct->server_change) {
-        update_option(
-                'cleantalk_server', array(
-            'ct_work_url' => $ct->work_url,
-            'ct_server_ttl' => $ct->server_ttl,
-            'ct_server_changed' => time()
-                )
-        );
-    }
+		$ct_request = new CleantalkRequest();
+		$ct_request->auth_key = $options['apikey'];
+		$ct_request->feedback = $feedback_request;
 
-    return $resultMessage;
+		$ct->sendFeedback($ct_request);
+
+		if ($ct->server_change) {
+			update_option(
+					'cleantalk_server', array(
+				'ct_work_url' => $ct->work_url,
+				'ct_server_ttl' => $ct->server_ttl,
+				'ct_server_changed' => time()
+					)
+			);
+		}
+		return true;
+	}
+	
+	return false;
 }
 
 /**
@@ -122,6 +158,10 @@ function ct_feedback($hash, $message, $allow) {
  */
 function ct_init_locale() {
     load_plugin_textdomain('cleantalk', false, basename(dirname(__FILE__)) . '/i18n');
+    if(!session_id()) {
+    	session_name('cleantalksession');
+        session_start();
+    }
 }
 
 /**
@@ -164,11 +204,8 @@ function ct_set_session() {
     // this action is called any time WP process GET request (shows any page)
     // this action is called AFTER wp-comments-post.php executing and AFTER ct_check calling so we can create new session value here
     // it can be any action between init and send_headers, see http://codex.wordpress.org/Plugin_API/Action_Reference
-    session_name('cleantalksession');
-    if (!isset($_SESSION)) {
-        session_start();
-        $_SESSION['formtime'] = time();
-    }
+    
+	$_SESSION['formtime'] = time();
 }
 
 /**
@@ -206,7 +243,7 @@ function ct_check($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user;
+    global $wpdb, $current_user, $comment_post_id;
 
     if (ct_is_user_enable() === false) {
         return $comment;
@@ -225,43 +262,30 @@ function ct_check($comment) {
     } elseif ($_POST['ct_checkjs'] !== 0) {
         $checkjs = 0;
     }
-
-    session_name('cleantalksession');
-    if (!isset($_SESSION)) {
-        session_start();
-    }
+	
     if (array_key_exists('formtime', $_SESSION)) {
         $submit_time = time() - (int) $_SESSION['formtime'];
     } else {
         $submit_time = null;
     }
 
-    $user_info = '';
-	$post_info = '';
 	$example = null;
     if (function_exists('json_encode')) {
         $blog_lang = substr(get_locale(), 0, 2);
-        $arr = array(
+        $user_info = array(
             'cms_lang' => $blog_lang,
             'REFFERRER' => @$_SERVER['HTTP_REFERER'],
             'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
 			'sender_url' => $comment['comment_author_url'],
         );
-        $user_info = json_encode($arr);
+        $user_info = json_encode($user_info);
         if ($user_info === false)
             $user_info = '';
 			
-		$arr = array();
-		$arr['comment_type'] = $comment['comment_type']; 
-		
-		$last_comment = get_comments('number=1');
-		$new_comment_ID = isset($last_comment[0]->comment_ID) ? (int) $last_comment[0]->comment_ID + 1 : 1;
-		
-		$permalink = get_permalink($comment_post_id) !== null ? get_permalink($comment_post_id) : null;
-		
-		$arr['post_url'] = $permalink !== null ? $permalink . '#comment-' . $new_comment_ID : null;
+		$post_info['comment_type'] = $comment['comment_type']; 
+		$post_info['post_url'] = ct_post_url(null, $comment_post_id); 
 
-		$post_info = json_encode($arr);
+		$post_info = json_encode($post_info);
         if ($post_info === false)
 			$post_info = '';
 		
@@ -292,6 +316,7 @@ function ct_check($comment) {
     $ct = new Cleantalk();
     $ct->work_url = $config['ct_work_url'];
     $ct->server_url = $options['server'];
+    $ct->server_url = "http://localhost:9000";
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
 
@@ -302,7 +327,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-202';
+    $ct_request->agent = 'wordpress-212';
     $ct_request->sender_info = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];
@@ -348,9 +373,34 @@ function ct_check($comment) {
                 add_filter('pre_comment_approved', 'ct_set_not_approved');
             }
         }
-        add_action('comment_post', 'ct_set_meta', 10, 2);
+        
+		add_action('comment_post', 'ct_set_meta', 10, 2);
     }
     return $comment;
+}
+
+/**
+ * Get post url 
+ * @param int $comment_id 
+ * @param int $comment_post_id
+ * @return string|bool
+ */
+function ct_post_url($comment_id = null, $comment_post_id) {
+	
+	if (empty($comment_post_id))
+		return null;
+
+	if ($comment_id === null) {
+		$last_comment = get_comments('number=1');
+		$comment_id = isset($last_comment[0]->comment_ID) ? (int) $last_comment[0]->comment_ID + 1 : 1;
+	}	
+	$permalink = get_permalink($comment_post_id);
+
+	$post_url = null;
+	if ($permalink !== null)
+		$post_url = $permalink . '#comment-' . $comment_id;
+
+	return $post_url;
 }
 
 /**
@@ -398,10 +448,26 @@ function ct_set_comment_spam() {
 function ct_set_meta($comment_id, $comment_status) {
     /* update_comment_meta($comment_id, 'ct_hash', 'huz');
       return; */
+
+	global $comment_post_id;
+
     $hash1 = ct_hash();
     if (!empty($hash1)) {
         update_comment_meta($comment_id, 'ct_hash', $hash1);
+		
+		if (function_exists('base64_encode')) {
+			$post_url = ct_post_url($comment_id, $comment_post_id);
+			$post_url = base64_encode($post_url);
+			if ($post_url === false)
+				return false;
+			
+			// 01 - URL to approved comment
+			$feedback_request = $hash1 . ':' . '01' . ':' . $post_url . ';';
+			ct_send_feedback($feedback_request);
+		}
     }
+	
+	return true;
 }
 
 /**
@@ -522,7 +588,6 @@ function ct_admin_init() {
  * Admin callback function - Displays description of 'main' plugin parameters section
  */
 function ct_section_settings_main() {
-
 }
 
 /**
@@ -660,6 +725,8 @@ function admin_notice_message(){
 	if ($options['apikey'] === 'enter key' || $options['apikey'] === '')
 		echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
 	
+	ct_send_feedback();
+
 	return true;
 }
 
