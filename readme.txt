@@ -54,6 +54,9 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 == Changelog ==
 
+= 2.1.3 =
+  * Fixed bug with server URL 
+
 = 2.1.2 =
   * Improved perfomance for processing large comments (over 32kb size)
   * Improved perfomance for bulk operations with comments in Comments panel 
