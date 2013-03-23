@@ -28,7 +28,7 @@ Main feature of the plugin is an automatic approval relevant, not spam comments.
 1. Stop comments with swear, negative words.
 1. Automatic approval not spam comments.
 
-This plugin is a client application for spam protection service cleantalk.org. It is free to use for small and medium sized blogs.
+This plugin is a client application for commercial spam protection service cleantalk.org. It is free to use for first 14 days! 
 
 = Translation =
 
