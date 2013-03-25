@@ -28,7 +28,7 @@ Main feature of the plugin is an automatic approval relevant, not spam comments.
 1. Stop comments with swear, negative words.
 1. Automatic approval not spam comments.
 
-This plugin is a client application for commercial spam protection service cleantalk.org. It is free to use for first 14 days! 
+This plugin is a client application for spam protection service cleantalk.org. It is free to use for small and medium sized blogs.
 
 = Translation =
 
@@ -48,14 +48,12 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 == Screenshots ==
 
+1. Plug-in's work scheme 
 1. CleanTalk stops spam comment
 1. CleanTalk settings to filter spam in the blog 
 1. Service Control panel at cleantalk.org 
 
 == Changelog ==
-
-= 2.1.3 =
-  * Fixed bug with server URL 
 
 = 2.1.2 =
   * Improved perfomance for processing large comments (over 32kb size)
