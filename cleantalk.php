@@ -326,7 +326,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-212';
+    $ct_request->agent = 'wordpress-213';
     $ct_request->sender_info = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];
@@ -648,7 +648,7 @@ function ct_input_apikey() {
     $value = $options['apikey'];
     $def_value = $def_options['apikey'];
     echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' onfocus=\"if(this.value=='$def_value') this.value='';\"/>";
-    echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/wordpress'>".__('Click here to get access key', 'cleantalk')."</a>";
+    echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
 }
 
 /**
