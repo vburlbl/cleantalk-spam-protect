@@ -3,7 +3,7 @@
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
   Description: Plugin stops 99% spam in WordPress comments without moving to blog's trash. It use several tests to stops spam. 1) Emails, IPs blacklists tests. 2) Compares comment with previous posts on blog. 3) Javascript availability. 4) Comment submit time. CleanTalk dramatically reduces spam activity at the blog. 
-  Version: 2.1.3
+  Version: 2.2.3
   Author: СleanTalk team
   Author URI: http://cleantalk.org
  */
@@ -177,10 +177,9 @@ function ct_delete_comment_meta($comment_id) {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = 0) {
-    $conf = ct_get_options();
     $ct_checkjs_def = 0;
-    $ct_checkjs_key = md5($conf['apikey']);
-        
+    $ct_checkjs_key = ct_get_checkjs_value(); 
+
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -257,12 +256,12 @@ function ct_check($comment) {
 	$checkjs = null; 
     if (!isset($_POST['ct_checkjs'])) {
         $checkjs = null;
-    } elseif($_POST['ct_checkjs'] == md5($options['apikey'])) {
+    } elseif($_POST['ct_checkjs'] == ct_get_checkjs_value()) {
         $checkjs = 1;
     } elseif ($_POST['ct_checkjs'] !== 0) {
         $checkjs = 0;
     }
-	
+
     if (array_key_exists('formtime', $_SESSION)) {
         $submit_time = time() - (int) $_SESSION['formtime'];
     } else {
@@ -278,6 +277,7 @@ function ct_check($comment) {
             'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
 			'sender_url' => $comment['comment_author_url'],
         );
+        
         $user_info = json_encode($user_info);
         if ($user_info === false)
             $user_info = '';
@@ -326,7 +326,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-213';
+    $ct_request->agent = 'wordpress-223';
     $ct_request->sender_info = $user_info;
     $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];
@@ -752,5 +752,17 @@ function ct_active(){
 
 	return $ct_active;
 }
+
+/**
+ * Get ct_get_checkjs_value 
+ * @return string
+ */
+function ct_get_checkjs_value() {
+    $options = ct_get_options();
+
+    return md5($options['apikey'] . '+' . get_settings('admin_email'));
+}
+
+
 
 ?>

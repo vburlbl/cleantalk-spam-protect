@@ -1,12 +1,12 @@
 <?php
 /**
- * CleanTalk base class
+ * Cleantalk base class
  *
- * @version 0.14
- * @package CleanTalk
+ * @version 0.16
+ * @package Cleantalk
  * @subpackage Base
- * @author СleanTalk team (welcome@cleantalk.ru)
- * @copyright (C) 2011 - 2012 СleanTalk team (http://cleantalk.ru)
+ * @author Сleantalk team (welcome@cleantalk.ru)
+ * @copyright (C) 2013 СleanTalk team (http://cleantalk.org)
  * @license GNU/GPL: http://www.gnu.org/copyleft/gpl.html
  * @see http://cleantalk.ru/wiki/doku.php/api
  *
@@ -132,7 +132,7 @@ class CleantalkResponse {
         } else {
             $this->errno = $obj->errno;
             $this->errstr = $obj->errstr;
-			
+
 			$this->errstr = preg_replace("/.+(\*\*\*.+\*\*\*).+/", "$1", $this->errstr);
 
             // Разбираем xmlrpcresp ответ с клинтолка
@@ -153,7 +153,7 @@ class CleantalkResponse {
                 $this->stop_queue = (isset($obj->val['stop_queue'])) ? $obj->val['stop_queue'] : 0;
             } else {
                 $this->comment = $this->errstr . '. Automoderator cleantalk.org';
-			}
+            }
         }
     }
 
@@ -163,6 +163,8 @@ class CleantalkResponse {
  * Request class
  */
 class CleantalkRequest {
+
+    const VERSION = '0.7';
 
     /**
      * User message
@@ -299,8 +301,8 @@ class Cleantalk {
      * @var int
      */
     public $debug = 0;
-
-	/**
+	
+    /**
 	* Maximum data size in bytes
 	* @var int
 	*/
@@ -311,7 +313,7 @@ class Cleantalk {
 	* @var int
 	*/
 	private $compressRate = 6;
-	
+
     /**
      * Cleantalk server url
      * @var string
@@ -465,24 +467,52 @@ class Cleantalk {
         // special and must be
         switch ($method) {
             case 'check_message':
-                if (!in_array($request->response_lang, array('ru', 'en'))) {
-                    $error_params[] = 'response_lang';
+                if (empty($request->message)) {
+                    $error_params[] = 'message';
                 }
-				$request->message = $this->compressData($request->message);
+				
+                $request->message = $this->compressData($request->message);
 				$request->example = $this->compressData($request->example);
-                break;
-            case 'check_newuser':
+
                 if (!in_array($request->response_lang, array('ru', 'en'))) {
                     $error_params[] = 'response_lang';
                 }
                 break;
+
+            case 'check_newuser':
+                if (empty($request->sender_nickname)) {
+                    $error_params[] = 'sender_nickname';
+                }
+                if (empty($request->sender_email)) {
+                    $error_params[] = 'sender_email';
+                }
+                if (!in_array($request->response_lang, array('ru', 'en'))) {
+                    $error_params[] = 'response_lang';
+                }
+                break;
+
             case 'send_feedback':
                 if (empty($request->feedback)) {
                     $error_params[] = 'feedback';
                 }
                 break;
         }
+        
+        if (isset($request->sender_info)) {
+            if (function_exists('json_decode')){
+                $sender_info = json_decode($request->sender_info, true);
 
+                // Save request's creation timestamps 
+                if (function_exists('microtime'))
+                    $sender_info['request_submit_time'] = (float) (time() + (float) microtime()); 
+                
+                if (function_exists('json_encode')){
+                    $request->sender_info = json_encode($sender_info);
+
+                }
+            }
+        }
+        
         return $error_params;
     }
     
@@ -607,11 +637,13 @@ class Cleantalk {
                 return false;
             } else {
                 foreach ($this->get_servers_ip($pool) as $server) {
-                    $server_host = gethostbyaddr($server['ip']);
-                    $work_url = $url_prefix . $server_host;
-                    if ($server['host'] === 'localhost')
+                    if ($server['host'] === 'localhost' || $server['ip'] === null) {
                         $work_url = $url_prefix . $server['host'];
-
+                    } else {
+                        $server_host = gethostbyaddr($server['ip']);
+                        $work_url = $url_prefix . $server_host;
+                    }
+                    
                     $work_url = ($port !== '') ? $work_url . ':' . $port : $work_url;
 
                     $this->work_url = $work_url;
@@ -649,20 +681,34 @@ class Cleantalk {
             return $response;
 
         if (function_exists('dns_get_record')) {
-            foreach (dns_get_record($host, DNS_A) as $server) {
-                $response[] = $server;
+            $records = dns_get_record($host, DNS_A);
+
+            if ($records !== FALSE) {
+                foreach ($records as $server) {
+                    $response[] = $server;
+                }
+                if (count($response))
+                    return $response;
             }
-            if (count($response))
-                return $response;
         }
         if (function_exists('gethostbynamel')) {
-            foreach (gethostbynamel($host) as $server) {
-                $response[] = array("ip" => $server,
-                    "host" => $host,
-                    "ttl" => $this->server_ttl
-                );
+            $records = gethostbynamel($host);
+
+            if ($records !== FALSE) {
+                foreach ($records as $server) {
+                    $response[] = array("ip" => $server,
+                        "host" => $host,
+                        "ttl" => $this->server_ttl
+                    );
+                }
+                if (count($response))
+                    return $response;
             }
         }
+        $response[] = array("ip" => null,
+            "host" => $host,
+            "ttl" => $this->server_ttl
+        );
 
         return $response;
     }
@@ -721,23 +767,21 @@ class Cleantalk {
         return $message;
     }
 
-}
-
-/*
-  Get user IP
- */
-function ct_session_ip( $data_ip )
-{
+    /*
+       Get user IP
+    */
+    public function ct_session_ip( $data_ip )
+    {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
         {
-                $forwarded_for = (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? htmlentities($_SERVER['HTTP_X_FORWARDED_FOR']) : '';
+            $forwarded_for = (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? htmlentities($_SERVER['HTTP_X_FORWARDED_FOR']) : '';
         }
 
         // 127.0.0.1 usually used at reverse proxy
         $session_ip = ($data_ip == '127.0.0.1' && !empty($forwarded_for)) ? $forwarded_for : $data_ip;
 
         return $session_ip;
+    }
 }
-
 
 ?>

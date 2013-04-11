@@ -56,6 +56,11 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 == Changelog ==
 
 = 2.1.2 =
+  * Secured md5 string for JavaScript test
+  * Added requests's timestamp to calculate request work time
+  * Update base CleanTalk's PHP class
+
+= 2.1.2 =
   * Improved perfomance for processing large comments (over 32kb size)
   * Improved perfomance for bulk operations with comments in Comments panel 
   * Added feedback request with URL to approved comment 
