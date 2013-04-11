@@ -55,7 +55,7 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 == Changelog ==
 
-= 2.1.2 =
+= 2.2.3 =
   * Secured md5 string for JavaScript test
   * Added requests's timestamp to calculate request work time
   * Update base CleanTalk's PHP class
