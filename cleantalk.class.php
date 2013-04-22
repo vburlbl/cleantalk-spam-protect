@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.16
+ * @version 0.17
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -313,6 +313,12 @@ class Cleantalk {
 	* @var int
 	*/
 	private $compressRate = 6;
+	
+    /**
+	* Server connection timeout in seconds 
+	* @var int
+	*/
+	private $server_timeout = 2;
 
     /**
      * Cleantalk server url
@@ -362,7 +368,7 @@ class Cleantalk {
             $response = new CleantalkResponse(
                             array(
                                 'allow' => 0,
-                                'comment' => 'Cleantalk. Spam protect. Request params error: ' . implode(', ', $error_params)
+                                'comment' => 'CleanTalk. Request params error: ' . implode(', ', $error_params)
                             ), null);
 
             return $response;
@@ -384,7 +390,7 @@ class Cleantalk {
             $response = new CleantalkResponse(
                             array(
                                 'allow' => 0,
-                                'comment' => 'Cleantalk. Spam protect. Request params error: ' . implode(', ', $error_params)
+                                'comment' => 'CleanTalk. Request params error: ' . implode(', ', $error_params)
                             ), null);
 
             return $response;
@@ -622,10 +628,10 @@ class Cleantalk {
             $ct_request->return_type = 'phpvals';
             $ct_request->setDebug($this->debug);
 					
-            $result = $ct_request->send($msg);
+            $result = $ct_request->send($msg, $this->server_timeout);
         }
 
-        if (empty($result) && $this->stay_on_server == false) {
+        if ((!isset($result) || $result->errno != 0) && $this->stay_on_server == false) {
             $matches = array();
             preg_match("#^(http://|https://)([a-z\.\-0-9]+):?(\d*)$#i", $this->server_url, $matches);
             $url_prefix = $matches[1];
@@ -647,12 +653,12 @@ class Cleantalk {
                     $work_url = ($port !== '') ? $work_url . ':' . $port : $work_url;
 
                     $this->work_url = $work_url;
-                    $this->ttl = $server['ttl'];
+                    $this->server_ttl = $server['ttl'];
                     $ct_request = new xmlrpc_client($this->work_url);
                     $ct_request->request_charset_encoding = 'utf-8';
                     $ct_request->return_type = 'phpvals';
                     $ct_request->setDebug($this->debug);
-                    $result = $ct_request->send($msg);
+                    $result = $ct_request->send($msg, $this->server_timeout);
 
                     if (!$result->faultCode()) {
                         $this->server_change = true;
@@ -687,11 +693,10 @@ class Cleantalk {
                 foreach ($records as $server) {
                     $response[] = $server;
                 }
-                if (count($response))
-                    return $response;
             }
         }
-        if (function_exists('gethostbynamel')) {
+
+        if (count($response) == 0 && function_exists('gethostbynamel')) {
             $records = gethostbynamel($host);
 
             if ($records !== FALSE) {
@@ -701,14 +706,32 @@ class Cleantalk {
                         "ttl" => $this->server_ttl
                     );
                 }
-                if (count($response))
-                    return $response;
             }
         }
-        $response[] = array("ip" => null,
-            "host" => $host,
-            "ttl" => $this->server_ttl
-        );
+
+        if (count($response) == 0) {
+            $response[] = array("ip" => null,
+                "host" => $host,
+                "ttl" => $this->server_ttl
+            );
+        } else {
+
+            // $i - to resolve collisions with localhost and 
+            $i = 0;
+            foreach ($response as $server) {
+                $ping = $this->httpPing($server['ip']);
+                
+                // -1 server is down, skips not reachable server
+                if ($ping != -1)
+                    $r_temp[$ping * 10000 + $i] = $server;
+
+                $i++;
+            }
+            if (count($r_temp)){
+                ksort($r_temp);
+                $response = $r_temp;
+            }
+        }
 
         return $response;
     }
@@ -782,6 +805,35 @@ class Cleantalk {
 
         return $session_ip;
     }
+    
+    /**
+    * Function to check response time
+    * param string
+    * @return int
+    */
+    function httpPing($host){
+
+        // Skip localhost ping cause it raise error at fsockopen.
+        // And return minimun value 
+        if ($host == 'localhost')
+            return 0.001;
+
+        $starttime = microtime(true);
+        $file      = @fsockopen ($host, 80, $errno, $errstr, $this->server_timeout);
+        $stoptime  = microtime(true);
+        $status    = 0;
+
+        if (!$file) {
+            $status = -1;  // Site is down
+        } else {
+            fclose($file);
+            $status = ($stoptime - $starttime);
+            $status = round($status, 4);
+        }
+        
+        return $status;
+    }
+    
 }
 
 ?>
