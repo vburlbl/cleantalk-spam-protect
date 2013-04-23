@@ -1,16 +1,16 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: comments, spam, filter, autopublication, cleantalk, anti-spam, antispam, captcha, comment, approve, spambot, recaptcha, block spam, bot, Spam Free, spam-bot, spambot, spamfree, spammer, spammers
+Tags: comments, spam, cleantalk, anti-spam, antispam, captcha, comment, approve, spambot, recaptcha, block spam, bot, Spam Free, spam-bot, spambot, spamfree, spammer, spammers
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.5.1
 Stable tag: trunk
 
-No Captcha. No spam. Comments automoderation.
+With CleanTalk you can remove a CAPTCHA and forget about spam in the blog.
 
 == Description ==
 
-Plugin use several invisible tests to stop spam in comments without move to trash or manual approval queue. Plugin also approves relevant, not spam comments. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+Plugin use several invisible tests to stop spam in comments without move to trash or manual approval queue. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 = All features ot the plugin =
 1. Stop spam in comments.

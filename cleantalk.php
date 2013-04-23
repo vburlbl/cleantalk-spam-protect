@@ -2,7 +2,7 @@
 /*
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plugin use several invisible tests to stop spam in comments without move to trash or manual approval queue. Plugin also approves relevant, not spam comments. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. 
+  Description: Plugin use several invisible tests to stop spam in comments without move to trash or manual approval queue. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. 
   Version: 2.3.8
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
