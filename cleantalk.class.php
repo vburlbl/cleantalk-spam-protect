@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.17
+ * @version 0.19
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -445,6 +445,7 @@ class Cleantalk {
                     $error_params[] = $param;
                 }
             }
+            
             if (in_array($param, array('js_on')) && !empty($value)) {
                 if (!is_integer($value)) {
                     $error_params[] = $param;
@@ -473,16 +474,13 @@ class Cleantalk {
         // special and must be
         switch ($method) {
             case 'check_message':
-                if (empty($request->message)) {
-                    $error_params[] = 'message';
-                }
-				
+                
+                // Convert strings to UTF8
+                $this->message = $this->stringToUTF8($request->message);
+                $this->example = $this->stringToUTF8($request->example);
+
                 $request->message = $this->compressData($request->message);
 				$request->example = $this->compressData($request->example);
-
-                if (!in_array($request->response_lang, array('ru', 'en'))) {
-                    $error_params[] = 'response_lang';
-                }
                 break;
 
             case 'check_newuser':
@@ -491,9 +489,6 @@ class Cleantalk {
                 }
                 if (empty($request->sender_email)) {
                     $error_params[] = 'sender_email';
-                }
-                if (!in_array($request->response_lang, array('ru', 'en'))) {
-                    $error_params[] = 'response_lang';
                 }
                 break;
 
@@ -622,7 +617,8 @@ class Cleantalk {
     private function xmlRequest(xmlrpcmsg $msg) {
         if (((isset($this->work_url) && $this->work_url !== '') && ($this->server_changed + $this->server_ttl > time()))
 				|| $this->stay_on_server == true) {
-	    $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
+	        
+            $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
             $ct_request = new xmlrpc_client($url);
             $ct_request->request_charset_encoding = 'utf-8';
             $ct_request->return_type = 'phpvals';
@@ -731,6 +727,8 @@ class Cleantalk {
                 ksort($r_temp);
                 $response = $r_temp;
             }
+
+            var_dump($response);
         }
 
         return $response;
@@ -834,6 +832,20 @@ class Cleantalk {
         return $status;
     }
     
+    /**
+    * Function convert string to UTF8 and removes non UTF8 characters 
+    * param string
+    * @return string
+    */
+    function stringToUTF8($str){
+        
+        if (!preg_match('//u', $str) && function_exists('mb_detect_encoding') && function_exists('mb_convert_encoding')) {
+            $encoding = mb_detect_encoding($str);
+            $srt = mb_convert_encoding($str, 'UTF-8', $encoding);
+        }
+        
+        return $str;
+    }
 }
 
 ?>
