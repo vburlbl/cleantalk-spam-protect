@@ -27,6 +27,7 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 = How plugin stop spam? =
 Plugin use several simple tests to stop spambots
+
 * Blacklists checks by Email, IP in lists with several billions records.
 * JavaScript availability.
 * Comment submit time.
