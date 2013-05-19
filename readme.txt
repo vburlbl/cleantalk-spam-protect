@@ -10,7 +10,7 @@ Spam free WordPress.
 
 == Description ==
 
-Plugin stops spambots without move spam comments to trash or manual approval queue, invisible for users and admins.
+Plugin stops spambots without move spam comments to trash or manual approval queue, invisible for users and admins. Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 1. Stop spam-bots in comments.
 1. Invisible for users. 
@@ -52,6 +52,9 @@ Plugin sends a comment's text and several previous approved comments to the serv
 1. Service Control panel at cleantalk.org 
 
 == Changelog ==
+
+= 2.4.9 =
+  * Fixed extra debugging in base class 
 
 = 2.4.8 =
   * Enabled convertion to UTF8 for comment and example text 

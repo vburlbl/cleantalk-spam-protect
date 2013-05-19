@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.19
+ * @version 0.20.1
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -114,9 +114,15 @@ class CleantalkResponse {
     
 	/**
      * Stop queue message, 1|0
-     * @var string
+     * @var int  
      */
     public $stop_queue = null;
+	
+    /**
+     * Account shuld by deactivated after registration, 1|0
+     * @var int  
+     */
+    public $inactive = null;
 
     /**
      * Create server response
@@ -151,6 +157,7 @@ class CleantalkResponse {
                 $this->sms_error_code = (isset($obj->val['sms_error_code'])) ? $obj->val['sms_error_code'] : null;
                 $this->sms_error_text = (isset($obj->val['sms_error_text'])) ? $obj->val['sms_error_text'] : null;
                 $this->stop_queue = (isset($obj->val['stop_queue'])) ? $obj->val['stop_queue'] : 0;
+                $this->inactive = (isset($obj->val['inactive'])) ? $obj->val['inactive'] : 0;
             } else {
                 $this->comment = $this->errstr . '. Automoderator cleantalk.org';
             }
@@ -714,6 +721,7 @@ class Cleantalk {
 
             // $i - to resolve collisions with localhost and 
             $i = 0;
+            $r_temp = null;
             foreach ($response as $server) {
                 $ping = $this->httpPing($server['ip']);
                 
@@ -727,8 +735,6 @@ class Cleantalk {
                 ksort($r_temp);
                 $response = $r_temp;
             }
-
-            var_dump($response);
         }
 
         return $response;
