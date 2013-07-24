@@ -55,6 +55,7 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 = 2.4.10 2013-07-24 =
   * Fixed warning in PHP 5.4
+  * Fixed bug with disabling comments test for Administrators, Authors and Editors 
   * "Stop words" settings moved to <a href="http://cleantalk.org/my">Control panel</a> of the service
   * "Response language" settings moved <a href="http://cleantalk.org/my">Control panel</a> of the service
 
