@@ -203,29 +203,22 @@ function ct_set_session() {
 }
 
 /**
- * Get user role
- * @global type $current_user
- * @return type
- */
-function ct_get_user_role() {
-    global $current_user;
-
-    $user_roles = $current_user->roles;
-    $user_role = array_shift($user_roles);
-
-    return $user_role;
-}
-
-/**
  * Is enable for user group
  * @return boolean
  */
 function ct_is_user_enable() {
-    $disable_roles = array('administrator', 'editor', 'author');
-    $user_role = ct_get_user_role();
-    if (in_array($user_role, $disable_roles)) {
-        return false;
+    global $current_user;
+
+    if (!isset($current_user->roles)) {
+        return true; 
     }
+    
+    $disable_roles = array('administrator', 'editor', 'author');
+    foreach ($current_user->roles as $k => $v) {
+        if (in_array($v, $disable_roles))
+            return false;
+    }
+
     return true;
 }
 /**
