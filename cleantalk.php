@@ -315,7 +315,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
-    $ct_request->agent = 'wordpress-249';
+    $ct_request->agent = 'wordpress-2410';
     $ct_request->sender_info = $user_info;
     $ct_request->submit_time = $submit_time;
     $ct_request->js_on = $checkjs;
