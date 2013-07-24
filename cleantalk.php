@@ -2,8 +2,8 @@
 /*
   Plugin Name: CleanTalk. Spam protection
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plugin use several invisible tests to stop spam in comments without move to trash or manual approval queue. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. 
-  Version: 2.3.8
+  Description: Plugin stops spambots without move spam comments to trash or manual approval queue, invisible for users and admins. Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+  Version: 2.4.9
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
@@ -321,12 +321,12 @@ function ct_check($comment) {
 
     $ct_request->auth_key = $options['apikey'];
     $ct_request->message = $comment['comment_content'];
+    $ct_request->example = $example; 
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
-    $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-238';
+    $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+    $ct_request->agent = 'wordpress-249';
     $ct_request->sender_info = $user_info;
-    $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
     $ct_request->stoplist_check = $options['stopwords'];
     $ct_request->response_lang = $options['language'];
     $ct_request->allow_links = $options['allowlinks'];
