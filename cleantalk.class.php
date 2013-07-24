@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.17
+ * @version 0.20.1
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -114,9 +114,15 @@ class CleantalkResponse {
     
 	/**
      * Stop queue message, 1|0
-     * @var string
+     * @var int  
      */
     public $stop_queue = null;
+	
+    /**
+     * Account shuld by deactivated after registration, 1|0
+     * @var int  
+     */
+    public $inactive = null;
 
     /**
      * Create server response
@@ -151,6 +157,7 @@ class CleantalkResponse {
                 $this->sms_error_code = (isset($obj->val['sms_error_code'])) ? $obj->val['sms_error_code'] : null;
                 $this->sms_error_text = (isset($obj->val['sms_error_text'])) ? $obj->val['sms_error_text'] : null;
                 $this->stop_queue = (isset($obj->val['stop_queue'])) ? $obj->val['stop_queue'] : 0;
+                $this->inactive = (isset($obj->val['inactive'])) ? $obj->val['inactive'] : 0;
             } else {
                 $this->comment = $this->errstr . '. Automoderator cleantalk.org';
             }
@@ -445,6 +452,7 @@ class Cleantalk {
                     $error_params[] = $param;
                 }
             }
+            
             if (in_array($param, array('js_on')) && !empty($value)) {
                 if (!is_integer($value)) {
                     $error_params[] = $param;
@@ -473,16 +481,13 @@ class Cleantalk {
         // special and must be
         switch ($method) {
             case 'check_message':
-                if (empty($request->message)) {
-                    $error_params[] = 'message';
-                }
-				
+                
+                // Convert strings to UTF8
+                $this->message = $this->stringToUTF8($request->message);
+                $this->example = $this->stringToUTF8($request->example);
+
                 $request->message = $this->compressData($request->message);
 				$request->example = $this->compressData($request->example);
-
-                if (!in_array($request->response_lang, array('ru', 'en'))) {
-                    $error_params[] = 'response_lang';
-                }
                 break;
 
             case 'check_newuser':
@@ -491,9 +496,6 @@ class Cleantalk {
                 }
                 if (empty($request->sender_email)) {
                     $error_params[] = 'sender_email';
-                }
-                if (!in_array($request->response_lang, array('ru', 'en'))) {
-                    $error_params[] = 'response_lang';
                 }
                 break;
 
@@ -622,7 +624,8 @@ class Cleantalk {
     private function xmlRequest(xmlrpcmsg $msg) {
         if (((isset($this->work_url) && $this->work_url !== '') && ($this->server_changed + $this->server_ttl > time()))
 				|| $this->stay_on_server == true) {
-	    $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
+	        
+            $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
             $ct_request = new xmlrpc_client($url);
             $ct_request->request_charset_encoding = 'utf-8';
             $ct_request->return_type = 'phpvals';
@@ -718,6 +721,7 @@ class Cleantalk {
 
             // $i - to resolve collisions with localhost and 
             $i = 0;
+            $r_temp = null;
             foreach ($response as $server) {
                 $ping = $this->httpPing($server['ip']);
                 
@@ -834,6 +838,20 @@ class Cleantalk {
         return $status;
     }
     
+    /**
+    * Function convert string to UTF8 and removes non UTF8 characters 
+    * param string
+    * @return string
+    */
+    function stringToUTF8($str){
+        
+        if (!preg_match('//u', $str) && function_exists('mb_detect_encoding') && function_exists('mb_convert_encoding')) {
+            $encoding = mb_detect_encoding($str);
+            $srt = mb_convert_encoding($str, 'UTF-8', $encoding);
+        }
+        
+        return $str;
+    }
 }
 
 ?>

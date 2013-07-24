@@ -1,29 +1,23 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: comments, spam, cleantalk, anti-spam, antispam, captcha, comment, approve, spambot, recaptcha, block spam, bot, Spam Free, spam-bot, spambot, spamfree, spammer, spammers
+Tags: comments, spam, cleantalk, anti-spam, antispam, captcha, comment, spambot, spam-bot, recaptcha, block spam, Spam Free, spamfree 
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.5.1
 Stable tag: trunk
 
-With CleanTalk you can remove a CAPTCHA and forget about spam in the blog.
+No spam in the comments. Smart, simple anti-spam without CAPTCHA, Q&A.
 
 == Description ==
+1. Stops spam-bots in the comments.
+1. Invisible for visitors of a blog. 
+1. Anti-spam without CAPTCHA, Q&A.
 
-Plugin use several invisible tests to stop spam in comments without move to trash or manual approval queue. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple and clever anti-spam for your blog.
 
-= All features ot the plugin =
-1. Stop spam in comments.
-1. Not using CAPTCHA.
-1. Stop comments with swear, negative words.
-1. Automatic approval not spam comments.
+Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-This plugin is a client application for spam protection service cleantalk.org. It is free to use for small and medium sized blogs.
-
-= Translation =
-
-* English (en_EN)
-* Russian (ru_RU)
+This plugin is a client application for anti-spam service cleantalk.org. It is free to use for small and medium sized blogs.
 
 == Installation ==
 
@@ -31,14 +25,14 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 == Frequently Asked Questions ==
 
-= How plugin stop spam comments? =
-Plugin use several simple tests to stop spam in comments
+= How plugin stop spam? =
+Plugin uses several simple tests to stop spambots
 
 * Blacklists checks by Email, IP in lists with several billions records.
 * JavaScript availability.
 * Comment submit time.
 * Relevance test for the comment.
-* Spam templates in comments
+* Spam signatures.
 
 = How plugin works? =
 
@@ -46,18 +40,30 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 = Why do I need one more anti-spam plugin? =
 
-1. This plugin use several tests to filter spam, that's why it have the best performance.
+1. The plugin is more effective than CAPTCHA because use several methods to stop spambots.
+1. This plugin stops spam-bots automatically, plugin invisible for blog visitors and admins.
 1. CleanTalk automatically approves relevant, not spam comments.
-
 
 == Screenshots ==
 
-1. Plug-in's work scheme 
+1. Plug-in's anti-spam work scheme 
 1. CleanTalk stops spam comment
-1. CleanTalk settings to filter spam in the blog 
+1. CleanTalk settings to filter spam-bots
 1. Service Control panel at cleantalk.org 
 
 == Changelog ==
+
+= 2.4.10 2013-07-24 =
+  * Fixed warning in PHP 5.4
+  * "Stop words" settings moved to <a href="http://cleantalk.org/my">Control panel</a> of the service
+  * "Response language" settings moved <a href="http://cleantalk.org/my">Control panel</a> of the service
+
+= 2.4.9 =
+  * Fixed extra debugging in base class 
+
+= 2.4.8 =
+  * Enabled convertion to UTF8 for comment and example text 
+  * Optimized PHP code 
 
 = 2.3.8 =
   * Enabled selection the fastest server in the pool 
@@ -126,15 +132,3 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 = 1.1.0 =
   * First version
-
-== Upgrade Notice ==
-
-= 1.1.2 =
-* Addition: Title of the post attached to the example text in auto publication tool.
-* Tested with WordPress 3.4.1.
-
-= 1.1.1 =
-* Added user locale support, tested up to WP 3.4
-
-= 1.1.0 =
-* First version
