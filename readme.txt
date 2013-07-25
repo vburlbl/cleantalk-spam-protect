@@ -4,7 +4,7 @@ Tags: comments, spam, cleantalk, anti-spam, antispam, captcha, comment, spambot,
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.5.1
-Stable tag: trunk
+Stable tag: 2.4.10 
 
 No spam in the comments. Smart, simple anti-spam without CAPTCHA, Q&A.
 
