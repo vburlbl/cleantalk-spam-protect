@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.20.1
+ * @version 0.20.2
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -202,14 +202,14 @@ class CleantalkRequest {
      * valid are 0|1
      * @var int
      */
-    public $stoplist_check = 1;
+    public $stoplist_check = null;
 
     /**
      * Language server response,
      * valid are 'en' or 'ru'
      * @var string
      */
-    public $response_lang = 'en';
+    public $response_lang = null;
 
     /**
      * User IP

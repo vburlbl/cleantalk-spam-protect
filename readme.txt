@@ -4,18 +4,18 @@ Tags: comments, spam, cleantalk, anti-spam, antispam, captcha, comment, spambot,
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.5.1
-Stable tag: trunk
+Stable tag: 2.4.10 
 
-Spam free WordPress.
+No spam in the comments. Smart, simple anti-spam without CAPTCHA, Q&A.
 
 == Description ==
+1. Stops spam-bots in the comments.
+1. Invisible for visitors of a blog. 
+1. Anti-spam without CAPTCHA, Q&A.
 
-Plugin stops spambots without move spam comments to trash or manual approval queue, invisible for users and admins. Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple and clever anti-spam for your blog.
 
-1. Stop spam-bots in comments.
-1. Invisible for users. 
-1. Antispam without CAPTCHA.
-1. Automatic approval not spam comments.
+Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 This plugin is a client application for anti-spam service cleantalk.org. It is free to use for small and medium sized blogs.
 
@@ -26,7 +26,7 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 == Frequently Asked Questions ==
 
 = How plugin stop spam? =
-Plugin use several simple tests to stop spambots
+Plugin uses several simple tests to stop spambots
 
 * Blacklists checks by Email, IP in lists with several billions records.
 * JavaScript availability.
@@ -52,6 +52,12 @@ Plugin sends a comment's text and several previous approved comments to the serv
 1. Service Control panel at cleantalk.org 
 
 == Changelog ==
+
+= 2.4.10 2013-07-24 =
+  * Fixed warning in PHP 5.4
+  * Fixed bug with disabling comments test for Administrators, Authors and Editors 
+  * "Stop words" settings moved to <a href="http://cleantalk.org/my">Control panel</a> of the service
+  * "Response language" settings moved <a href="http://cleantalk.org/my">Control panel</a> of the service
 
 = 2.4.9 =
   * Fixed extra debugging in base class 
@@ -127,15 +133,3 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 = 1.1.0 =
   * First version
-
-== Upgrade Notice ==
-
-= 1.1.2 =
-* Addition: Title of the post attached to the example text in auto publication tool.
-* Tested with WordPress 3.4.1.
-
-= 1.1.1 =
-* Added user locale support, tested up to WP 3.4
-
-= 1.1.0 =
-* First version
