@@ -6,14 +6,14 @@ License: GPLv2
 Tested up to: 3.5.1
 Stable tag: 2.4.10 
 
-No spam in the comments. Smart, simple anti-spam without CAPTCHA, Q&A.
+No spam in the comments. Smart, simple antispam without CAPTCHA.
 
 == Description ==
-1. Stops spam-bots in the comments.
-1. Invisible for visitors of a blog. 
-1. Anti-spam without CAPTCHA, Q&A.
+1. Stops spam bots in the comments.
+1. Invisible spam protection for visitors.
+1. Antispam without CAPTCHA.
 
-Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple and clever anti-spam for your blog.
+Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam bots. It's simple and clever antispam for your blog.
 
 Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
@@ -46,7 +46,7 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 == Screenshots ==
 
-1. Plug-in's anti-spam work scheme 
+1. Plug-in's antispam work scheme 
 1. CleanTalk stops spam comment
 1. CleanTalk settings to filter spam-bots
 1. Service Control panel at cleantalk.org 
