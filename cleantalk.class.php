@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.17
+ * @version 0.20.3
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -21,12 +21,6 @@ require_once(dirname(__FILE__) . '/cleantalk.xmlrpc.php');
  * Response class
  */
 class CleantalkResponse {
-
-    /**
-     * Unique user ID
-     * @var string
-     */
-    public $sender_id = null;
 
     /**
      *  Is stop words
@@ -114,9 +108,15 @@ class CleantalkResponse {
     
 	/**
      * Stop queue message, 1|0
-     * @var string
+     * @var int  
      */
     public $stop_queue = null;
+	
+    /**
+     * Account shuld by deactivated after registration, 1|0
+     * @var int  
+     */
+    public $inactive = null;
 
     /**
      * Create server response
@@ -137,7 +137,6 @@ class CleantalkResponse {
 
             // Разбираем xmlrpcresp ответ с клинтолка
             if ($obj->val !== 0) {
-                $this->sender_id = (isset($obj->val['sender_id'])) ? $obj->val['sender_id'] : null;
                 $this->stop_words = isset($obj->val['stop_words']) ? $obj->val['stop_words'] : null;
                 $this->comment = $obj->val['comment'];
                 $this->blacklisted = (isset($obj->val['blacklisted'])) ? $obj->val['blacklisted'] : null;
@@ -151,6 +150,7 @@ class CleantalkResponse {
                 $this->sms_error_code = (isset($obj->val['sms_error_code'])) ? $obj->val['sms_error_code'] : null;
                 $this->sms_error_text = (isset($obj->val['sms_error_text'])) ? $obj->val['sms_error_text'] : null;
                 $this->stop_queue = (isset($obj->val['stop_queue'])) ? $obj->val['stop_queue'] : 0;
+                $this->inactive = (isset($obj->val['inactive'])) ? $obj->val['inactive'] : 0;
             } else {
                 $this->comment = $this->errstr . '. Automoderator cleantalk.org';
             }
@@ -195,14 +195,14 @@ class CleantalkRequest {
      * valid are 0|1
      * @var int
      */
-    public $stoplist_check = 1;
+    public $stoplist_check = null;
 
     /**
      * Language server response,
      * valid are 'en' or 'ru'
      * @var string
      */
-    public $response_lang = 'en';
+    public $response_lang = null;
 
     /**
      * User IP
@@ -239,7 +239,7 @@ class CleantalkRequest {
      * valid are 1|0
      * @var int
      */
-    public $allow_links = 0;
+    public $allow_links = null;
 
     /**
      * Time form filling
@@ -445,6 +445,7 @@ class Cleantalk {
                     $error_params[] = $param;
                 }
             }
+            
             if (in_array($param, array('js_on')) && !empty($value)) {
                 if (!is_integer($value)) {
                     $error_params[] = $param;
@@ -473,16 +474,13 @@ class Cleantalk {
         // special and must be
         switch ($method) {
             case 'check_message':
-                if (empty($request->message)) {
-                    $error_params[] = 'message';
-                }
-				
+                
+                // Convert strings to UTF8
+                $this->message = $this->stringToUTF8($request->message);
+                $this->example = $this->stringToUTF8($request->example);
+
                 $request->message = $this->compressData($request->message);
 				$request->example = $this->compressData($request->example);
-
-                if (!in_array($request->response_lang, array('ru', 'en'))) {
-                    $error_params[] = 'response_lang';
-                }
                 break;
 
             case 'check_newuser':
@@ -491,9 +489,6 @@ class Cleantalk {
                 }
                 if (empty($request->sender_email)) {
                     $error_params[] = 'sender_email';
-                }
-                if (!in_array($request->response_lang, array('ru', 'en'))) {
-                    $error_params[] = 'response_lang';
                 }
                 break;
 
@@ -622,7 +617,8 @@ class Cleantalk {
     private function xmlRequest(xmlrpcmsg $msg) {
         if (((isset($this->work_url) && $this->work_url !== '') && ($this->server_changed + $this->server_ttl > time()))
 				|| $this->stay_on_server == true) {
-	    $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
+	        
+            $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
             $ct_request = new xmlrpc_client($url);
             $ct_request->request_charset_encoding = 'utf-8';
             $ct_request->return_type = 'phpvals';
@@ -670,9 +666,6 @@ class Cleantalk {
 
         $response = new CleantalkResponse(null, $result);
 
-        if (!empty($response->sender_id)) {
-            $this->setSenderId($response->sender_id);
-        }
         return $response;
     }
 
@@ -718,6 +711,7 @@ class Cleantalk {
 
             // $i - to resolve collisions with localhost and 
             $i = 0;
+            $r_temp = null;
             foreach ($response as $server) {
                 $ping = $this->httpPing($server['ip']);
                 
@@ -734,23 +728,6 @@ class Cleantalk {
         }
 
         return $response;
-    }
-
-    /**
-     * Function to get the SenderID
-     * @return string
-     */
-    public function getSenderId() {
-        return ( isset($_COOKIE['ct_sender_id']) && !empty($_COOKIE['ct_sender_id']) ) ? $_COOKIE['ct_sender_id'] : '';
-    }
-
-    /**
-     * Function to change the SenderID
-     * @param $senderId
-     * @return bool
-     */
-    private function setSenderId($senderId) {
-        return @setcookie('ct_sender_id', $senderId);
     }
 
     /**
@@ -834,6 +811,20 @@ class Cleantalk {
         return $status;
     }
     
+    /**
+    * Function convert string to UTF8 and removes non UTF8 characters 
+    * param string
+    * @return string
+    */
+    function stringToUTF8($str){
+        
+        if (!preg_match('//u', $str) && function_exists('mb_detect_encoding') && function_exists('mb_convert_encoding')) {
+            $encoding = mb_detect_encoding($str);
+            $srt = mb_convert_encoding($str, 'UTF-8', $encoding);
+        }
+        
+        return $str;
+    }
 }
 
 ?>

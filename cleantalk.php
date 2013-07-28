@@ -1,12 +1,14 @@
 <?php
 /*
-  Plugin Name: CleanTalk. Spam protection
+  Plugin Name: CleanTalk
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plugin use several invisible tests to stop spam in comments without move to trash or manual approval queue. Every new comment plugin compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. 
-  Version: 2.3.8
+  Description: Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. Spam protection is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple and clever antispam for your blog. 
+  Version: 2.4.10
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
+
+$ct_agent_version = '2.4.11';
 
 add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
@@ -36,7 +38,7 @@ function ct_get_options() {
     $options = get_option('cleantalk_settings');
     if (!is_array($options))
         $options = array();
-    return array_merge(ct_def_options(), $options);
+    return array_merge(ct_def_options(), (array) $options);
 }
 
 /**
@@ -46,9 +48,6 @@ function ct_get_options() {
 function ct_def_options() {
     $lang = get_bloginfo('language');
     return array(
-        'stopwords' => '1',
-        'allowlinks' => '0',
-        'language' => 'en',
         'server' => 'http://moderate.cleantalk.ru',
         'apikey' => __('enter key', 'cleantalk'),
         'autoPubRevelantMess' => '1' 
@@ -195,6 +194,7 @@ function ct_add_hidden_fields($post_id = 0) {
  * Public action 'parse_request' - Inits session value
  */
 function ct_set_session() {
+
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -206,29 +206,22 @@ function ct_set_session() {
 }
 
 /**
- * Get user role
- * @global type $current_user
- * @return type
- */
-function ct_get_user_role() {
-    global $current_user;
-
-    $user_roles = $current_user->roles;
-    $user_role = array_shift($user_roles);
-
-    return $user_role;
-}
-
-/**
  * Is enable for user group
  * @return boolean
  */
 function ct_is_user_enable() {
-    $disable_roles = array('administrator', 'editor', 'author');
-    $user_role = ct_get_user_role();
-    if (in_array($user_role, $disable_roles)) {
-        return false;
+    global $current_user;
+
+    if (!isset($current_user->roles)) {
+        return true; 
     }
+    
+    $disable_roles = array('administrator', 'editor', 'author');
+    foreach ($current_user->roles as $k => $v) {
+        if (in_array($v, $disable_roles))
+            return false;
+    }
+
     return true;
 }
 /**
@@ -240,11 +233,25 @@ function ct_check($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version;
 
     if (ct_is_user_enable() === false) {
         return $comment;
     }
+    
+    $wp_host = null;
+    if (preg_match("@^(?:https?://)([^/:]+)@i", get_permalink($comment['comment_post_ID']), $matches))
+        $wp_host = $matches[1];
+    
+    $author_host = null;
+    if (preg_match("@^(?:https?://)([^/:]+)@i", $comment['comment_author_url'], $matches))
+        $author_host = $matches[1];
+    
+    // Skip tests for selfmade pingback's
+    if ($comment['comment_type'] == 'pingback' && $wp_host !== null && $wp_host === $author_host) {
+        return $comment;
+    }
+
     $options = ct_get_options();
 
     $comment_post_id = $comment['comment_post_ID'];
@@ -280,7 +287,7 @@ function ct_check($comment) {
         if ($user_info === false)
             $user_info = '';
 			
-		$post_info['comment_type'] = $comment['comment_type']; 
+		$post_info['comment_type'] = $comment['comment_type'];
 		$post_info['post_url'] = ct_post_url(null, $comment_post_id); 
 
 		$post_info = json_encode($post_info);
@@ -321,15 +328,12 @@ function ct_check($comment) {
 
     $ct_request->auth_key = $options['apikey'];
     $ct_request->message = $comment['comment_content'];
+    $ct_request->example = $example; 
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
-    $ct_request->example = $example; 
-    $ct_request->agent = 'wordpress-238';
+    $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+    $ct_request->agent = $ct_agent_version; 
     $ct_request->sender_info = $user_info;
-    $ct_request->sender_ip = preg_replace('/[^0-9.]/', '', $_SERVER['REMOTE_ADDR']);
-    $ct_request->stoplist_check = $options['stopwords'];
-    $ct_request->response_lang = $options['language'];
-    $ct_request->allow_links = $options['allowlinks'];
     $ct_request->submit_time = $submit_time;
     $ct_request->js_on = $checkjs;
     $ct_request->post_info = $post_info;
@@ -344,7 +348,7 @@ function ct_check($comment) {
                 )
         );
     }
-
+file_put_contents($_SERVER['DOCUMENT_ROOT']."/log.txt", print_r($ct_result, true) . print_r($ct_request, true) . print_r($comment, true));
     if ($ct_result->stop_queue == 1) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
@@ -565,7 +569,7 @@ function ct_enqueue_scripts($hook) {
  * Admin action 'admin_menu' - Add the admin options page
  */
 function ct_admin_add_page() {
-    add_options_page(__('CleanTalk settings', 'cleantalk'), '<b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>. Spam protection', 'manage_options', 'cleantalk', 'ct_settings_page');
+    add_options_page(__('CleanTalk settings', 'cleantalk'), '<b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>', 'manage_options', 'cleantalk', 'ct_settings_page');
 }
 
 /**
@@ -574,8 +578,6 @@ function ct_admin_add_page() {
 function ct_admin_init() {
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
     add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
-    add_settings_field('cleantalk_stopwords', __('Stop words checking', 'cleantalk'), 'ct_input_stopwords', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_language', __('System messages language', 'cleantalk'), 'ct_input_language', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_autoPubRevelantMess', __('Publicate relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
 }
@@ -584,18 +586,7 @@ function ct_admin_init() {
  * Admin callback function - Displays description of 'main' plugin parameters section
  */
 function ct_section_settings_main() {
-}
-
-/**
- * Admin callback function - Displays inputs of 'stopwords' plugin parameter
- */
-function ct_input_stopwords() {
-    $options = ct_get_options();
-    $value = $options['stopwords'];
-    echo "<input type='radio' id='cleantalk_stopwords0' name='cleantalk_settings[stopwords]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_stopwords0'> " . __('No') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_stopwords1' name='cleantalk_settings[stopwords]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_stopwords1'> " . __('Yes') . "</label>";
-    admin_addDescriptionsFields(__('Comments with rude and swear words will be moved to manual moderation.', 'cleantalk'));
+    return true;
 }
 
 /**
@@ -614,37 +605,14 @@ function ct_input_autoPubRevelantMess () {
 }
 
 /**
- * Admin callback function - Displays inputs of 'allowlinks' plugin parameter
- */
-function ct_input_allowlinks() {
-    $options = ct_get_options();
-    $value = $options['allowlinks'];
-    echo "<input type='radio' id='cleantalk_allowlinks0' name='cleantalk_settings[allowlinks]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_allowlinks0'> " . __('No') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_allowlinks1' name='cleantalk_settings[allowlinks]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_allowlinks1'> " . __('Yes') . "</label>";
-}
-
-/**
- * Admin callback function - Displays inputs of 'language' plugin parameter
- */
-function ct_input_language() {
-    $options = ct_get_options();
-    $value = $options['language'];
-    echo "<input type='radio' id='cleantalk_language0' name='cleantalk_settings[language]' value='en' " . ($value == 'en' ? 'checked' : '') . " /><label for='cleantalk_language0'> " . __('English', 'cleantalk') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_language1' name='cleantalk_settings[language]' value='ru' " . ($value == 'ru' ? 'checked' : '') . " /><label for='cleantalk_language1'> " . __('Russian', 'cleantalk') . "</label>";
-    admin_addDescriptionsFields(__('This language will be used to notice blogs owner and commentators.', 'cleantalk'));
-}
-
-/**
  * Admin callback function - Displays inputs of 'apikey' plugin parameter
  */
 function ct_input_apikey() {
     $options = ct_get_options();
-    $def_options = __('enter key', 'cleantalk');
     $value = $options['apikey'];
-    $def_value = $def_options['apikey'];
-    echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' onfocus=\"if(this.value=='$def_value') this.value='';\"/>";
+
+    $def_value = ''; 
+    echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' />";
     echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
 }
 
@@ -662,9 +630,7 @@ function ct_settings_validate($input) {
 function ct_settings_page() {
     ?>
     <div>
-        <h2><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>. Spam protection 
-
-        </h2>
+        <h2><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b></h2>
         <form action="options.php" method="post">
             <?php settings_fields('cleantalk_settings'); ?>
             <?php do_settings_sections('cleantalk'); ?>
