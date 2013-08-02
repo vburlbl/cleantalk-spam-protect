@@ -1,12 +1,14 @@
 <?php
 /*
-  Plugin Name: CleanTalk
+  Plugin Name: CleanTalk. Anti-spam app
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. Spam protection is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple and clever antispam for your blog. 
-  Version: 2.4.10
+  Description: Plug-in filters spam bots in the comments of a blog without move to trash. Spam protection is invisible for visitors of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple, smart antispam for your blog. 
+  Version: 2.4.11
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
+
+$ct_agent_version = 'wordpress-2411';
 
 add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
@@ -192,6 +194,7 @@ function ct_add_hidden_fields($post_id = 0) {
  * Public action 'parse_request' - Inits session value
  */
 function ct_set_session() {
+
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -230,11 +233,25 @@ function ct_check($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version;
 
     if (ct_is_user_enable() === false) {
         return $comment;
     }
+    
+    $wp_host = null;
+    if (preg_match("@^(?:https?://)([^/:]+)@i", get_permalink($comment['comment_post_ID']), $matches))
+        $wp_host = $matches[1];
+    
+    $author_host = null;
+    if (preg_match("@^(?:https?://)([^/:]+)@i", $comment['comment_author_url'], $matches))
+        $author_host = $matches[1];
+    
+    // Skip tests for selfmade pingback's
+    if ($comment['comment_type'] == 'pingback' && $wp_host !== null && $wp_host === $author_host) {
+        return $comment;
+    }
+
     $options = ct_get_options();
 
     $comment_post_id = $comment['comment_post_ID'];
@@ -270,7 +287,7 @@ function ct_check($comment) {
         if ($user_info === false)
             $user_info = '';
 			
-		$post_info['comment_type'] = $comment['comment_type']; 
+		$post_info['comment_type'] = $comment['comment_type'];
 		$post_info['post_url'] = ct_post_url(null, $comment_post_id); 
 
 		$post_info = json_encode($post_info);
@@ -315,7 +332,7 @@ function ct_check($comment) {
     $ct_request->sender_email = $comment['comment_author_email'];
     $ct_request->sender_nickname = $comment['comment_author'];
     $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
-    $ct_request->agent = 'wordpress-2410';
+    $ct_request->agent = $ct_agent_version; 
     $ct_request->sender_info = $user_info;
     $ct_request->submit_time = $submit_time;
     $ct_request->js_on = $checkjs;
@@ -331,7 +348,7 @@ function ct_check($comment) {
                 )
         );
     }
-
+    
     if ($ct_result->stop_queue == 1) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';

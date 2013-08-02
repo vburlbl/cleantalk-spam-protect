@@ -1,17 +1,17 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: comments, spam, cleantalk, anti-spam, antispam, captcha, comment, spambot, spam-bot, recaptcha, block spam, Spam Free, spamfree 
+Tags: spam, anti-spam, antispam, spambot, spam-bot, block spam, spammers, spamfree, captcha, recaptcha, comment, comments 
 Requires at least: 3.1.2
 License: GPLv2 
-Tested up to: 3.5.1
-Stable tag: 2.4.10 
+Tested up to: 3.6
+Stable tag: 2.4.11 
 
-No spam in the comments. Smart, simple antispam without CAPTCHA.
+No spam in the comments. Smart, simple anti-spam app without CAPTCHA.
 
 == Description ==
 1. Stops spam bots in the comments.
 1. Invisible spam protection for visitors.
-1. Antispam without CAPTCHA.
+1. Anti-spam without CAPTCHA.
 
 Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam bots. It's simple and clever antispam for your blog.
 
@@ -25,14 +25,14 @@ Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setu
 
 == Frequently Asked Questions ==
 
-= How plugin stop spam? =
-Plugin uses several simple tests to stop spambots
+= How plugin stops spam? =
+Plugin uses several simple tests to stop spammers.
 
-* Blacklists checks by Email, IP in lists with several billions records.
+* Spam bots signatures.
+* Blacklists checks by Email, IP, web-sites domain names.
 * JavaScript availability.
 * Comment submit time.
 * Relevance test for the comment.
-* Spam signatures.
 
 = How plugin works? =
 
@@ -40,18 +40,21 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 = Why do I need one more anti-spam plugin? =
 
-1. The plugin is more effective than CAPTCHA because use several methods to stop spambots.
-1. This plugin stops spam-bots automatically, plugin invisible for blog visitors and admins.
+1. The plugin is more effective than CAPTCHA because use several methods to stop spammers.
+1. This plugin stops spam bots automatically, plugin invisible for blog visitors and admins.
 1. CleanTalk automatically approves relevant, not spam comments.
 
 == Screenshots ==
 
-1. Plug-in's antispam work scheme 
-1. CleanTalk stops spam comment
-1. CleanTalk settings to filter spam-bots
-1. Service Control panel at cleantalk.org 
+1. Plug-in's anti-spam work scheme 
+1. CleanTalk stops spammer comment
+1. CleanTalk settings to filter spam bots
 
 == Changelog ==
+
+= 2.4.11 2013-08-02 =
+  * Removed spam tests for self-made pingbacks 
+  * Tested up to WP 3.6
 
 = 2.4.10 2013-07-24 =
   * Fixed warning in PHP 5.4
