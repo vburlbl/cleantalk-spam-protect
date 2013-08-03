@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: spam, anti-spam, antispam, spambot, spam-bot, block spam, spammers, spamfree, captcha, recaptcha, comment, comments 
+Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, recaptcha, comment, comments, plugin 
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.6
@@ -13,7 +13,7 @@ No spam in the comments. Smart, simple anti-spam app without CAPTCHA.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA.
 
-Plug-in filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam bots. It's simple and clever antispam for your blog.
+Plugin filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plugin not uses CAPTCHA or Q&A to stop spammers. It's simple and clever antispam for your blog.
 
 Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
@@ -21,7 +21,7 @@ This plugin is a client application for anti-spam service cleantalk.org. It is f
 
 == Installation ==
 
-Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Setup manual</a> at the plugin's site
+Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Antispam setup manual</a> at the plugin's site.
 
 == Frequently Asked Questions ==
 
@@ -46,9 +46,9 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 == Screenshots ==
 
-1. Plug-in's anti-spam work scheme 
-1. CleanTalk stops spammer comment
-1. CleanTalk settings to filter spam bots
+1. Antispam work scheme of plugin 
+1. Plugin stops spammer comment
+1. Antispam settings to filter spam bots
 
 == Changelog ==
 
