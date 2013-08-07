@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 0.20.2
+ * @version 1.21.3
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -13,20 +13,30 @@
  */
 
 /**
-* @ignore
+* Load JSON functions if they are not exists 
 */
-require_once(dirname(__FILE__) . '/cleantalk.xmlrpc.php');
+if(!function_exists('json_encode')) {
+    require_once 'JSON.php';
+
+    function json_encode($data) {
+        $json = new Services_JSON();
+        return( $json->encode($data) );
+    }
+
+}
+if(!function_exists('json_decode')) {
+    require_once 'JSON.php';
+
+    function json_decode($data) {
+        $json = new Services_JSON();
+        return( $json->decode($data) );
+    }
+}
 
 /**
  * Response class
  */
 class CleantalkResponse {
-
-    /**
-     * Unique user ID
-     * @var string
-     */
-    public $sender_id = null;
 
     /**
      *  Is stop words
@@ -128,9 +138,9 @@ class CleantalkResponse {
      * Create server response
      *
      * @param type $response
-     * @param xmlrpcresp $obj
+     * @param type $obj
      */
-    function __construct($response = null, xmlrpcresp $obj = null) {
+    function __construct($response = null, $obj = null) {
         if ($response && is_array($response) && count($response) > 0) {
             foreach ($response as $param => $value) {
                 $this->{$param} = $value;
@@ -140,27 +150,24 @@ class CleantalkResponse {
             $this->errstr = $obj->errstr;
 
 			$this->errstr = preg_replace("/.+(\*\*\*.+\*\*\*).+/", "$1", $this->errstr);
+            // Разбираем  ответ с клинтолка
+            $this->stop_words = isset($obj->stop_words) ? $obj->stop_words : null;
+            $this->comment = isset($obj->comment) ? utf8_decode($obj->comment) : null;
+            $this->blacklisted = (isset($obj->blacklisted)) ? $obj->blacklisted : null;
+            $this->allow = (isset($obj->allow)) ? $obj->allow : null;
+            $this->id = (isset($obj->id)) ? $obj->id : null;
+            $this->fast_submit = (isset($obj->fast_submit)) ? $obj->fast_submit : 0;
+            $this->spam = (isset($obj->spam)) ? $obj->spam : 0;
+            $this->js_disabled = (isset($obj->js_disabled)) ? $obj->js_disabled : 0;
+            $this->sms_allow = (isset($obj->sms_allow)) ? $obj->sms_allow : null;
+            $this->sms = (isset($obj->sms)) ? $obj->sms : null;
+            $this->sms_error_code = (isset($obj->sms_error_code)) ? $obj->sms_error_code : null;
+            $this->sms_error_text = (isset($obj->sms_error_text)) ? $obj->sms_error_text : null;
+            $this->stop_queue = (isset($obj->stop_queue)) ? $obj->stop_queue : 0;
+            $this->inactive = (isset($obj->inactive)) ? $obj->inactive : 0;
 
-            // Разбираем xmlrpcresp ответ с клинтолка
-            if ($obj->val !== 0) {
-                $this->sender_id = (isset($obj->val['sender_id'])) ? $obj->val['sender_id'] : null;
-                $this->stop_words = isset($obj->val['stop_words']) ? $obj->val['stop_words'] : null;
-                $this->comment = $obj->val['comment'];
-                $this->blacklisted = (isset($obj->val['blacklisted'])) ? $obj->val['blacklisted'] : null;
-                $this->allow = (isset($obj->val['allow'])) ? $obj->val['allow'] : null;
-                $this->id = (isset($obj->val['id'])) ? $obj->val['id'] : null;
-                $this->fast_submit = (isset($obj->val['fast_submit'])) ? $obj->val['fast_submit'] : 0;
-                $this->spam = (isset($obj->val['spam'])) ? $obj->val['spam'] : 0;
-                $this->js_disabled = (isset($obj->val['js_disabled'])) ? $obj->val['js_disabled'] : 0;
-                $this->sms_allow = (isset($obj->val['sms_allow'])) ? $obj->val['sms_allow'] : null;
-                $this->sms = (isset($obj->val['sms'])) ? $obj->val['sms'] : null;
-                $this->sms_error_code = (isset($obj->val['sms_error_code'])) ? $obj->val['sms_error_code'] : null;
-                $this->sms_error_text = (isset($obj->val['sms_error_text'])) ? $obj->val['sms_error_text'] : null;
-                $this->stop_queue = (isset($obj->val['stop_queue'])) ? $obj->val['stop_queue'] : 0;
-                $this->inactive = (isset($obj->val['inactive'])) ? $obj->val['inactive'] : 0;
-            } else {
-                $this->comment = $this->errstr . '. Automoderator cleantalk.org';
-            }
+            if ($this->errno !== 0 && $this->errstr !== null && $this->comment === null)
+                $this->comment = '*** ' . $this->errstr . ' Automoderator cleantalk.org ***'; 
         }
     }
 
@@ -170,8 +177,6 @@ class CleantalkResponse {
  * Request class
  */
 class CleantalkRequest {
-
-    const VERSION = '0.7';
 
     /**
      * User message
@@ -246,7 +251,7 @@ class CleantalkRequest {
      * valid are 1|0
      * @var int
      */
-    public $allow_links = 0;
+    public $allow_links = null;
 
     /**
      * Time form filling
@@ -283,6 +288,12 @@ class CleantalkRequest {
      * @var type 
      */
     public $phone = null;
+    
+    /**
+    * Method name
+    * @var string
+    */
+    public $method_name = 'check_message'; 
 
     /**
      * Fill params with constructor
@@ -362,7 +373,7 @@ class Cleantalk {
      * @var bool
      */
     public $stay_on_server = false;
-
+    
     /**
      * Function checks whether it is possible to publish the message
      * @param CleantalkRequest $request
@@ -382,7 +393,7 @@ class Cleantalk {
         }
 
         $msg = $this->createMsg('check_message', $request);
-        return $this->xmlRequest($msg);
+        return $this->httpRequest($msg);
     }
 
     /**
@@ -404,7 +415,7 @@ class Cleantalk {
         }
 
         $msg = $this->createMsg('check_newuser', $request);
-        return $this->xmlRequest($msg);
+        return $this->httpRequest($msg);
     }
 
     /**
@@ -427,7 +438,8 @@ class Cleantalk {
         }
 
         $msg = $this->createMsg('send_feedback', $request);
-        return $this->xmlRequest($msg);
+        
+        return $this->httpRequest($msg);
     }
 
     /**
@@ -481,13 +493,6 @@ class Cleantalk {
         // special and must be
         switch ($method) {
             case 'check_message':
-                
-                // Convert strings to UTF8
-                $this->message = $this->stringToUTF8($request->message);
-                $this->example = $this->stringToUTF8($request->example);
-
-                $request->message = $this->compressData($request->message);
-				$request->example = $this->compressData($request->example);
                 break;
 
             case 'check_newuser':
@@ -504,21 +509,6 @@ class Cleantalk {
                     $error_params[] = 'feedback';
                 }
                 break;
-        }
-        
-        if (isset($request->sender_info)) {
-            if (function_exists('json_decode')){
-                $sender_info = json_decode($request->sender_info, true);
-
-                // Save request's creation timestamps 
-                if (function_exists('microtime'))
-                    $sender_info['request_submit_time'] = (float) (time() + (float) microtime()); 
-                
-                if (function_exists('json_encode')){
-                    $request->sender_info = json_encode($sender_info);
-
-                }
-            }
         }
         
         return $error_params;
@@ -558,127 +548,142 @@ class Cleantalk {
     private function createMsg($method, CleantalkRequest $request) {
         switch ($method) {
             case 'check_message':
-                $params = array(
-                    'message' => $request->message,
-                    'base_text' => $request->example,
-                    'auth_key' => $request->auth_key,
-                    'agent' => $request->agent,
-                    'sender_info' => $request->sender_info,
-                    'ct_stop_words' => $request->stoplist_check,
-                    'response_lang' => $request->response_lang,
-                    'session_ip' => $request->sender_ip,
-                    'user_email' => $request->sender_email,
-                    'user_name' => $request->sender_nickname,
-                    'post_info' => $request->post_info,
-                    'ct_links' => $request->allow_links,
-                    'submit_time' => $request->submit_time,
-                    'js_on' => $request->js_on);
+                // Convert strings to UTF8
+                $request->message = $this->stringToUTF8($request->message);
+                $request->example = $this->stringToUTF8($request->example);
+
+                $request->message = $this->compressData($request->message);
+				$request->example = $this->compressData($request->example);
                 break;
 
             case 'check_newuser':
-                $params = array(
-                    'auth_key' => $request->auth_key,
-                    'agent' => $request->agent,
-                    'response_lang' => $request->response_lang,
-                    'session_ip' => $request->sender_ip,
-                    'user_email' => $request->sender_email,
-                    'user_name' => $request->sender_nickname,
-                    'tz' => $request->tz,
-                    'submit_time' => $request->submit_time,
-                    'js_on' => $request->js_on,
-                    'phone' => $request->phone,
-                    'sender_info' => $request->sender_info);
                 break;
 
             case 'send_feedback':
                 if (is_array($request->feedback)) {
-                    $feedback = implode(';', $request->feedback);
-                } else {
-                    $feedback = $request->feedback;
+                    $request->feedback = implode(';', $request->feedback);
                 }
-
-                $params = array(
-                    'auth_key' => $request->auth_key, // !
-                    'feedback' => $feedback);
                 break;
         }
+        
+        $request->method_name = $method;
 
-        $xmlvars = array();
-        foreach ($params as $param) {
-            $xmlvars[] = new xmlrpcval($param);
-        }
+        return $request;
+    }
+    
+    /**
+     * Send JSON request to servers 
+     * @param $msg
+     * @return boolean|\CleantalkResponse
+     */
+    private function sendRequest($data = null, $url, $server_timeout = 3) {
+        
+        // Convert to array
+        $data = json_decode(json_encode($data), true);
+        
+        // Convert to JSON
+        $data = json_encode($data);
 
-        $ct_params = new xmlrpcmsg(
-                        $method,
-                        array(new xmlrpcval($xmlvars, "array"))
+        $opts = array('http' =>
+          array(
+            'method'  => 'POST',
+            'header'  => "Content-Type: text/html\r\n",
+            'content' => $data,
+            'timeout' => $server_timeout
+          )
         );
 
-        return $ct_params;
+        $context  = stream_context_create($opts);
+        $result = @file_get_contents($url, false, $context);
+       
+        $errstr = null;
+        $response = json_decode($result);
+        if ($result !== false && is_object($response)) {
+            $response->errno = 0;
+            $response->errstr = $errstr;
+        } else {
+            if ($result === false)
+                $errstr = 'Failed connect to ' . $url;
+            else
+                $errstr = $result;
+            
+            $response = null;
+            $response['errno'] = 1;
+            $response['errstr'] = $errstr;
+            $response = json_decode(json_encode($response));
+        } 
+        
+        return $response;
     }
 
     /**
-     * XM-Request
-     * @param xmlrpcmsg $msg
+     * httpRequest 
+     * @param $msg
      * @return boolean|\CleantalkResponse
      */
-    private function xmlRequest(xmlrpcmsg $msg) {
+    private function httpRequest($msg) {
+        $result = false;
         if (((isset($this->work_url) && $this->work_url !== '') && ($this->server_changed + $this->server_ttl > time()))
 				|| $this->stay_on_server == true) {
 	        
             $url = (!empty($this->work_url)) ? $this->work_url : $this->server_url;
-            $ct_request = new xmlrpc_client($url);
-            $ct_request->request_charset_encoding = 'utf-8';
-            $ct_request->return_type = 'phpvals';
-            $ct_request->setDebug($this->debug);
 					
-            $result = $ct_request->send($msg, $this->server_timeout);
+            $result = $this->sendRequest($msg, $url, $this->server_timeout);
         }
+        
+        if (($result === false || $result->errno != 0) && $this->stay_on_server == false) {
+            
+            // Split server url to parts
+            preg_match("@^(https?://)([^/:]+)(.*)@i", $this->server_url, $matches);
+            $url_prefix = '';
+            if (isset($matches[1]))
+                $url_prefix = $matches[1];
 
-        if ((!isset($result) || $result->errno != 0) && $this->stay_on_server == false) {
-            $matches = array();
-            preg_match("#^(http://|https://)([a-z\.\-0-9]+):?(\d*)$#i", $this->server_url, $matches);
-            $url_prefix = $matches[1];
-            $pool = $matches[2];
-            $port = $matches[3];
-            if (empty($url_prefix))
+            $pool = null;
+            if (isset($matches[2]))
+                $pool = $matches[2];
+            
+            $url_suffix = '';
+            if (isset($matches[3]))
+                $url_suffix = $matches[3];
+            
+            if ($url_prefix === '')
                 $url_prefix = 'http://';
+
             if (empty($pool)) {
                 return false;
             } else {
+
+                // Loop until find work server
                 foreach ($this->get_servers_ip($pool) as $server) {
                     if ($server['host'] === 'localhost' || $server['ip'] === null) {
-                        $work_url = $url_prefix . $server['host'];
+                        $work_url = $server['host'];
                     } else {
                         $server_host = gethostbyaddr($server['ip']);
-                        $work_url = $url_prefix . $server_host;
+                        $work_url = $server_host;
                     }
-                    
-                    $work_url = ($port !== '') ? $work_url . ':' . $port : $work_url;
+                    $work_url = $url_prefix . $work_url; 
+                    if (isset($url_suffix)) 
+                        $work_url = $work_url . $url_suffix;
 
                     $this->work_url = $work_url;
                     $this->server_ttl = $server['ttl'];
-                    $ct_request = new xmlrpc_client($this->work_url);
-                    $ct_request->request_charset_encoding = 'utf-8';
-                    $ct_request->return_type = 'phpvals';
-                    $ct_request->setDebug($this->debug);
-                    $result = $ct_request->send($msg, $this->server_timeout);
+                    
+                    $result = $this->sendRequest($msg, $this->work_url, $this->server_timeout);
 
-                    if (!$result->faultCode()) {
+                    if ($result !== false && $result->errno === 0) {
                         $this->server_change = true;
                         break;
                     }
                 }
             }
         }
-
+        
         $response = new CleantalkResponse(null, $result);
 
-        if (!empty($response->sender_id)) {
-            $this->setSenderId($response->sender_id);
-        }
         return $response;
     }
-
+    
     /**
      * Function DNS request
      * @param $host
@@ -738,23 +743,6 @@ class Cleantalk {
         }
 
         return $response;
-    }
-
-    /**
-     * Function to get the SenderID
-     * @return string
-     */
-    public function getSenderId() {
-        return ( isset($_COOKIE['ct_sender_id']) && !empty($_COOKIE['ct_sender_id']) ) ? $_COOKIE['ct_sender_id'] : '';
-    }
-
-    /**
-     * Function to change the SenderID
-     * @param $senderId
-     * @return bool
-     */
-    private function setSenderId($senderId) {
-        return @setcookie('ct_sender_id', $senderId);
     }
 
     /**
