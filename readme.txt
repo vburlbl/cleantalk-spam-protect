@@ -4,7 +4,7 @@ Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfre
 Requires at least: 3.1.2
 License: GPLv2 
 Tested up to: 3.6
-Stable tag: 2.4.11 
+Stable tag: 2.4.12 
 
 No spam in the comments. Smart, simple anti-spam app without CAPTCHA.
 
@@ -21,7 +21,7 @@ This plugin is a client application for anti-spam service cleantalk.org. It is f
 
 == Installation ==
 
-Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Antispam setup manual</a> at the plugin's site.
+Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">setup manual</a> at the plugin's site.
 
 == Frequently Asked Questions ==
 
@@ -38,6 +38,14 @@ Plugin uses several simple tests to stop spammers.
 
 Plugin sends a comment's text and several previous approved comments to the servers. Servers evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
 
+= Will plugin works with my theme? =
+
+Plugin works with all WordPress themes. With some themes may not works JavaScript antispam method, but it's not crucial to protect your blog from spam.
+
+= How can I test antispam protection? =
+
+Please use test email stop_email@example.com for comments. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a>.
+
 = Why do I need one more anti-spam plugin? =
 
 1. The plugin is more effective than CAPTCHA because use several methods to stop spammers.
@@ -51,6 +59,11 @@ Plugin sends a comment's text and several previous approved comments to the serv
 1. Antispam settings to filter spam bots
 
 == Changelog ==
+
+= 2.4.12 2013-08-12 =
+  * Removed RPC::XML library from plugin. 
+  * Switched plugin to HTTP+JSON connection with servers.
+  * Fixed bug with comments antispam tests with non UTF8 codepage.
 
 = 2.4.11 2013-08-02 =
   * Removed spam tests for self-made pingbacks 
