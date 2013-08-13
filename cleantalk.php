@@ -2,13 +2,13 @@
 /*
   Plugin Name: CleanTalk. Anti-spam app
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plug-in filters spam bots in the comments of a blog without move to trash. Spam protection is invisible for visitors of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple, smart antispam for your blog. 
-  Version: 2.4.11
+  Description: Plug-in filters spam bots in the comments of a blog without move to trash. Spam protection is invisible for visitors of a blog. The plug-in doesn't use CAPTCHA or Q&A to stop spam bots. It's simple, smart antispam for your blog. 
+  Version: 2.4.12
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-2411';
+$ct_agent_version = 'wordpress-2412';
 
 add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
@@ -257,7 +257,7 @@ function ct_check($comment) {
     $comment_post_id = $comment['comment_post_ID'];
 
     $post = get_post($comment_post_id);
-    
+
 	$checkjs = null; 
     if (!isset($_POST['ct_checkjs'])) {
         $checkjs = null;

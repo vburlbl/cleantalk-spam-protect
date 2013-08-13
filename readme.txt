@@ -13,7 +13,7 @@ No spam in the comments. Smart, simple anti-spam app without CAPTCHA.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA.
 
-Plugin filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plugin not uses CAPTCHA or Q&A to stop spammers. It's simple and clever antispam for your blog.
+Plugin filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA or Q&A to stop spammers. It's simple and clever antispam for your blog.
 
 Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
