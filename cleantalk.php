@@ -2,13 +2,13 @@
 /*
   Plugin Name: CleanTalk. Anti-spam app
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plug-in filters spam bots in the comments of a blog without move to trash. Spam protection is invisible for visitors of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple, smart antispam for your blog. 
-  Version: 2.4.11
+  Description: Plug-in filters spam bots in the comments of a blog without move to trash. Spam protection is invisible for visitors of a blog. The plug-in doesn't use CAPTCHA or Q&A to stop spam bots. It's simple, smart antispam for your blog. 
+  Version: 2.4.13
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-2411';
+$ct_agent_version = 'wordpress-2413';
 
 add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
@@ -257,7 +257,7 @@ function ct_check($comment) {
     $comment_post_id = $comment['comment_post_ID'];
 
     $post = get_post($comment_post_id);
-    
+
 	$checkjs = null; 
     if (!isset($_POST['ct_checkjs'])) {
         $checkjs = null;
@@ -686,7 +686,11 @@ function admin_notice_message(){
     $options = ct_get_options();
 	if ($options['apikey'] === 'enter key' || $options['apikey'] === '')
 		echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
-	
+    
+    $allow_url_fopen = ini_get('allow_url_fopen');
+    if (!isset($allow_url_fopen) || $allow_url_fopen == '')
+		echo '<div class="updated"><p>' . __("Please enable PHP <b>allow_url_fopen</b> setting to use CleanTalk plugin!", 'cleantalk') . '</p></div>';
+
 	ct_send_feedback();
 
 	return true;
