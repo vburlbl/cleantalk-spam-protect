@@ -1,23 +1,24 @@
-=== Plugin Name ===
+=== CleanTalk. Anti-spam app ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, recaptcha, comment, comments, plugin 
-Requires at least: 3.1.2
-License: GPLv2 
+Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, recaptcha, comment, comments, math, cloud, blacklist 
+Requires at least: 3.0
 Tested up to: 3.6
 Stable tag: 2.4.12 
+License: GPLv2 
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam in the comments. Smart, simple anti-spam app without CAPTCHA.
+No spam in the comments. Cloud, smart, invisible anti-spam app without CAPTCHA.
 
 == Description ==
 1. Stops spam bots in the comments.
 1. Invisible spam protection for visitors.
-1. Anti-spam without CAPTCHA.
+1. Anti-spam without CAPTCHA, math or Q&A.
 
-Plugin filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA or Q&A to stop spammers. It's simple and clever antispam for your blog.
+Plugin filters spam bots in the comments of a blog without move to trash or approval queue. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA or Q&A to stop spammers. It's simple and clever antispam for your blog.
 
 Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-This plugin is a client application for anti-spam service cleantalk.org. It is free to use for small and medium sized blogs.
+This plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
 
 == Installation ==
 
@@ -36,7 +37,7 @@ Plugin uses several simple tests to stop spammers.
 
 = How plugin works? =
 
-Plugin sends a comment's text and several previous approved comments to the servers. Servers evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
+Plugin sends a comment's text and several previous approved comments to the cloud. Cloud evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
 
 = Will plugin works with my theme? =
 
@@ -54,9 +55,9 @@ Please use test email stop_email@example.com for comments. Also you can see comm
 
 == Screenshots ==
 
-1. Antispam work scheme of plugin 
-1. Plugin stops spammer comment
+1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress
 1. Antispam settings to filter spam bots
+1. Not spam, but also not relevant comment moved by plugin to manual approve queue. 
 
 == Changelog ==
 
