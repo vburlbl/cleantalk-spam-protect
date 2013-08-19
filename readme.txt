@@ -1,6 +1,6 @@
 === CleanTalk. Cloud anti-spam ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, recaptcha, comment, comments, math, cloud, blacklist 
+Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist 
 Requires at least: 3.0
 Tested up to: 3.6
 Stable tag: 2.4.13 
