@@ -1,4 +1,4 @@
-=== CleanTalk. Anti-spam app ===
+=== CleanTalk. Cloud anti-spam ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
 Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, recaptcha, comment, comments, math, cloud, blacklist 
 Requires at least: 3.0
@@ -7,9 +7,11 @@ Stable tag: 2.4.12
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam in the comments. Cloud, smart, invisible anti-spam app without CAPTCHA.
+No spam in the comments. Cloud, smart, invisible anti-spam without CAPTCHA.
 
 == Description ==
+
+= Features =
 1. Stops spam bots in the comments.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA, math or Q&A.
@@ -19,6 +21,9 @@ Plugin filters spam bots in the comments of a blog without move to trash or appr
 Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 This plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
+
+= Requirements =
+WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting.
 
 == Installation ==
 
@@ -56,10 +61,15 @@ Please use test email stop_email@example.com for comments. Also you can see comm
 == Screenshots ==
 
 1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress
-1. Antispam settings to filter spam bots
-1. Not spam, but also not relevant comment moved by plugin to manual approve queue. 
+1. Antispam settings to filter spam bots. Just enter Access key and app ready to stop spammers at the blog.
+1. Not spam, not relevant to article comment has moved to approval. 
 
 == Changelog ==
+
+= 2.4.13 2013-08-19 =
+  * Changed: Switched HTTP requests from file_get_contents() to CURL. Added file_get_contens() as backup connection to the servers. 
+  * Changed: Removed feedback requests for comments moved to trash. 
+  * Fixed: "Fail connect to servers..." error on hostings with disabled 'allow_url_fopen' PHP option.
 
 = 2.4.12 2013-08-12 =
   * Removed RPC::XML library from plugin. 
@@ -150,3 +160,8 @@ Please use test email stop_email@example.com for comments. Also you can see comm
 
 = 1.1.0 =
   * First version
+
+== Upgrade Notice ==
+= 2.4.13 2013-08-19 =
+  * Fixed: "Fail connect to servers..." error on hostings with disabled 'allow_url_fopen' PHP option.
+
