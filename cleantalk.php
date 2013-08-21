@@ -2,13 +2,13 @@
 /*
   Plugin Name: CleanTalk. Cloud anti-spam
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plugin filters spam bots in comments without move to trash. Spam protection is invisible for visitors of a blog. The plugin doesn't use CAPTCHA or Q&A to stop spam bots. It's cloud, invisible, smart antispam for your blog. 
-  Version: 2.4.13
+  Description:  It's cloud, invisible, smart antispam for your blog. The plugin doesn't use CAPTCHA, Q&A, math to stop spam bots. 
+  Version: 2.4.14
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-2413';
+$ct_agent_version = 'wordpress-2414';
 
 add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
@@ -454,7 +454,7 @@ function ct_set_meta($comment_id, $comment_status) {
     if (!empty($hash1)) {
         update_comment_meta($comment_id, 'ct_hash', $hash1);
 		
-		if (function_exists('base64_encode')) {
+        if (function_exists('base64_encode') && isset($comment_status) && $comment_status != 'spam') {
 			$post_url = ct_post_url($comment_id, $comment_post_id);
 			$post_url = base64_encode($post_url);
 			if ($post_url === false)

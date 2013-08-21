@@ -16,11 +16,9 @@ No spam in the comments. Cloud, smart, invisible anti-spam without CAPTCHA.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA, math or Q&A.
 
-Plugin filters spam bots in the comments of a blog without move to trash or approval queue. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA or Q&A to stop spammers. It's simple and clever antispam for your blog.
+Also every new comment plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. This feature works for English, Russian laguages.
 
-Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
-
-This plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
+It's simple and clever antispam for your blog. This plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting.
