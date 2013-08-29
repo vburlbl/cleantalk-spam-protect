@@ -1,27 +1,34 @@
-=== Plugin Name ===
+=== CleanTalk. Cloud anti-spam ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, recaptcha, comment, comments, plugin 
-Requires at least: 3.1.2
-License: GPLv2 
+Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist 
+Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 2.4.11 
+Stable tag: 2.4.14 
+License: GPLv2 
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam in the comments. Smart, simple anti-spam app without CAPTCHA.
+No spam in the comments. Cloud, smart, invisible anti-spam without CAPTCHA.
 
 == Description ==
+
+= Features =
 1. Stops spam bots in the comments.
 1. Invisible spam protection for visitors.
-1. Anti-spam without CAPTCHA.
+1. Anti-spam without CAPTCHA, math or Q&A.
 
-Plugin filters spam bots in the comments of a blog without move to trash or approval in the queue. The plugin is not visible for visitors and administrators of a blog. The plugin not uses CAPTCHA or Q&A to stop spammers. It's simple and clever antispam for your blog.
+Also every new comment plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. This feature works for English, Russian laguages.
 
-Every new comment compares with article and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+It's simple and clever antispam for your blog. This plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
 
-This plugin is a client application for anti-spam service cleantalk.org. It is free to use for small and medium sized blogs.
+= Requirements =
+WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting.
 
 == Installation ==
 
-Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">Antispam setup manual</a> at the plugin's site.
+1. Download, install and activate the plugin. 
+1. Get and enter the Access key in the settings
+<a href="http://cleantalk.org/register?platform=wordpress" target="_blank">http://cleantalk.org/register</a>
+1. Enjoy the blog without spam.
 
 == Frequently Asked Questions ==
 
@@ -36,7 +43,15 @@ Plugin uses several simple tests to stop spammers.
 
 = How plugin works? =
 
-Plugin sends a comment's text and several previous approved comments to the servers. Servers evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
+Plugin sends a comment's text and several previous approved comments to the cloud. Cloud evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
+
+= Will plugin works with my theme? =
+
+Plugin works with all WordPress themes. With some themes may not works JavaScript antispam method, but it's not crucial to protect your blog from spam.
+
+= How can I test antispam protection? =
+
+Please use test email stop_email@example.com for comments. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = Why do I need one more anti-spam plugin? =
 
@@ -46,11 +61,24 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 == Screenshots ==
 
-1. Antispam work scheme of plugin 
-1. Plugin stops spammer comment
-1. Antispam settings to filter spam bots
+1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress
+1. Antispam settings to filter spam bots. Just enter Access key and app ready to stop spammers at the blog.
+1. Not spam, not relevant to article comment has moved to approval. 
 
 == Changelog ==
+
+= 2.4.14 2013-08-29 =
+  * Changed: Removed feedback requests to the servers for banned (spam) comments. 
+
+= 2.4.13 2013-08-19 =
+  * Changed: Switched HTTP requests from file_get_contents() to CURL. Added file_get_contens() as backup connection to the servers. 
+  * Changed: Removed feedback requests for comments moved to trash. 
+  * Fixed: "Fail connect to servers..." error on hostings with disabled 'allow_url_fopen' PHP option.
+
+= 2.4.12 2013-08-12 =
+  * Removed RPC::XML library from plugin. 
+  * Switched plugin to HTTP+JSON connection with servers.
+  * Fixed bug with comments antispam tests with non UTF8 codepage.
 
 = 2.4.11 2013-08-02 =
   * Removed spam tests for self-made pingbacks 
@@ -136,3 +164,11 @@ Plugin sends a comment's text and several previous approved comments to the serv
 
 = 1.1.0 =
   * First version
+
+== Upgrade Notice ==
+= 2.4.14 2013-08-29 =
+  * Changed: Removed feedback requests to the servers for banned (spam) comments.
+
+= 2.4.13 2013-08-19 =
+  * Fixed: "Fail connect to servers..." error on hostings with disabled 'allow_url_fopen' PHP option.
+

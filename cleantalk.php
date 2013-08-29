@@ -1,14 +1,14 @@
 <?php
 /*
-  Plugin Name: CleanTalk. Anti-spam app
+  Plugin Name: CleanTalk. Cloud anti-spam
   Plugin URI: http://cleantalk.org/wordpress
-  Description: Plug-in filters spam bots in the comments of a blog without move to trash. Spam protection is invisible for visitors of a blog. The plug-in not uses CAPTCHA or Q&A to stop spam-bots. It's simple, smart antispam for your blog. 
-  Version: 2.4.11
+  Description:  It's cloud, invisible, smart antispam for your blog. The plugin doesn't use CAPTCHA, Q&A, math to stop spam bots. 
+  Version: 2.4.14
   Author: СleanTalk team <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-2411';
+$ct_agent_version = 'wordpress-2414';
 
 add_action('init', 'ct_init_locale');
 add_action('delete_comment', 'ct_delete_comment_meta');    // param - comment ID
@@ -25,7 +25,6 @@ if (is_admin()) {
     add_action('comment_approved_to_unapproved', 'ct_comment_unapproved'); // param - comment object
     add_action('comment_unapproved_to_spam', 'ct_comment_spam');  // param - comment object
     add_action('comment_approved_to_spam', 'ct_comment_spam');   // param - comment object
-    add_action('trash_comment', 'ct_comment_trash');    // param - comment ID
     add_filter('get_comment_text', 'ct_get_comment_text');   // param - current comment text
     add_filter('unspam_comment', 'ct_unspam_comment');
 }
@@ -101,7 +100,7 @@ function ct_feedback($hash, $message, $allow) {
 	} else {
 		$_SESSION['feedback_request'] .= $ct_feedback; 
 	}
-	
+
 	return $resultMessage;
 }
 
@@ -257,7 +256,7 @@ function ct_check($comment) {
     $comment_post_id = $comment['comment_post_ID'];
 
     $post = get_post($comment_post_id);
-    
+
 	$checkjs = null; 
     if (!isset($_POST['ct_checkjs'])) {
         $checkjs = null;
@@ -455,7 +454,7 @@ function ct_set_meta($comment_id, $comment_status) {
     if (!empty($hash1)) {
         update_comment_meta($comment_id, 'ct_hash', $hash1);
 		
-		if (function_exists('base64_encode')) {
+        if (function_exists('base64_encode') && isset($comment_status) && $comment_status != 'spam') {
 			$post_url = ct_post_url($comment_id, $comment_post_id);
 			$post_url = base64_encode($post_url);
 			if ($post_url === false)
@@ -528,18 +527,6 @@ function ct_unspam_comment($comment_id) {
 }
 
 /**
- * Admin action 'trash_comment' - Sends bad feedback to cleantalk
- * @param 	int $comment_id Comment ID
- * @return	boolean TRUE
- */
-function ct_comment_trash($comment_id) {
-    $comment = get_comment($comment_id, 'ARRAY_A');
-    $hash = get_comment_meta($comment_id, 'ct_hash', true);
-    ct_feedback($hash, $comment['comment_content'], 0);
-    return true;
-}
-
-/**
  * Admin filter 'get_comment_text' - Adds some info to comment text to display
  * @param 	string $current_text Current comment text
  * @return	string New comment text
@@ -578,7 +565,7 @@ function ct_admin_add_page() {
 function ct_admin_init() {
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
     add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
-    add_settings_field('cleantalk_autoPubRevelantMess', __('Publicate relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
 }
 
@@ -601,7 +588,7 @@ function ct_input_autoPubRevelantMess () {
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
-    admin_addDescriptionsFields(__('Relevant comments will be automatic publicated at the blog.', 'cleantalk'));
+    admin_addDescriptionsFields(__('Relevant (not spam) comments will be automatic published at the blog', 'cleantalk'));
 }
 
 /**
@@ -687,7 +674,7 @@ function admin_notice_message(){
 	if ($options['apikey'] === 'enter key' || $options['apikey'] === '')
 		echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
 	
-	ct_send_feedback();
+    ct_send_feedback();
 
 	return true;
 }
