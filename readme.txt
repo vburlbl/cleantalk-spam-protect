@@ -14,7 +14,9 @@ No spam in the comments. Cloud, smart, invisible anti-spam without CAPTCHA.
 = Features =
 1. Stops spam bots in the comments.
 1. Invisible spam protection for visitors.
-1. Anti-spam without CAPTCHA, math or Q&A.
+1. Anti-spam without CAPTCHA, math, puzzles or Q&A.
+
+Plugin filters spam bots in the comments, spam moves to trash. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA, Q&A, puzzles or math to stop spammers. It's simple and clever antispam for your blog.
 
 Also every new comment plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. This feature works for English, Russian laguages.
 
