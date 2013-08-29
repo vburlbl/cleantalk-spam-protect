@@ -3,7 +3,7 @@ Contributors: znaeff, default.asp, shagimuratov, aleontiev
 Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist 
 Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 2.4.13 
+Stable tag: 2.4.14 
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 == Installation ==
 
-Please use <a href="http://cleantalk.org/install/wordpress" target="_blank">setup manual</a> at the plugin's site.
+1. Download, install and activate the plugin. 
+1. Get and enter the Access key in the settings
+<a href="http://cleantalk.org/register?platform=wordpress" target="_blank">http://cleantalk.org/register</a>
+1. Enjoy the blog without spam.
 
 == Frequently Asked Questions ==
 
@@ -48,7 +51,7 @@ Plugin works with all WordPress themes. With some themes may not works JavaScrip
 
 = How can I test antispam protection? =
 
-Please use test email stop_email@example.com for comments. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a>.
+Please use test email stop_email@example.com for comments. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = Why do I need one more anti-spam plugin? =
 
@@ -63,6 +66,9 @@ Please use test email stop_email@example.com for comments. Also you can see comm
 1. Not spam, not relevant to article comment has moved to approval. 
 
 == Changelog ==
+
+= 2.4.14 2013-08-29 =
+  * Changed: Removed feedback requests to the servers for banned (spam) comments. 
 
 = 2.4.13 2013-08-19 =
   * Changed: Switched HTTP requests from file_get_contents() to CURL. Added file_get_contens() as backup connection to the servers. 
@@ -160,6 +166,9 @@ Please use test email stop_email@example.com for comments. Also you can see comm
   * First version
 
 == Upgrade Notice ==
+= 2.4.14 2013-08-29 =
+  * Changed: Removed feedback requests to the servers for banned (spam) comments.
+
 = 2.4.13 2013-08-19 =
   * Fixed: "Fail connect to servers..." error on hostings with disabled 'allow_url_fopen' PHP option.
 
