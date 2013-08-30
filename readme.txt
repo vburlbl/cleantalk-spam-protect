@@ -11,7 +11,6 @@ No spam in the comments. Cloud, smart, invisible anti-spam without CAPTCHA.
 
 == Description ==
 
-= Features =
 1. Stops spam bots in the comments.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA, math, puzzles or Q&A.
