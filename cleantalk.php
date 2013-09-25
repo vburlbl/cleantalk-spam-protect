@@ -1,6 +1,6 @@
 <?php
 /*
-  Plugin Name: CleanTalk. Cloud anti-spam
+  Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  It's cloud, invisible, smart antispam for your blog. The plugin doesn't use CAPTCHA, Q&A, math to stop spam bots. 
   Version: 2.4.15
