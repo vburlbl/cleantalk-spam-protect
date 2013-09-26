@@ -1,17 +1,16 @@
-=== CleanTalk. Cloud anti-spam ===
+=== Anti-spam by CleanTalk ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle 
+Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite 
 Requires at least: 3.0
-Tested up to: 3.6
-Stable tag: 2.4.14 
+Tested up to: 3.6.1
+Stable tag: 2.4.15 
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam in the comments. Cloud, smart, invisible anti-spam without CAPTCHA.
+Cloud, smart, invisible anti-spam without CAPTCHA. No spam in the comments.
 
 == Description ==
 
-= Features =
 1. Stops spam bots in the comments.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA, math, puzzles or Q&A.
@@ -20,7 +19,9 @@ Plugin filters spam bots in the comments, spam moves to trash. The plugin is not
 
 Also every new comment plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. This feature works for English, Russian laguages.
 
-It's simple and clever antispam for your blog. This plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
+The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 3 000 blogs, blocks up to 300 000 spam bots attacks and approves up to 2 000 not spam comments.
+
+The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting.
@@ -68,6 +69,11 @@ Please use test email stop_email@example.com for comments. Also you can see comm
 1. Not spam, not relevant to article comment has moved to approval. 
 
 == Changelog ==
+
+= 2.4.15 2013-09-26 =
+  * Fixed: Bug with mass comments deletion 
+  * Changed: Russian localization for admin panel 
+  * Tested with mulitsite setup (WordPress network or WPMU) 
 
 = 2.4.14 2013-08-29 =
   * Changed: Removed feedback requests to the servers for banned (spam) comments. 
@@ -168,6 +174,11 @@ Please use test email stop_email@example.com for comments. Also you can see comm
   * First version
 
 == Upgrade Notice ==
+= 2.4.15 2013-09-26 =
+  * Fixed: Bug with mass comments deletion 
+  * Changed: Russian localization for admin panel 
+  * Tested with mulitsite setup (WordPress network or WPMU) 
+
 = 2.4.14 2013-08-29 =
   * Changed: Removed feedback requests to the servers for banned (spam) comments.
 
