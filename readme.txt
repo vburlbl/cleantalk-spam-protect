@@ -3,7 +3,7 @@ Contributors: znaeff, default.asp, shagimuratov, aleontiev
 Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite 
 Requires at least: 3.0
 Tested up to: 3.6.1
-Stable tag: 2.4.14 
+Stable tag: 2.4.15 
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
