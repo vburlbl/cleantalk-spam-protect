@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, default.asp, shagimuratov, aleontiev
-Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite 
+Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite, akismet, спам, 垃圾邮件, correo no deseado,  
 Requires at least: 3.0
 Tested up to: 3.6.1
 Stable tag: 2.4.15 
@@ -56,11 +56,20 @@ Plugin works with all WordPress themes. With some themes may not works JavaScrip
 
 Please use test email stop_email@example.com for comments. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
+= How the plugin is effective against spam bots? =
+Plugin Antispam by CleanTalk stops about 99.99% of spam comments by spam bots. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
+
+= What about pingback, trackback spam? = 
+Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">Blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the Blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
+
 = Why do I need one more anti-spam plugin? =
 
 1. The plugin is more effective than CAPTCHA because use several methods to stop spammers.
 1. This plugin stops spam bots automatically, plugin invisible for blog visitors and admins.
 1. CleanTalk automatically approves relevant, not spam comments.
+
+= Should I use another antispam plugins? =
+Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of spam comments. But if necessary, the plugin can work together with Akismet, Captcha and etc.
 
 == Screenshots ==
 
