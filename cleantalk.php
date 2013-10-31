@@ -55,7 +55,7 @@ function ct_def_options() {
         'comments_test' => '1', 
         'formidable_test' => '1', 
         'remove_old_spam' => '1',
-        'spam_store_days' => '1' // Days before delete comments from folder Spam 
+        'spam_store_days' => '31' // Days before delete comments from folder Spam 
     );
 }
 
@@ -594,8 +594,6 @@ function ct_comment_approved($comment_object) {
     $comment['comment_approved'] = 1;
     wp_update_comment($comment);
     
-    delete_spam_comments();
-    
     return true;
 }
 
@@ -610,8 +608,6 @@ function ct_comment_unapproved($comment_object) {
     ct_feedback($hash, $comment['comment_content'], 0);
     $comment['comment_approved'] = 0;
     wp_update_comment($comment);
-    
-    delete_spam_comments();
     
     return true;
 }
@@ -628,8 +624,6 @@ function ct_comment_spam($comment_object) {
     $comment['comment_approved'] = 'spam';
     wp_update_comment($comment);
 
-    delete_spam_comments();
-
     return true;
 }
 
@@ -644,8 +638,6 @@ function ct_unspam_comment($comment_id) {
     $hash = get_comment_meta($comment_id, 'ct_hash', true);
     $comment['comment_content'] = ct_unmark_red($comment['comment_content']);
     $comment['comment_content'] = ct_feedback($hash, $comment['comment_content'], 1);
-    
-    delete_spam_comments();
     
     wp_update_comment($comment);
 }
@@ -850,6 +842,8 @@ function admin_notice_message(){
 	
     ct_send_feedback();
     
+    delete_spam_comments();
+
 	return true;
 }
 
