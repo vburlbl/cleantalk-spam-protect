@@ -2,7 +2,7 @@
 /*
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
-  Description:  Invisible antispam for comments and feedback forms. The plugin doesn't use CAPTCHA, Q&A, math to stop spam bots. 
+  Description:  Invisible antispam for comments and feedback forms. The plugin doesn't use CAPTCHA, Q&A, math or quiz to stop spam bots. 
   Version: 2.4.17
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
@@ -53,7 +53,9 @@ function ct_def_options() {
         'apikey' => __('enter key', 'cleantalk'),
         'autoPubRevelantMess' => '1', 
         'comments_test' => '1', 
-        'formidable_test' => '1' 
+        'formidable_test' => '1', 
+        'remove_old_spam' => '1',
+        'spam_store_days' => '31' // Days before delete comments from folder Spam 
     );
 }
 
@@ -408,7 +410,7 @@ function ct_check($comment) {
 			$example['body'] = $post->post_content;
 			$example['comments'] = null;
 			
-			$last_comments = get_comments(array('status' => 'approve', 'number' >= 10, 'post_id' => $comment_post_id));
+			$last_comments = get_comments(array('status' => 'approve', 'number' => 10, 'post_id' => $comment_post_id));
 			foreach ($last_comments as $post_comment){
 				$example['comments'] .= "\n\n" . $post_comment->comment_content;
 			}
@@ -675,16 +677,25 @@ function ct_admin_add_page() {
 function ct_admin_init() {
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
     add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
-    add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_formidable_test', __('Formidable Forms', 'cleantalk'), 'ct_input_formidable_test', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_remove_old_spam', __('Automatically delete spam comments', 'cleantalk'), 'ct_input_remove_old_spam', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+    add_settings_field('cleantalk_formidable_test', __('Formidable Forms', 'cleantalk'), 'ct_input_formidable_test', 'cleantalk', 'cleantalk_settings_anti_spam');
 }
 
 /**
  * Admin callback function - Displays description of 'main' plugin parameters section
  */
 function ct_section_settings_main() {
+    return true;
+}
+
+/**
+ * Admin callback function - Displays description of 'anti-spam' plugin parameters section
+ */
+function ct_section_settings_anti_spam() {
     return true;
 }
 
@@ -701,6 +712,20 @@ function ct_input_autoPubRevelantMess () {
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
     admin_addDescriptionsFields(__('Relevant (not spam) comments will be automatic published at the blog', 'cleantalk'));
+}
+/**
+ * @author Artem Leontiev
+ * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
+ *
+ * @return null
+ */
+function ct_input_remove_old_spam() {
+    $options = ct_get_options();
+    $value = $options['remove_old_spam'];
+    echo "<input type='radio' id='cleantalk_remove_old_spam1' name='cleantalk_settings[remove_old_spam]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_remove_old_spam0' name='cleantalk_settings[remove_old_spam]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(sprintf(__('Delete spam comments older than %d days.', 'cleantalk'),  $options['spam_store_days']));
 }
 
 /**
@@ -812,6 +837,19 @@ function admin_notice_message(){
 		echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
 	
     ct_send_feedback();
+    
+    /*
+        Deletion old spam comments
+    */
+    if ($options['remove_old_spam'] == 1) {
+        $last_comments = get_comments(array('status' => 'spam', 'number' => 1000, 'order' => 'ASC'));
+        foreach ($last_comments as $c) {
+            if (time() - strtotime($c->comment_date_gmt) > 86400 * $options['spam_store_days']) {
+                // Force deletion old spam comments
+                wp_delete_comment($c->comment_ID, true);
+            } 
+        }
+    }
 
 	return true;
 }
