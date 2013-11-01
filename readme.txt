@@ -81,6 +81,7 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress
 1. Antispam settings to filter spam bots. Just enter Access key and app ready to stop spammers at the blog.
 1. Not spam, not relevant to article comment has moved to approval. 
+1. Spam bot stopped at Formidable feedback form 
 
 == Changelog ==
 
