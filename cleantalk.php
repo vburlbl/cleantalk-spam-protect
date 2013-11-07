@@ -3,13 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  Invisible antispam for comments and feedback forms. The plugin doesn't use CAPTCHA, Q&A, math or quiz to stop spam bots. 
-  Version: 2.5.18
+  Version: 2.7
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-2518';
+$ct_agent_version = 'wordpress-27';
 $ct_checkjs_frm = 'ct_checkjs_frm';
+$ct_checkjs_register_form = 'ct_checkjs_register_form';
 
 add_action('init', 'ct_init_locale');
 add_action('comment_form', 'ct_add_hidden_fields');
@@ -18,6 +19,9 @@ add_action('admin_notices', 'admin_notice_message');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
 add_action('frm_validate_entry', 'ct_frm_validate_entry', 20, 2);
 add_action('frm_entries_footer_scripts', 'ct_frm_entries_footer_scripts', 20, 2);
+
+add_action('register_form','ct_register_form');
+add_filter('registration_errors', 'ct_registration_errors', 10, 3);
 
 if (is_admin()) {
     add_action('admin_init', 'ct_admin_init');
@@ -52,6 +56,7 @@ function ct_def_options() {
         'server' => 'http://moderate.cleantalk.ru',
         'apikey' => __('enter key', 'cleantalk'),
         'autoPubRevelantMess' => '1', 
+        'registrations_test' => '1', 
         'comments_test' => '1', 
         'formidable_test' => '1', 
         'remove_old_spam' => '0',
@@ -170,7 +175,7 @@ function ct_init_locale() {
  * Public action 'comment_form' - Adds hidden filed to define avaialbility of client's JavaScript
  * @param 	int $post_id Post ID, not used
  */
-function ct_add_hidden_fields($post_id = 0) {
+function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs') {
     $ct_checkjs_def = 0;
     $ct_checkjs_key = ct_get_checkjs_value(); 
     
@@ -180,10 +185,10 @@ function ct_add_hidden_fields($post_id = 0) {
     }
     
     ?>
-    <input type="hidden" id="ct_checkjs" name="ct_checkjs" value="0">
+    <input type="hidden" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" value="0">
     <script type="text/javascript">
         // <![CDATA[
-        document.getElementById("ct_checkjs").value = document.getElementById("ct_checkjs").value.replace("<?php echo $ct_checkjs_def ?>", "<?php echo $ct_checkjs_key ?>");
+        document.getElementById("<?php echo $field_name; ?>").value = document.getElementById("<?php echo $field_name; ?>").value.replace("<?php echo $ct_checkjs_def ?>", "<?php echo $ct_checkjs_key ?>");
         // ]]>
     </script>
     <?php
@@ -660,143 +665,6 @@ function ct_get_comment_text($current_text) {
 }
 
 /**
- * Admin action 'admin_enqueue_scripts' - Enqueue admin script of reloading admin page after needed AJAX events
- * @param 	string $hook URL of hooked page
- */
-function ct_enqueue_scripts($hook) {
-    if ($hook == 'edit-comments.php')
-        wp_enqueue_script('ct_reload_script', plugins_url('/cleantalk-rel.js', __FILE__));
-}
-
-/**
- * Admin action 'admin_menu' - Add the admin options page
- */
-function ct_admin_add_page() {
-    add_options_page(__('CleanTalk settings', 'cleantalk'), '<b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>', 'manage_options', 'cleantalk', 'ct_settings_page');
-}
-
-/**
- * Admin action 'admin_init' - Add the admin settings and such
- */
-function ct_admin_init() {
-    register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
-    add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
-    add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
-    add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_remove_old_spam', __('Automatically delete spam comments', 'cleantalk'), 'ct_input_remove_old_spam', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
-    add_settings_field('cleantalk_formidable_test', __('Formidable Forms', 'cleantalk'), 'ct_input_formidable_test', 'cleantalk', 'cleantalk_settings_anti_spam');
-}
-
-/**
- * Admin callback function - Displays description of 'main' plugin parameters section
- */
-function ct_section_settings_main() {
-    return true;
-}
-
-/**
- * Admin callback function - Displays description of 'anti-spam' plugin parameters section
- */
-function ct_section_settings_anti_spam() {
-    return true;
-}
-
-/**
- * @author Artem Leontiev
- * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
- *
- * @return null
- */
-function ct_input_autoPubRevelantMess () {
-    $options = ct_get_options();
-    $value = $options['autoPubRevelantMess'];
-    echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('Relevant (not spam) comments will be automatic published at the blog', 'cleantalk'));
-}
-/**
- * @author Artem Leontiev
- * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
- *
- * @return null
- */
-function ct_input_remove_old_spam() {
-    $options = ct_get_options();
-    $value = $options['remove_old_spam'];
-    echo "<input type='radio' id='cleantalk_remove_old_spam1' name='cleantalk_settings[remove_old_spam]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam1'> " . __('Yes') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_remove_old_spam0' name='cleantalk_settings[remove_old_spam]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(sprintf(__('Delete spam comments older than %d days.', 'cleantalk'),  $options['spam_store_days']));
-}
-
-/**
- * Admin callback function - Displays inputs of 'apikey' plugin parameter
- */
-function ct_input_apikey() {
-    $options = ct_get_options();
-    $value = $options['apikey'];
-
-    $def_value = ''; 
-    echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' />";
-    echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
-}
-
-/**
- * Admin callback function - Displays inputs of 'formidable_test' plugin parameter
- */
-function ct_input_formidable_test() {
-    $options = ct_get_options();
-    $value = $options['formidable_test'];
-    echo "<input type='radio' id='cleantalk_formidable_test1' name='cleantalk_settings[formidable_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_formidable_test1'> " . __('Yes') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_formidable_test0' name='cleantalk_settings[formidable_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_formidable_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('Spam protection for feeback plugin <a href="http://wordpress.org/plugins/formidable/">Formidable Forms</a>', 'cleantalk'));
-}
-
-/**
- * Admin callback function - Displays inputs of 'comments_test' plugin parameter
- */
-function ct_input_comments_test() {
-    $options = ct_get_options();
-    $value = $options['comments_test'];
-    echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_comments_test0' name='cleantalk_settings[comments_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_comments_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('Spam protection WordPress comments', 'cleantalk'));
-}
-
-
-/**
- * Admin callback function - Plugin parameters validator
- */
-function ct_settings_validate($input) {
-    return $input;
-}
-
-
-/**
- * Admin callback function - Displays plugin options page
- */
-function ct_settings_page() {
-    ?>
-    <div>
-        <h2><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b></h2>
-        <form action="options.php" method="post">
-            <?php settings_fields('cleantalk_settings'); ?>
-            <?php do_settings_sections('cleantalk'); ?>
-            <br>
-            <br>
-            <br>
-            <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
-        </form></div>
-
-    <?php
-}
-
-/**
  * Mark bad words
  * @global string $ct_stop_words
  * @param int $comment_id
@@ -914,5 +782,232 @@ function delete_spam_comments() {
 }
 
 
+/**
+ * Insert a hidden field to registration form
+ * @return null
+ */
+function ct_register_form() {
+    global $ct_checkjs_register_form;
+
+    ct_add_hidden_fields(0, $ct_checkjs_register_form);
+    return null;
+}
+
+/**
+ * Test users registration
+ * @return array with errors 
+ */
+function ct_registration_errors($errors, $sanitized_user_login, $user_email) {
+    global $ct_agent_version, $ct_checkjs_register_form;
+    
+    $options = ct_get_options();
+    if ($options['registrations_test'] == 0) {
+        return $errors;
+    }
+
+	$checkjs = 0; 
+    if (isset($_POST[$ct_checkjs_register_form])) {
+        if($_POST[$ct_checkjs_register_form] == ct_get_checkjs_value()) {
+            $checkjs = 1;
+        }
+    }
+    require_once('cleantalk.class.php');
+
+    $blog_lang = substr(get_locale(), 0, 2);
+    $user_info = array(
+        'cms_lang' => $blog_lang,
+        'REFFERRER' => @$_SERVER['HTTP_REFERER'],
+        'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
+    );
+    $user_info = json_encode($user_info);
+    if ($user_info === false)
+        $user_info = '';
+        
+    $sender_email = $user_email;
+    
+    $config = get_option('cleantalk_server');
+
+    $ct = new Cleantalk();
+    $ct->work_url = $config['ct_work_url'];
+    $ct->server_url = $options['server'];
+    $ct->server_ttl = $config['ct_server_ttl'];
+    $ct->server_changed = $config['ct_server_changed'];
+
+    $ct_request = new CleantalkRequest();
+
+    $ct_request->auth_key = $options['apikey'];
+    $ct_request->sender_email = $sender_email; 
+    $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+    $ct_request->sender_nickname = $sanitized_user_login; 
+    $ct_request->agent = $ct_agent_version; 
+    $ct_request->sender_info = $user_info;
+    $ct_request->js_on = $checkjs;
+
+    $ct_result = $ct->isAllowUser($ct_request);
+    if ($ct->server_change) {
+        update_option(
+                'cleantalk_server', array(
+                'ct_work_url' => $ct->work_url,
+                'ct_server_ttl' => $ct->server_ttl,
+                'ct_server_changed' => time()
+                )
+        );
+    }
+    
+    if ($ct_result->errno == 0 && $ct_result->allow == 0) {
+        $wordpress_domain = preg_replace("/^https?:\/\//", "", site_url());
+        $errors->add('ct_error', __($ct_result->comment, $wordpress_domain));
+    }
+
+    return $errors;
+}
+
+
+/**
+ * Admin action 'admin_enqueue_scripts' - Enqueue admin script of reloading admin page after needed AJAX events
+ * @param 	string $hook URL of hooked page
+ */
+function ct_enqueue_scripts($hook) {
+    if ($hook == 'edit-comments.php')
+        wp_enqueue_script('ct_reload_script', plugins_url('/cleantalk-rel.js', __FILE__));
+}
+
+/**
+ * Admin action 'admin_menu' - Add the admin options page
+ */
+function ct_admin_add_page() {
+    add_options_page(__('CleanTalk settings', 'cleantalk'), '<b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>', 'manage_options', 'cleantalk', 'ct_settings_page');
+}
+
+/**
+ * Admin action 'admin_init' - Add the admin settings and such
+ */
+function ct_admin_init() {
+    register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
+    add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
+    add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
+    add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_remove_old_spam', __('Automatically delete spam comments', 'cleantalk'), 'ct_input_remove_old_spam', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_registrations_test', __('Registration form', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+    add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+    add_settings_field('cleantalk_formidable_test', __('Formidable Forms', 'cleantalk'), 'ct_input_formidable_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+}
+
+/**
+ * Admin callback function - Displays description of 'main' plugin parameters section
+ */
+function ct_section_settings_main() {
+    return true;
+}
+
+/**
+ * Admin callback function - Displays description of 'anti-spam' plugin parameters section
+ */
+function ct_section_settings_anti_spam() {
+    return true;
+}
+
+/**
+ * @author Artem Leontiev
+ * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
+ *
+ * @return null
+ */
+function ct_input_autoPubRevelantMess () {
+    $options = ct_get_options();
+    $value = $options['autoPubRevelantMess'];
+    echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(__('Relevant (not spam) comments will be automatic published at the blog', 'cleantalk'));
+}
+/**
+ * @author Artem Leontiev
+ * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
+ *
+ * @return null
+ */
+function ct_input_remove_old_spam() {
+    $options = ct_get_options();
+    $value = $options['remove_old_spam'];
+    echo "<input type='radio' id='cleantalk_remove_old_spam1' name='cleantalk_settings[remove_old_spam]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_remove_old_spam0' name='cleantalk_settings[remove_old_spam]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(sprintf(__('Delete spam comments older than %d days.', 'cleantalk'),  $options['spam_store_days']));
+}
+
+/**
+ * Admin callback function - Displays inputs of 'apikey' plugin parameter
+ */
+function ct_input_apikey() {
+    $options = ct_get_options();
+    $value = $options['apikey'];
+
+    $def_value = ''; 
+    echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' />";
+    echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
+}
+
+/**
+ * Admin callback function - Displays inputs of 'formidable_test' plugin parameter
+ */
+function ct_input_formidable_test() {
+    $options = ct_get_options();
+    $value = $options['formidable_test'];
+    echo "<input type='radio' id='cleantalk_formidable_test1' name='cleantalk_settings[formidable_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_formidable_test1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_formidable_test0' name='cleantalk_settings[formidable_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_formidable_test0'> " . __('No') . "</label>";
+}
+
+/**
+ * Admin callback function - Displays inputs of 'comments_test' plugin parameter
+ */
+function ct_input_comments_test() {
+    $options = ct_get_options();
+    $value = $options['comments_test'];
+    echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_comments_test0' name='cleantalk_settings[comments_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_comments_test0'> " . __('No') . "</label>";
+}
+
+/**
+ * Admin callback function - Displays inputs of 'comments_test' plugin parameter
+ */
+function ct_input_registrations_test() {
+    $options = ct_get_options();
+    $value = $options['registrations_test'];
+    echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_registrations_test0' name='cleantalk_settings[registrations_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_registrations_test0'> " . __('No') . "</label>";
+}
+
+
+/**
+ * Admin callback function - Plugin parameters validator
+ */
+function ct_settings_validate($input) {
+    return $input;
+}
+
+
+/**
+ * Admin callback function - Displays plugin options page
+ */
+function ct_settings_page() {
+    ?>
+    <div>
+        <h2><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b></h2>
+        <form action="options.php" method="post">
+            <?php settings_fields('cleantalk_settings'); ?>
+            <?php do_settings_sections('cleantalk'); ?>
+            <br>
+            <br>
+            <br>
+            <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
+        </form></div>
+
+    <?php
+}
 
 ?>
