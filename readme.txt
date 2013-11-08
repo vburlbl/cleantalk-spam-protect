@@ -7,7 +7,7 @@ Stable tag: 2.19
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Invisible anti-spam without CAPTCHA. No spam in the comments and feedback forms.
+Invisible anti-spam without CAPTCHA. No spam in the comments, registration and feedback forms.
 
 == Description ==
 
