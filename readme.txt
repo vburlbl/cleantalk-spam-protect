@@ -1,9 +1,9 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite, akismet, спам, 垃圾邮件, correo no deseado, forms, formidable forms, feedback 
+Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite, akismet, спам, 垃圾邮件, correo no deseado, forms, formidable forms, feedback, registration 
 Requires at least: 3.0
 Tested up to: 3.7.1
-Stable tag: 2.5.18 
+Stable tag: 2.19
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,8 @@ Invisible anti-spam without CAPTCHA. No spam in the comments and feedback forms.
 == Description ==
 
 1. Stops spam bots in the comments.
-1. Stops spam bots in the feedback forms.
+1. Stops spam bots in the registration.
+1. Stops spam bots at the feedback forms.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA, math, puzzles or Q&A.
 
@@ -26,6 +27,7 @@ The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each b
 
 = Functions =
 * Antispam protection for comments form.
+* Antispam protection for registration form.
 * Antispam protection for <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
 
 = Requirements =
@@ -79,11 +81,16 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 == Screenshots ==
 
 1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress
-1. Antispam settings to filter spam bots. Just enter Access key and app ready to stop spammers at the blog.
 1. Not spam, not relevant to article comment has moved to approval. 
+1. Antispam stoppped spam bot at the registration form 
 1. Spam bot stopped at Formidable feedback form 
 
 == Changelog ==
+
+= 2.19 2013-11-08 =
+  * New: Antispam protection from spam bots at the registration form
+  * Changed: Russian localization for admin panel 
+  * Changed: PHP code optimizations 
 
 = 2.5.18 2013-11-01 =
   * Fixed: Bug with selection of the last comments for post
@@ -196,6 +203,11 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
   * First version
 
 == Upgrade Notice ==
+= 2.19 2013-11-08 =
+  * New: Antispam protection from spam bots at the registration form
+  * Changed: Russian localization for admin panel 
+  * Changed: PHP code optimizations 
+
 = 2.5.18 2013-11-01 =
   * Fixed: Bug with selection of the last comments for post
   * New: Antispam protection for Formiadble feedback forms
