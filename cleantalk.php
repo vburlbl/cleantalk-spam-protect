@@ -167,7 +167,7 @@ function ct_init_locale() {
     load_plugin_textdomain('cleantalk', false, basename(dirname(__FILE__)) . '/i18n');
     if(!session_id()) {
     	session_name('cleantalksession');
-        session_start();
+        @session_start();
     }
 }
 
