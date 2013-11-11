@@ -3,16 +3,15 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  Invisible antispam for comments, registrations and feedbacks. The plugin doesn't use CAPTCHA, Q&A, math or quiz to stop spam bots. 
-  Version: 2.19
+  Version: 2.20
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-219';
+$ct_agent_version = 'wordpress-220';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 
-add_action('init', 'ct_init_locale');
 add_action('comment_form', 'ct_add_hidden_fields');
 add_action('parse_request', 'ct_set_session');
 add_action('admin_notices', 'admin_notice_message');
@@ -24,7 +23,7 @@ add_action('register_form','ct_register_form');
 add_filter('registration_errors', 'ct_registration_errors', 10, 3);
 
 if (is_admin()) {
-    add_action('admin_init', 'ct_admin_init');
+    add_action('admin_init', 'ct_admin_init', 1);
     add_action('admin_menu', 'ct_admin_add_page');
     add_action('admin_enqueue_scripts', 'ct_enqueue_scripts');
     add_action('comment_unapproved_to_approved', 'ct_comment_approved'); // param - comment object
@@ -89,6 +88,7 @@ function ct_hash($new_hash = '') {
  * @return 	string comment_content w\o cleantalk resume
  */
 function ct_feedback($hash, $message, $allow) {
+
     require_once('cleantalk.class.php');
     $options = ct_get_options();
 	
@@ -121,8 +121,8 @@ function ct_feedback($hash, $message, $allow) {
  * @return bool
  */
 function ct_send_feedback($feedback_request = null) {
-	
-	if (empty($feedback_request) && isset($_SESSION['feedback_request']) && preg_match("/^[a-z0-9\;\:]+$/", $_SESSION['feedback_request'])) { 
+    
+    if (empty($feedback_request) && isset($_SESSION['feedback_request']) && preg_match("/^[a-z0-9\;\:]+$/", $_SESSION['feedback_request'])) { 
 		$feedback_request = $_SESSION['feedback_request'];
 		unset($_SESSION['feedback_request']);
 	}
@@ -165,10 +165,19 @@ function ct_send_feedback($feedback_request = null) {
  */
 function ct_init_locale() {
     load_plugin_textdomain('cleantalk', false, basename(dirname(__FILE__)) . '/i18n');
+}
+
+/**
+ * Session init
+ * @return null;
+ */
+function ct_init_session() {
     if(!session_id()) {
     	session_name('cleantalksession');
         @session_start();
     }
+
+    return null;
 }
 
 /**
@@ -207,7 +216,6 @@ function ct_set_session() {
     // this action is called AFTER wp-comments-post.php executing and AFTER ct_check calling so we can create new session value here
     // it can be any action between init and send_headers, see http://codex.wordpress.org/Plugin_API/Action_Reference
     
-	$_SESSION['formtime'] = time();
 }
 
 /**
@@ -268,12 +276,7 @@ function ct_frm_validate_entry ($errors, $values) {
         return false;
     }
 
-	$checkjs = 0; 
-    if (isset($_POST[$ct_checkjs_frm])) {
-        if($_POST[$ct_checkjs_frm] == ct_get_checkjs_value()) {
-            $checkjs = 1;
-        }
-    }
+	$checkjs = js_test($ct_checkjs_frm); 
     
     require_once('cleantalk.class.php');
 
@@ -351,12 +354,26 @@ function ct_check($comment) {
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
     global $wpdb, $current_user, $comment_post_id, $ct_agent_version;
-
+    
     $options = ct_get_options();
     if (ct_is_user_enable() === false || $options['comments_test'] == 0) {
         return $comment;
     }
     
+    $local_blacklists = wp_blacklist_check(
+        $comment['comment_author'],
+        $comment['comment_author_email'], 
+        $comment['comment_author_url'], 
+        $comment['comment_content'], 
+        @$_SERVER['REMOTE_ADDR'], 
+        @$_SERVER['HTTP_USER_AGENT']
+    );
+    
+    // Go out if author in local blacklists
+    if ($local_blacklists === true) {
+        return $comment;
+    }
+   
     $wp_host = null;
     if (preg_match("@^(?:https?://)([^/:]+)@i", get_permalink($comment['comment_post_ID']), $matches))
         $wp_host = $matches[1];
@@ -374,20 +391,7 @@ function ct_check($comment) {
 
     $post = get_post($comment_post_id);
 
-	$checkjs = null; 
-    if (!isset($_POST['ct_checkjs'])) {
-        $checkjs = null;
-    } elseif($_POST['ct_checkjs'] == ct_get_checkjs_value()) {
-        $checkjs = 1;
-    } elseif ($_POST['ct_checkjs'] !== 0) {
-        $checkjs = 0;
-    }
-
-    if (array_key_exists('formtime', $_SESSION)) {
-        $submit_time = time() - (int) $_SESSION['formtime'];
-    } else {
-        $submit_time = null;
-    }
+	$checkjs = js_test('ct_checkjs'); 
 
 	$example = null;
     if (function_exists('json_encode')) {
@@ -450,7 +454,6 @@ function ct_check($comment) {
     $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
     $ct_request->agent = $ct_agent_version; 
     $ct_request->sender_info = $user_info;
-    $ct_request->submit_time = $submit_time;
     $ct_request->js_on = $checkjs;
     $ct_request->post_info = $post_info;
 
@@ -469,30 +472,61 @@ function ct_check($comment) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
         wp_die($err_text, 'Blacklisted', array('back_link' => true));
-    } else {
-        ct_hash($ct_result->id);
-        if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
-            add_filter('pre_comment_approved', 'ct_set_approved');
-        } elseif($ct_result->allow == 0) {
-            if (!empty($ct_result->stop_words)) {
-                global $ct_stop_words;
-                $ct_stop_words = $ct_result->stop_words;
-                add_action('comment_post', 'ct_mark_red', 11, 2);
+
+        return $comment;
+    } 
+    
+    ct_hash($ct_result->id);
+
+    if ($ct_result->spam == 1) {
+        $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
+        add_filter('pre_comment_approved', 'ct_set_comment_spam');
+		add_action('comment_post', 'ct_set_meta', 10, 2);
+        return $comment;
+    }
+      
+    if (isset($comment['comment_author_email'])) {
+        $approved_comments = get_comments(array('status' => 'approve', 'count' => true, 'author_email' => $comment['comment_author_email']));
+
+        // Change comment flow only for new authors
+        if ((int) $approved_comments == 0) {
+
+            if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
+                add_filter('pre_comment_approved', 'ct_set_approved');
             }
-            $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
-            if ($ct_result->spam == 1) {
-                add_filter('pre_comment_approved', 'ct_set_comment_spam');
-                global $ct_comment;
-                $ct_comment = $ct_result->comment;
-                add_action('comment_post', 'ct_die', 12, 2);
-            } else {
+            if ($ct_result->allow == 0) {
+                if (isset($ct_result->stop_words)) {
+                    global $ct_stop_words;
+                    $ct_stop_words = $ct_result->stop_words;
+                    add_action('comment_post', 'ct_mark_red', 11, 2);
+                }
+                
+                $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
                 add_filter('pre_comment_approved', 'ct_set_not_approved');
             }
+            
+            add_action('comment_post', 'ct_set_meta', 10, 2);
         }
-        
-		add_action('comment_post', 'ct_set_meta', 10, 2);
     }
+    
     return $comment;
+}
+
+/**
+ *
+ *
+ */
+function js_test($field_name = 'ct_checkjs') {
+    $checkjs = null;
+    if (isset($_POST[$field_name])) {
+        if($_POST[$field_name] == ct_get_checkjs_value()) {
+            $checkjs = 1;
+        } else {
+	        $checkjs = 0; 
+        }
+    }
+    
+    return $checkjs;
 }
 
 /**
@@ -519,18 +553,6 @@ function ct_post_url($comment_id = null, $comment_post_id) {
 	return $post_url;
 }
 
-/**
- * Set die page with Cleantalk comment.
- * @global type $ct_comment
-    $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
- * @param type $comment_status
- */
-function ct_die($comment_id, $comment_status) {
-    global $ct_comment;
-    $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
-        $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
-        wp_die($err_text, 'Blacklisted', array('back_link' => true));
-}
 /**
  * Public filter 'pre_comment_approved' - Mark comment unapproved always
  * @return 	int Zero
@@ -777,7 +799,6 @@ function delete_spam_comments() {
         }
     }
 
-
     return null; 
 }
 
@@ -805,12 +826,8 @@ function ct_registration_errors($errors, $sanitized_user_login, $user_email) {
         return $errors;
     }
 
-	$checkjs = 0; 
-    if (isset($_POST[$ct_checkjs_register_form])) {
-        if($_POST[$ct_checkjs_register_form] == ct_get_checkjs_value()) {
-            $checkjs = 1;
-        }
-    }
+	$checkjs = js_test($ct_checkjs_register_form); 
+    
     require_once('cleantalk.class.php');
 
     $blog_lang = substr(get_locale(), 0, 2);
@@ -883,6 +900,10 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
+    ct_init_locale();
+
+    ct_init_session();
+
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
     add_settings_section('cleantalk_settings_main', __('Main settings', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
     add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
@@ -920,7 +941,7 @@ function ct_input_autoPubRevelantMess () {
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('Relevant (not spam) comments will be automatic published at the blog', 'cleantalk'));
+    admin_addDescriptionsFields(__('Relevant (not spam) comments from new authors will be automatic published at the blog', 'cleantalk'));
 }
 /**
  * @author Artem Leontiev
