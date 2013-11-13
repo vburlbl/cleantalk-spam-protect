@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite, akismet, спам, 垃圾邮件, correo no deseado, forms, formidable forms, feedback, registration 
 Requires at least: 3.0
 Tested up to: 3.7.1
-Stable tag: 2.19
+Stable tag: 2.21
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,13 +13,13 @@ Invisible anti-spam without CAPTCHA. No spam in the comments, registration and f
 
 1. Stops spam bots in the comments.
 1. Stops spam bots in the registration.
-1. Stops spam bots at the feedback forms.
+1. Stops spam bots at the Formiadble forms.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA, math, puzzles or Q&A.
 
 Plugin filters spam bots in the comments, spam moves to trash. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA, Q&A, puzzles or math to stop spammers. It's simple and clever antispam for your blog.
 
-Also every new comment plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval. This feature works for English, Russian laguages.
+Also every comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 3 000 blogs, blocks up to 300 000 spam bots attacks and approves up to 2 000 not spam comments.
 
@@ -86,6 +86,11 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 1. Spam bot stopped at Formidable feedback form 
 
 == Changelog ==
+
+= 2.21 2013-11-13 =
+  * Changed: WordPress blacklists settings get priority over plugin's antispam settings 
+  * Changed: Disabled management approval comments for regular commentators of the blog. Automatically approved for publication only the comments of the new blog authors. 
+  * Changed: PHP code optimizations 
 
 = 2.19 2013-11-08 =
   * New: Antispam protection from spam bots at the registration form
@@ -203,6 +208,11 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
   * First version
 
 == Upgrade Notice ==
+= 2.21 2013-11-13 =
+  * Changed: WordPress blacklists settings get priority over plugin's antispam settings 
+  * Changed: Disabled management approval comments for regular commentators of the blog. Automatically approved for publication only the comments of the new blog authors. 
+  * Changed: PHP code optimizations
+
 = 2.19 2013-11-08 =
   * New: Antispam protection from spam bots at the registration form
   * Changed: Russian localization for admin panel 
