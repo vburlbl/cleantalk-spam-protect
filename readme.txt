@@ -90,6 +90,7 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 = 2.21 2013-11-13 =
   * Changed: WordPress blacklists settings get priority over plugin's antispam settings 
   * Changed: Disabled management approval comments for regular commentators of the blog. Automatically approved for publication only the comments of the new blog authors. 
+  * Changed: Removed form submit time test. Imporved JavaScript spam test. 
   * Changed: PHP code optimizations 
 
 = 2.19 2013-11-08 =
