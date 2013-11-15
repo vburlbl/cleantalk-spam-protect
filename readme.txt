@@ -21,7 +21,7 @@ Plugin filters spam bots in the comments, spam moves to trash. The plugin is not
 
 Also every comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 3 000 blogs, blocks up to 300 000 spam bots attacks and approves up to 2 000 not spam comments.
+The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 4 500 blogs, blocks up to 400 000 spam bots attacks and approves up to 2 000 not spam comments. 
 
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
@@ -31,7 +31,7 @@ The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each b
 * Antispam protection for <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
 
 = Requirements =
-WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting.
+WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
 
 == Installation ==
 
