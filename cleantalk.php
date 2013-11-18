@@ -13,8 +13,6 @@ $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 
 add_action('comment_form', 'ct_add_hidden_fields');
-add_action('parse_request', 'ct_set_session');
-add_action('admin_notices', 'admin_notice_message');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
 add_action('frm_validate_entry', 'ct_frm_validate_entry', 20, 2);
 add_action('frm_entries_footer_scripts', 'ct_frm_entries_footer_scripts', 20, 2);
@@ -26,6 +24,7 @@ if (is_admin()) {
     add_action('admin_init', 'ct_admin_init', 1);
     add_action('admin_menu', 'ct_admin_add_page');
     add_action('admin_enqueue_scripts', 'ct_enqueue_scripts');
+    add_action('admin_notices', 'admin_notice_message');
     add_action('comment_unapproved_to_approved', 'ct_comment_approved'); // param - comment object
     add_action('comment_approved_to_unapproved', 'ct_comment_unapproved'); // param - comment object
     add_action('comment_unapproved_to_spam', 'ct_comment_spam');  // param - comment object
@@ -193,6 +192,9 @@ function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs') {
         return false;
     }
     
+    ct_init_session();
+    $_SESSION['formtime'] = time();
+
     ?>
     <input type="hidden" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" value="0">
     <script type="text/javascript">
@@ -201,21 +203,6 @@ function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs') {
         // ]]>
     </script>
     <?php
-}
-
-/**
- * Public action 'parse_request' - Inits session value
- */
-function ct_set_session() {
-
-    $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['comments_test'] == 0) {
-        return false;
-    }
-    // this action is called any time WP process GET request (shows any page)
-    // this action is called AFTER wp-comments-post.php executing and AFTER ct_check calling so we can create new session value here
-    // it can be any action between init and send_headers, see http://codex.wordpress.org/Plugin_API/Action_Reference
-    
 }
 
 /**
@@ -392,6 +379,13 @@ function ct_check($comment) {
     $post = get_post($comment_post_id);
 
 	$checkjs = js_test('ct_checkjs'); 
+    
+    ct_init_session();
+    if (array_key_exists('formtime', $_SESSION)) {
+        $submit_time = time() - (int) $_SESSION['formtime'];
+    } else {
+        $submit_time = null;
+    }
 
 	$example = null;
     if (function_exists('json_encode')) {
@@ -455,6 +449,7 @@ function ct_check($comment) {
     $ct_request->agent = $ct_agent_version; 
     $ct_request->sender_info = $user_info;
     $ct_request->js_on = $checkjs;
+    $ct_request->submit_time = $submit_time;
     $ct_request->post_info = $post_info;
 
     $ct_result = $ct->isAllowMessage($ct_request);
@@ -481,7 +476,12 @@ function ct_check($comment) {
     if ($ct_result->spam == 1) {
         $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
         add_filter('pre_comment_approved', 'ct_set_comment_spam');
+        
+        global $ct_comment;
+        $ct_comment = $ct_result->comment;
+        add_action('comment_post', 'ct_die', 12, 2);
 		add_action('comment_post', 'ct_set_meta', 10, 2);
+        
         return $comment;
     }
       
@@ -511,6 +511,20 @@ function ct_check($comment) {
     
     return $comment;
 }
+
+/**
+ * Set die page with Cleantalk comment.
+ * @global type $ct_comment
+    $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
+ * @param type $comment_status
+ */
+function ct_die($comment_id, $comment_status) {
+    global $ct_comment;
+    $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
+        $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
+        wp_die($err_text, 'Blacklisted', array('back_link' => true));
+}
+
 
 /**
  *
@@ -727,8 +741,9 @@ function admin_notice_message(){
 		return false;
 
     $options = ct_get_options();
-	if ($options['apikey'] === 'enter key' || $options['apikey'] === '')
-		echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
+	if (ct_valid_key($options['apikey']) === false) {
+	    echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
+    }
 	
     ct_send_feedback();
     
@@ -744,6 +759,18 @@ function admin_notice_message(){
  */
 function admin_addDescriptionsFields($descr = '') {
     echo "<p style='color: #666 !important'>$descr</p>";
+}
+
+/**
+* Test API key 
+*/
+function ct_valid_key($apikey = null) {
+    if ($apikey === null) {
+        $options = ct_get_options();
+        $apikey = $options['apikey'];
+    }
+
+	return ($apikey === 'enter key' || $apikey === '') ? false : true;
 }
 
 /**
@@ -967,7 +994,9 @@ function ct_input_apikey() {
 
     $def_value = ''; 
     echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' />";
-    echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
+    if (ct_valid_key($value) === false) {
+        echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
+    }
 }
 
 /**
@@ -1026,8 +1055,19 @@ function ct_settings_page() {
             <br>
             <br>
             <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
-        </form></div>
+        </form>
+    </div>
+    <?php
 
+    if (ct_valid_key() === false)
+        return null;
+    ?>
+    <br />
+    <br />
+    <br />
+    <div>
+    <?php echo __('Plugin Homepage at', 'cleantalk'); ?> <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
+    </div>
     <?php
 }
 
