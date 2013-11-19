@@ -90,7 +90,7 @@ function ct_hash($new_hash = '') {
  * @param 	int $allow flag good comment (1) or bad (0)
  * @return 	string comment_content w\o cleantalk resume
  */
-function ct_feedback($hash, $message, $allow) {
+function ct_feedback($hash, $message = null, $allow) {
 
     require_once('cleantalk.class.php');
     $options = ct_get_options();
@@ -106,7 +106,9 @@ function ct_feedback($hash, $message, $allow) {
 	if (empty($hash)) {
 		$hash = $ct->getCleantalkCommentHash($message);
 	}
-	$resultMessage = $ct->delCleantalkComment($message);
+    if ($message !== null) {
+	    $resultMessage = $ct->delCleantalkComment($message);
+    }
 	
 	$ct_feedback = $hash . ':' . $allow . ';';
 	if (empty($_SESSION['feedback_request'])) {
@@ -939,8 +941,7 @@ function ct_user_register($user_id) {
 function ct_delete_user($user_id) {
     $hash = get_user_meta($user_id, 'ct_hash', true);
     if ($hash !== '') {
-        $feedback_result = $hash . ":" . 0 . ";";
-        ct_send_feedback($feedback_result);
+        ct_feedback($hash, null, 0);
     }
 }
 
