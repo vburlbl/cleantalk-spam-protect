@@ -3,14 +3,15 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  Invisible antispam for comments, registrations and feedbacks. The plugin doesn't use CAPTCHA, Q&A, math or quiz to stop spam bots. 
-  Version: 2.21
+  Version: 2.22
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-221';
+$ct_agent_version = 'wordpress-222';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
+$ct_session_request_id_label = 'request_id';
 
 add_action('comment_form', 'ct_add_hidden_fields');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
@@ -19,6 +20,7 @@ add_action('frm_entries_footer_scripts', 'ct_frm_entries_footer_scripts', 20, 2)
 
 add_action('register_form','ct_register_form');
 add_filter('registration_errors', 'ct_registration_errors', 10, 3);
+add_action('user_register', 'ct_user_register');
 
 if (is_admin()) {
     add_action('admin_init', 'ct_admin_init', 1);
@@ -31,6 +33,8 @@ if (is_admin()) {
     add_action('comment_approved_to_spam', 'ct_comment_spam');   // param - comment object
     add_filter('get_comment_text', 'ct_get_comment_text');   // param - current comment text
     add_filter('unspam_comment', 'ct_unspam_comment');
+    
+    add_action('delete_user', 'ct_delete_user');
 }
 
 /**
@@ -846,7 +850,7 @@ function ct_register_form() {
  * @return array with errors 
  */
 function ct_registration_errors($errors, $sanitized_user_login, $user_email) {
-    global $ct_agent_version, $ct_checkjs_register_form;
+    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label;
     
     $options = ct_get_options();
     if ($options['registrations_test'] == 0) {
@@ -898,12 +902,46 @@ function ct_registration_errors($errors, $sanitized_user_login, $user_email) {
         );
     }
     
-    if ($ct_result->errno == 0 && $ct_result->allow == 0) {
+    if ($ct_result->errno != 0) {
+        return $errors;
+    }
+
+    if ($ct_result->allow == 0) {
         $wordpress_domain = preg_replace("/^https?:\/\//", "", site_url());
         $errors->add('ct_error', __($ct_result->comment, $wordpress_domain));
+    } else {
+        if ($ct_result->id !== null) {
+            ct_init_session();  
+            $_SESSION[$ct_session_request_id_label] = $ct_result->id;
+        }
     }
 
     return $errors;
+}
+
+/**
+ * Set user meta 
+ * @return null 
+ */
+function ct_user_register($user_id) {
+    global $ct_session_request_id_label;
+
+    if (isset($_SESSION[$ct_session_request_id_label])) {
+        update_user_meta($user_id, 'ct_hash', $_SESSION[$ct_session_request_id_label]);
+		unset($_SESSION[$ct_session_request_id_label]);
+    }
+}
+
+/**
+ * Send feedback for user deletion 
+ * @return null 
+ */
+function ct_delete_user($user_id) {
+    $hash = get_user_meta($user_id, 'ct_hash', true);
+    if ($hash !== '') {
+        $feedback_result = $hash . ":" . 0 . ";";
+        ct_send_feedback($feedback_result);
+    }
 }
 
 
