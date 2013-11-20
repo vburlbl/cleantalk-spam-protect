@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite, akismet, спам, 垃圾邮件, correo no deseado, forms, formidable forms, feedback, registration 
 Requires at least: 3.0
 Tested up to: 3.7.1
-Stable tag: 2.21
+Stable tag: 2.23
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,7 @@ Plugin filters spam bots in the comments, spam moves to trash. The plugin is not
 
 Also every comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 4 500 blogs, blocks up to 400 000 spam bots attacks and approves up to 2 000 not spam comments. 
+The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 5000 blogs, blocks up to 400 000 spam bots attacks and approves up to 4000 not spam comments. 
 
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
@@ -86,6 +86,11 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 1. Spam bot stopped at Formidable feedback form 
 
 == Changelog ==
+
+= 2.23 2013-11-20 =
+  * New: Added automatic training blacklists on spam bot account deletion. 
+  * New: Added URL to project homepage at plugin options. 
+  * Changed: Improved antispam logic. 
 
 = 2.21 2013-11-13 =
   * Changed: WordPress blacklists settings get priority over plugin's antispam settings 
@@ -209,6 +214,11 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
   * First version
 
 == Upgrade Notice ==
+= 2.23 2013-11-20 =
+  * New: Added automatic training blacklists on spam bot account deletion. 
+  * New: Added URL to project homepage at plugin options. 
+  * Changed: Improved antispam logic. 
+
 = 2.21 2013-11-13 =
   * Changed: WordPress blacklists settings get priority over plugin's antispam settings 
   * Changed: Disabled management approval comments for regular commentators of the blog. Automatically approved for publication only the comments of the new blog authors. 
