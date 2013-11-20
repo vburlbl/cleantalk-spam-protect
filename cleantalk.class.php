@@ -508,9 +508,6 @@ class Cleantalk {
                 break;
 
             case 'check_newuser':
-                if (empty($request->sender_email)) {
-                    $error_params[] = 'sender_email';
-                }
                 break;
 
             case 'send_feedback':
