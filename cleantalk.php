@@ -8,7 +8,7 @@
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-223';
+$ct_agent_version = 'wordpress-222';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
