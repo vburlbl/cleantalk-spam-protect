@@ -22,6 +22,10 @@ add_action('register_form','ct_register_form');
 add_filter('registration_errors', 'ct_registration_errors', 10, 3);
 add_action('user_register', 'ct_user_register');
 
+// BuddyPress
+add_action('bp_before_registration_submit_buttons','ct_register_form');
+add_filter('bp_signup_validate', 'ct_registration_errors');
+
 if (is_admin()) {
     add_action('admin_init', 'ct_admin_init', 1);
     add_action('admin_menu', 'ct_admin_add_page');
@@ -851,9 +855,22 @@ function ct_register_form() {
  * Test users registration
  * @return array with errors 
  */
-function ct_registration_errors($errors, $sanitized_user_login, $user_email) {
-    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label;
-    
+function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
+    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $bp;
+   
+    //
+    // BuddyPress actions
+    //
+    $buddypress = false;
+    if ($sanitized_user_login === null && isset($_POST['signup_username'])) {
+        $sanitized_user_login = $_POST['signup_username'];
+        $buddypress = true;
+    }
+    if ($user_email === null && isset($_POST['signup_email'])) {
+        $user_email = $_POST['signup_email'];
+        $buddypress = true;
+    }
+
     $options = ct_get_options();
     if ($options['registrations_test'] == 0) {
         return $errors;
@@ -910,7 +927,11 @@ function ct_registration_errors($errors, $sanitized_user_login, $user_email) {
 
     if ($ct_result->allow == 0) {
         $wordpress_domain = preg_replace("/^https?:\/\//", "", site_url());
-        $errors->add('ct_error', __($ct_result->comment, $wordpress_domain));
+        if ($buddypress === true) {
+            $bp->signup->errors['signup_username'] =  $ct_result->comment;
+        } else {
+            $errors->add('ct_error', __($ct_result->comment, $wordpress_domain));
+        }
     } else {
         if ($ct_result->id !== null) {
             ct_init_session();  
