@@ -8,7 +8,7 @@
  * @author Сleantalk team (welcome@cleantalk.ru)
  * @copyright (C) 2013 СleanTalk team (http://cleantalk.org)
  * @license GNU/GPL: http://www.gnu.org/copyleft/gpl.html
- * @see http://cleantalk.ru/wiki/doku.php/api
+ * @see https://github.com/CleanTalk/php-antispam 
  *
  */
 

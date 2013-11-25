@@ -13,11 +13,18 @@ $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
 
+$ct_checkjs_cf7 = 'ct_checkjs_cf7';
+$ct_cf7_comment = 'This is a spam!';
+
+// Comments 
 add_action('comment_form', 'ct_add_hidden_fields');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
+
+// Formidable
 add_action('frm_validate_entry', 'ct_frm_validate_entry', 20, 2);
 add_action('frm_entries_footer_scripts', 'ct_frm_entries_footer_scripts', 20, 2);
 
+// Registrations
 add_action('register_form','ct_register_form');
 add_filter('registration_errors', 'ct_registration_errors', 10, 3);
 add_action('user_register', 'ct_user_register');
@@ -25,6 +32,10 @@ add_action('user_register', 'ct_user_register');
 // BuddyPress
 add_action('bp_before_registration_submit_buttons','ct_register_form');
 add_filter('bp_signup_validate', 'ct_registration_errors');
+
+// Contact Form7 
+add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements');
+add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 
 if (is_admin()) {
     add_action('admin_init', 'ct_admin_init', 1);
@@ -65,6 +76,7 @@ function ct_def_options() {
         'registrations_test' => '1', 
         'comments_test' => '1', 
         'formidable_test' => '1', 
+        'cf7_test' => '1', 
         'remove_old_spam' => '0',
         'spam_store_days' => '31' // Days before delete comments from folder Spam 
     );
@@ -193,7 +205,7 @@ function ct_init_session() {
  * Public action 'comment_form' - Adds hidden filed to define avaialbility of client's JavaScript
  * @param 	int $post_id Post ID, not used
  */
-function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs') {
+function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false) {
     $ct_checkjs_def = 0;
     $ct_checkjs_key = ct_get_checkjs_value(); 
     
@@ -204,15 +216,20 @@ function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs') {
     
     ct_init_session();
     $_SESSION['formtime'] = time();
-
-    ?>
-    <input type="hidden" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" value="0">
+    $html = '
+    <input type="hidden" id="%s" name="%s" value="0">
     <script type="text/javascript">
         // <![CDATA[
-        document.getElementById("<?php echo $field_name; ?>").value = document.getElementById("<?php echo $field_name; ?>").value.replace("<?php echo $ct_checkjs_def ?>", "<?php echo $ct_checkjs_key ?>");
+        document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
         // ]]>
     </script>
-    <?php
+';
+    $html = sprintf($html, $field_name, $field_name, $field_name, $field_name, $ct_checkjs_def, $ct_checkjs_key);
+    if ($return_string === true) {
+        return $html;
+    } else {
+        echo $html;
+    } 
 }
 
 /**
@@ -768,7 +785,7 @@ function admin_notice_message(){
  * Add descriptions for field
  */
 function admin_addDescriptionsFields($descr = '') {
-    echo "<p style='color: #666 !important'>$descr</p>";
+    echo "<div style='color: #666 !important'>$descr</div>";
 }
 
 /**
@@ -966,6 +983,125 @@ function ct_delete_user($user_id) {
     }
 }
 
+/**
+ * Inserts anti-spam hidden to CF7
+ */
+function ct_wpcf7_form_elements($html) {
+    global $ct_checkjs_cf7;
+    global $wpdb, $current_user, $ct_checkjs_cf7;
+    
+    $options = ct_get_options();
+    if (ct_is_user_enable() === false || $options['cf7_test'] == 0) {
+        return $html;
+    }
+
+    $html .= ct_add_hidden_fields(0, $ct_checkjs_cf7, true);
+
+    return $html;
+}
+
+/**
+ * Test CF7 message for spam
+ */
+function ct_wpcf7_spam($spam) {
+    global $wpdb, $current_user, $ct_agent_version, $ct_checkjs_cf7, $ct_cf7_comment;
+
+    if ($spam === true)
+        return $spam;
+    
+    $options = ct_get_options();
+    if (ct_is_user_enable() === false || $options['cf7_test'] == 0) {
+        return $spam;
+    }
+
+	$checkjs = js_test($ct_checkjs_cf7); 
+    
+    require_once('cleantalk.class.php');
+
+	$example = null;
+    $blog_lang = substr(get_locale(), 0, 2);
+    $user_info = array(
+        'cms_lang' => $blog_lang,
+        'REFFERRER' => @$_SERVER['HTTP_REFERER'],
+        'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
+    );
+    $user_info = json_encode($user_info);
+    if ($user_info === false)
+        $user_info = '';
+        
+    $post_info['comment_type'] = 'feedback';
+    $post_info = json_encode($post_info);
+    if ($post_info === false)
+        $post_info = '';
+    
+    $sender_email = null;
+    $sender_nickname = null;
+    $message = '';
+    foreach ($_POST as $k => $v) {
+        if ($sender_email === null && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+            $sender_email = $v;
+        }
+        if ($message === '' && preg_match("/-message$/", $k)) {
+            $message = $v;
+        }
+        if ($sender_nickname === null && preg_match("/-name$/", $k)) {
+            $sender_nickname = $v;
+        }
+    }
+    
+    $config = get_option('cleantalk_server');
+
+    $ct = new Cleantalk();
+    $ct->work_url = $config['ct_work_url'];
+    $ct->server_url = $options['server'];
+    $ct->server_ttl = $config['ct_server_ttl'];
+    $ct->server_changed = $config['ct_server_changed'];
+
+    $ct_request = new CleantalkRequest();
+
+    $ct_request->auth_key = $options['apikey'];
+    $ct_request->message = $message; 
+    $ct_request->example = $example; 
+    $ct_request->sender_email = $sender_email; 
+    $ct_request->sender_nickname = $sender_nickname; 
+    $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+    $ct_request->agent = $ct_agent_version; 
+    $ct_request->sender_info = $user_info;
+    $ct_request->js_on = $checkjs;
+    $ct_request->post_info = $post_info;
+
+    $ct_result = $ct->isAllowMessage($ct_request);
+    if ($ct->server_change) {
+        update_option(
+                'cleantalk_server', array(
+                'ct_work_url' => $ct->work_url,
+                'ct_server_ttl' => $ct->server_ttl,
+                'ct_server_changed' => time()
+                )
+        );
+    }
+    if ($ct_result->spam == 1) {
+        $spam = true;
+        $ct_cf7_comment = $ct_result->comment;
+	    add_filter('wpcf7_display_message', 'ct_wpcf7_display_message', 10, 2);
+    }
+    
+    return $spam;
+}
+/**
+ * Changes CF7 status message 
+ * @param 	string $hook URL of hooked page
+ */
+
+function ct_wpcf7_display_message($message, $status) {
+    global $ct_cf7_comment;
+
+    if ($status == 'spam') {
+        $message = $ct_cf7_comment; 
+    }
+    
+    return $message;
+}
 
 /**
  * Admin action 'admin_enqueue_scripts' - Enqueue admin script of reloading admin page after needed AJAX events
@@ -1000,6 +1136,7 @@ function ct_admin_init() {
     add_settings_field('cleantalk_registrations_test', __('Registration form', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_formidable_test', __('Formidable Forms', 'cleantalk'), 'ct_input_formidable_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+    add_settings_field('cleantalk_cf7_test', __('Contact form 7', 'cleantalk'), 'ct_input_cf7_test', 'cleantalk', 'cleantalk_settings_anti_spam');
 }
 
 /**
@@ -1090,8 +1227,19 @@ function ct_input_registrations_test() {
     echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_registrations_test0' name='cleantalk_settings[registrations_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_registrations_test0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(__('WordPress, BuddyPress', 'cleantalk'));
 }
 
+/**
+ * Admin callback function - Displays inputs of 'cf7_test' plugin parameter
+ */
+function ct_input_cf7_test() {
+    $options = ct_get_options();
+    $value = $options['cf7_test'];
+    echo "<input type='radio' id='cleantalk_cf7_test1' name='cleantalk_settings[cf7_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_cf7_test1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_cf7_test0' name='cleantalk_settings[cf7_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_cf7_test0'> " . __('No') . "</label>";
+}
 
 /**
  * Admin callback function - Plugin parameters validator
@@ -1111,8 +1259,6 @@ function ct_settings_page() {
         <form action="options.php" method="post">
             <?php settings_fields('cleantalk_settings'); ?>
             <?php do_settings_sections('cleantalk'); ?>
-            <br>
-            <br>
             <br>
             <input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
         </form>
