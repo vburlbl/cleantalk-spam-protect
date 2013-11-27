@@ -1,13 +1,13 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, admin, user, users, post, posts, wordpress, javascript
+Tags: spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, admin, user, users, post, posts, wordpress, javascript, plugin
 Requires at least: 3.0
 Tested up to: 3.7.1
 Stable tag: 2.25
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud antispam without CAPTCHA
+Cloud antispam for comments, registrations and contacts.
 
 == Description ==
 1. Stops spam bots in the comments.
