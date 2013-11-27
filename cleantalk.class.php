@@ -2,13 +2,13 @@
 /**
  * Cleantalk base class
  *
- * @version 1.21.9
+ * @version 1.21.11
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
  * @copyright (C) 2013 СleanTalk team (http://cleantalk.org)
  * @license GNU/GPL: http://www.gnu.org/copyleft/gpl.html
- * @see http://cleantalk.ru/wiki/doku.php/api
+ * @see https://github.com/CleanTalk/php-antispam 
  *
  */
 
@@ -151,10 +151,10 @@ class CleantalkResponse {
 
 			$this->errstr = preg_replace("/.+(\*\*\*.+\*\*\*).+/", "$1", $this->errstr);
             // Разбираем  ответ с клинтолка
-            $this->stop_words = isset($obj->stop_words) ? $obj->stop_words : null;
+            $this->stop_words = isset($obj->stop_words) ? utf8_decode($obj->stop_words) : null;
             $this->comment = isset($obj->comment) ? utf8_decode($obj->comment) : null;
             $this->blacklisted = (isset($obj->blacklisted)) ? $obj->blacklisted : null;
-            $this->allow = (isset($obj->allow)) ? $obj->allow : null;
+            $this->allow = (isset($obj->allow)) ? $obj->allow : 0;
             $this->id = (isset($obj->id)) ? $obj->id : null;
             $this->fast_submit = (isset($obj->fast_submit)) ? $obj->fast_submit : 0;
             $this->spam = (isset($obj->spam)) ? $obj->spam : 0;
@@ -508,12 +508,6 @@ class Cleantalk {
                 break;
 
             case 'check_newuser':
-                if (empty($request->sender_nickname)) {
-                    $error_params[] = 'sender_nickname';
-                }
-                if (empty($request->sender_email)) {
-                    $error_params[] = 'sender_email';
-                }
                 break;
 
             case 'send_feedback':
