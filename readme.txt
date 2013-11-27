@@ -1,37 +1,43 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: spam, antispam, anti-spam, spambot, spam-bot, stop spam, spammers, spamfree, captcha, capcha, captha, catcha, recaptcha, comment, comments, math, cloud, blacklist, puzzle, wpmu, network, multisite, akismet, спам, 垃圾邮件, correo no deseado, forms, formidable forms, feedback, registration 
+Tags: spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, admin, user, users, post, posts, wordpress, javascript
 Requires at least: 3.0
 Tested up to: 3.7.1
-Stable tag: 2.23
+Stable tag: 2.25
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Invisible anti-spam without CAPTCHA. No spam in the comments, registration and feedback forms.
+Cloud antispam without CAPTCHA
 
 == Description ==
-
 1. Stops spam bots in the comments.
 1. Stops spam bots in the registration.
-1. Stops spam bots at the Formiadble forms.
+1. Stops spam bots in the contact forms.
 1. Invisible spam protection for visitors.
 1. Anti-spam without CAPTCHA, math, puzzles or Q&A.
 
 Plugin filters spam bots in the comments, spam moves to trash. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA, Q&A, puzzles or math to stop spammers. It's simple and clever antispam for your blog.
 
-Also every comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+Also first comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 5000 blogs, blocks up to 400 000 spam bots attacks and approves up to 4000 not spam comments. 
+The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 5000 blogs, blocks up to 500 000 spam bots attacks and approves up to 4000 not spam comments. 
 
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
 = Functions =
 * Antispam protection for comments form.
-* Antispam protection for registration form.
+* Antispam protection for standard WordPress registration form.
+* Antispam protection for <a href="http://wordpress.org/plugins/buddypress/" target="_blank">BuddyPress</a> registration form.
 * Antispam protection for <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
+* Antispam protection for <a href="http://wordpress.org/plugins/contact-form-7/" target="_blank">Contact form 7</a>.
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
+
+= Translations =
+* English
+* Russian (ru_RU)
+* Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html?utm_expid=31925339-46.KEGZK8A6Q3yfZW0EUfEw5Q.1">WebHostingHub</a>
 
 == Installation ==
 
@@ -79,13 +85,18 @@ Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a hr
 Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of spam comments. But if necessary, the plugin can work together with Akismet, Captcha and etc.
 
 == Screenshots ==
-
-1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress
+1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress.
 1. Not spam, not relevant to article comment has moved to approval. 
-1. Antispam stoppped spam bot at the registration form 
-1. Spam bot stopped at Formidable feedback form 
+1. Antispam stoppped spam bot at the registration form. 
+1. Spam bot stopped at Formidable contact form. 
+1. Spam bot stopped at Contact form 7. 
 
 == Changelog ==
+
+= 2.25 2013-11-27 =
+  * New: Added protection against spam bots for BuddyPress registrations. 
+  * New: Added protection against spam bots for Contact form 7. 
+  * New: Added Spanish (es_ES) translation. 
 
 = 2.23 2013-11-20 =
   * New: Added automatic training blacklists on spam bot account deletion. 
@@ -214,6 +225,11 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
   * First version
 
 == Upgrade Notice ==
+= 2.25 2013-11-27 =
+  * New: Added protection against spam bots for BuddyPress registrations. 
+  * New: Added protection against spam bots for Contact form 7. 
+  * New: Added Spanish (es_ES) translation. 
+
 = 2.23 2013-11-20 =
   * New: Added automatic training blacklists on spam bot account deletion. 
   * New: Added URL to project homepage at plugin options. 
