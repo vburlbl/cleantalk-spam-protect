@@ -34,7 +34,7 @@ add_action('bp_before_registration_submit_buttons','ct_register_form');
 add_filter('bp_signup_validate', 'ct_registration_errors');
 
 // Contact Form7 
-add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements', 1, 1);
+add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements');
 add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 
 if (is_admin()) {
@@ -214,7 +214,7 @@ function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_
         return false;
     }
     
-    if ($options['comments_test'] == 0) {
+    if ($check_access === true && $options['comments_test'] == 0) {
         return false;
     }
     
@@ -993,12 +993,12 @@ function ct_delete_user($user_id) {
 function ct_wpcf7_form_elements($html) {
     global $ct_checkjs_cf7;
     global $wpdb, $current_user, $ct_checkjs_cf7;
-    
+/* 
     $options = ct_get_options();
     if ($options['cf7_test'] == 0) {
         return $html;
     }
-
+*/
     $html .= ct_add_hidden_fields(0, $ct_checkjs_cf7, true, false);
 
     return $html;
@@ -1010,13 +1010,15 @@ function ct_wpcf7_form_elements($html) {
 function ct_wpcf7_spam($spam) {
     global $wpdb, $current_user, $ct_agent_version, $ct_checkjs_cf7, $ct_cf7_comment;
 
+    $options = ct_get_options();
+/*
     if ($spam === true)
         return $spam;
     
-    $options = ct_get_options();
     if ($options['cf7_test'] == 0) {
         return $spam;
     }
+*/
 
 	$checkjs = js_test($ct_checkjs_cf7); 
     
