@@ -2,13 +2,13 @@
 /*
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
-  Description:  Invisible antispam for comments, registrations and feedbacks. The plugin doesn't use CAPTCHA, Q&A, math or quiz to stop spam bots. 
-  Version: 2.25
+  Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math or quiz to stop spam bots. 
+  Version: 2.26
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-225';
+$ct_agent_version = 'wordpress-226';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -34,7 +34,7 @@ add_action('bp_before_registration_submit_buttons','ct_register_form');
 add_filter('bp_signup_validate', 'ct_registration_errors');
 
 // Contact Form7 
-add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements');
+add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements', 1, 1);
 add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 
 if (is_admin()) {
@@ -205,12 +205,16 @@ function ct_init_session() {
  * Public action 'comment_form' - Adds hidden filed to define avaialbility of client's JavaScript
  * @param 	int $post_id Post ID, not used
  */
-function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false) {
+function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false, $check_access = true) {
     $ct_checkjs_def = 0;
     $ct_checkjs_key = ct_get_checkjs_value(); 
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['comments_test'] == 0) {
+    if ($check_access === true && ct_is_user_enable() === false) {
+        return false;
+    }
+    
+    if ($options['comments_test'] == 0) {
         return false;
     }
     
@@ -991,11 +995,11 @@ function ct_wpcf7_form_elements($html) {
     global $wpdb, $current_user, $ct_checkjs_cf7;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['cf7_test'] == 0) {
+    if ($options['cf7_test'] == 0) {
         return $html;
     }
 
-    $html .= ct_add_hidden_fields(0, $ct_checkjs_cf7, true);
+    $html .= ct_add_hidden_fields(0, $ct_checkjs_cf7, true, false);
 
     return $html;
 }
@@ -1010,7 +1014,7 @@ function ct_wpcf7_spam($spam) {
         return $spam;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['cf7_test'] == 0) {
+    if ($options['cf7_test'] == 0) {
         return $spam;
     }
 
