@@ -1032,7 +1032,7 @@ function ct_contact_form_is_spam($form) {
     
     $js_field_name = $ct_checkjs_jpcf;
     foreach ($_POST as $k => $v) {
-        if (preg_match("/^.+$ct_checkjs_jpcf$/"))
+        if (preg_match("/^.+$ct_checkjs_jpcf$/", $k))
            $js_field_name = $k; 
     }
 	$checkjs = js_test($js_field_name); 
@@ -1104,7 +1104,7 @@ function ct_contact_form_is_spam($form) {
     if ($ct_result->spam == 1) {
         global $ct_comment;
         $ct_comment = $ct_result->comment;
-        ct_die();
+        ct_die(null, null);
     }
    
     return null;
