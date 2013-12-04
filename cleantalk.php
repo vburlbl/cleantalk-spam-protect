@@ -44,7 +44,6 @@ add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 add_filter('grunion_contact_form_field_html', 'ct_grunion_contact_form_field_html', 10, 2 );
 add_filter('contact_form_is_spam', 'ct_contact_form_is_spam' );
 
-
 if (is_admin()) {
     add_action('admin_init', 'ct_admin_init', 1);
     add_action('admin_menu', 'ct_admin_add_page');
@@ -1105,9 +1104,10 @@ function ct_contact_form_is_spam($form) {
         global $ct_comment;
         $ct_comment = $ct_result->comment;
         ct_die(null, null);
+        exit;
     }
    
-    return null;
+    return (bool) $ct_result->spam;
 }
 
 /**
