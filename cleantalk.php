@@ -21,7 +21,7 @@ $ct_jpcf_patched = false;
 $ct_jpcf_fields = array('name', 'email');
 
 // Comments 
-add_action('comment_form', 'ct_add_hidden_fields');
+add_action('comment_form', 'ct_comment_form');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
 
 // Formidable
@@ -41,8 +41,9 @@ add_filter('bp_signup_validate', 'ct_registration_errors');
 add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements');
 add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 
-add_filter('grunion_contact_form_field_html', 'ct_grunion_contact_form_field_html', 10, 2 );
-add_filter('contact_form_is_spam', 'ct_contact_form_is_spam' );
+// JetPack Contact form
+add_filter('grunion_contact_form_field_html', 'ct_grunion_contact_form_field_html', 10, 2);
+add_filter('contact_form_is_spam', 'ct_contact_form_is_spam');
 
 if (is_admin()) {
     add_action('admin_init', 'ct_admin_init', 1);
@@ -208,21 +209,30 @@ function ct_init_session() {
 }
 
 /**
- * Public action 'comment_form' - Adds hidden filed to define avaialbility of client's JavaScript
- * @param 	int $post_id Post ID, not used
+ * Adds hidden filed to comment form 
  */
-function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false, $check_access = true) {
-    $ct_checkjs_def = 0;
-    $ct_checkjs_key = ct_get_checkjs_value(); 
+function ct_comment_form() {
+    if (ct_is_user_enable() === false) {
+        return false;
+    }
     
     $options = ct_get_options();
-    if ($check_access === true && ct_is_user_enable() === false) {
+    if ($options['comments_test'] == 0) {
         return false;
     }
     
-    if ($check_access === true && $options['comments_test'] == 0) {
-        return false;
-    }
+    ct_add_hidden_fields(0, 'ct_checkjs', false);
+    
+    return null;
+}
+
+/**
+ * Adds hidden filed to define avaialbility of client's JavaScript
+ * @param 	int $post_id Post ID, not used
+ */
+function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false) {
+    $ct_checkjs_def = 0;
+    $ct_checkjs_key = ct_get_checkjs_value(); 
     
     ct_init_session();
     $_SESSION['formtime'] = time();
@@ -873,8 +883,14 @@ function delete_spam_comments() {
  */
 function ct_register_form() {
     global $ct_checkjs_register_form;
+    
+    $options = ct_get_options();
+    if ($options['registrations_test'] == 0) {
+        return false;
+    }
 
-    ct_add_hidden_fields(0, $ct_checkjs_register_form, false, false);
+    ct_add_hidden_fields(0, $ct_checkjs_register_form, false);
+
     return null;
 }
 
@@ -1011,7 +1027,7 @@ function ct_grunion_contact_form_field_html($r, $field_label) {
             }
         }
 
-        $r .= ct_add_hidden_fields(0, $ct_checkjs_jpcf, true, false);
+        $r .= ct_add_hidden_fields(0, $ct_checkjs_jpcf, true);
         $ct_jpcf_patched = true;
     }
     
@@ -1122,7 +1138,7 @@ function ct_wpcf7_form_elements($html) {
         return $html;
     }
 
-    $html .= ct_add_hidden_fields(0, $ct_checkjs_cf7, true, false);
+    $html .= ct_add_hidden_fields(0, $ct_checkjs_cf7, true);
 
     return $html;
 }
@@ -1260,7 +1276,7 @@ function ct_admin_init() {
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_remove_old_spam', __('Automatically delete spam comments', 'cleantalk'), 'ct_input_remove_old_spam', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_registrations_test', __('Registration form', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+    add_settings_field('cleantalk_registrations_test', __('Registration forms', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_contact_forms_test', __('Contact forms', 'cleantalk'), 'ct_input_contact_forms_test', 'cleantalk', 'cleantalk_settings_anti_spam');
 }
