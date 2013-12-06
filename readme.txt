@@ -3,18 +3,18 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, admin, user, users, post, posts, wordpress, javascript, plugin
 Requires at least: 3.0
 Tested up to: 3.7.1
-Stable tag: 2.25
+Stable tag: 2.27
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Cloud antispam for comments, registrations and contacts.
 
 == Description ==
-1. Stops spam bots in the comments.
-1. Stops spam bots in the registration.
-1. Stops spam bots in the contact forms.
-1. Invisible spam protection for visitors.
-1. Anti-spam without CAPTCHA, math, puzzles or Q&A.
+1. Stops spam bots comments.
+1. Stops spam bots registrations.
+1. Stops spam bots emails from contact forms.
+1. Invisible antispam for visitors.
+1. Anti-spam without CAPTCHA, math, puzzles, counting animals or Q&A.
 
 Plugin filters spam bots in the comments, spam moves to trash. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA, Q&A, puzzles or math to stop spammers. It's simple and clever antispam for your blog.
 
@@ -30,6 +30,7 @@ The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each b
 * Antispam protection for <a href="http://wordpress.org/plugins/buddypress/" target="_blank">BuddyPress</a> registration form.
 * Antispam protection for <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
 * Antispam protection for <a href="http://wordpress.org/plugins/contact-form-7/" target="_blank">Contact form 7</a>.
+* Antispam protection for <a href="http://wordpress.org/plugins/jetpack/" target="_blank">JetPack Contact form</a>.
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
@@ -66,7 +67,6 @@ Plugin sends a comment's text and several previous approved comments to the clou
 Plugin works with all WordPress themes. With some themes may not works JavaScript antispam method, but it's not crucial to protect your blog from spam.
 
 = How can I test antispam protection? =
-
 Please use test email stop_email@example.com for comments. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = How the plugin is effective against spam bots? =
@@ -76,7 +76,6 @@ Plugin Antispam by CleanTalk stops about 99.99% of spam comments by spam bots. M
 Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">Blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the Blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
 
 = Why do I need one more anti-spam plugin? =
-
 1. The plugin is more effective than CAPTCHA because use several methods to stop spammers.
 1. This plugin stops spam bots automatically, plugin invisible for blog visitors and admins.
 1. CleanTalk automatically approves relevant, not spam comments.
@@ -92,6 +91,10 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 1. Spam bot stopped at Contact form 7. 
 
 == Changelog ==
+
+= 2.27 2013-12-06 =
+  * New: Added protection against spam bots for JetPack Contact form. 
+  * Fixed: JavaScript antispam logic for registrations and Contact form 7.
 
 = 2.25 2013-11-27 =
   * New: Added protection against spam bots for BuddyPress registrations. 
@@ -225,6 +228,10 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
   * First version
 
 == Upgrade Notice ==
+= 2.27 2013-12-06 =
+  * New: Added protection against spam bots for JetPack Contact form. 
+  * Fixed: JavaScript antispam logic for registrations and Contact form 7.
+
 = 2.25 2013-11-27 =
   * New: Added protection against spam bots for BuddyPress registrations. 
   * New: Added protection against spam bots for Contact form 7. 
