@@ -16,9 +16,7 @@ Cloud antispam for comments, registrations and contacts.
 1. Invisible antispam for visitors.
 1. Anti-spam without CAPTCHA, math, puzzles, counting animals or Q&A.
 
-Plugin filters spam bots in the comments, spam moves to trash. The plugin is not visible for visitors and administrators of a blog. The plugin doesn't use CAPTCHA, Q&A, puzzles or math to stop spammers. It's simple and clever antispam for your blog.
-
-Also first comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 5000 blogs, blocks up to 500 000 spam bots attacks and approves up to 4000 not spam comments. 
 
