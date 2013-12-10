@@ -1,20 +1,26 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, admin, user, users, post, posts, wordpress, javascript, plugin
+Tags: antispam, anti-spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math
 Requires at least: 3.0
 Tested up to: 3.7.1
 Stable tag: 2.27
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud antispam for comments, registrations and contacts.
+Cloud antispam for comments, signups and contacts.
 
 == Description ==
 1. Stops spam bots comments.
 1. Stops spam bots registrations.
 1. Stops spam bots emails from contact forms.
-1. Invisible antispam for visitors.
-1. Anti-spam without CAPTCHA, math, puzzles, counting animals or Q&A.
+1. No Captcha, no questions, no counting animals, no puzzles, no math.
+
+= ANTISPAM for =
+* WordPress comments and signups.
+* <a href="http://wordpress.org/plugins/buddypress/" target="_blank">BuddyPress</a> signups.
+* <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
+* <a href="http://wordpress.org/plugins/contact-form-7/" target="_blank">Contact form 7</a>.
+* <a href="http://wordpress.org/plugins/jetpack/" target="_blank">JetPack Contact form</a>.
 
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
@@ -22,13 +28,6 @@ The plugin is a client application for anti-spam cloud service <a href="http://c
 
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
-= Functions =
-* Antispam protection for comments form.
-* Antispam protection for standard WordPress registration form.
-* Antispam protection for <a href="http://wordpress.org/plugins/buddypress/" target="_blank">BuddyPress</a> registration form.
-* Antispam protection for <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
-* Antispam protection for <a href="http://wordpress.org/plugins/contact-form-7/" target="_blank">Contact form 7</a>.
-* Antispam protection for <a href="http://wordpress.org/plugins/jetpack/" target="_blank">JetPack Contact form</a>.
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
