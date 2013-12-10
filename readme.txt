@@ -11,7 +11,7 @@ Cloud antispam for comments, signups and contacts.
 
 == Description ==
 1. Stops spam bots comments.
-1. Stops spam bots registrations.
+1. Stops spam bots signups.
 1. Stops spam bots emails from contact forms.
 1. No Captcha, no questions, no counting animals, no puzzles, no math.
 
