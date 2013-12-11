@@ -13,21 +13,21 @@ Cloud antispam for comments, signups and contacts.
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
-
 = Antispam features =
 * WordPress comments and signups.
 * <a href="http://wordpress.org/plugins/buddypress/" target="_blank">BuddyPress</a>, <a href="http://wordpress.org/plugins/bbpress/" target="_blank">bbPress</a> signups.
 * <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
 * <a href="http://wordpress.org/plugins/contact-form-7/" target="_blank">Contact form 7</a>.
 * <a href="http://wordpress.org/plugins/jetpack/" target="_blank">JetPack Contact form</a>.
-
-Invisible antispam for visitors without CAPTCHA, questions, counting animals, puzzles, math and etc.
+* no CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
+Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+
+The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 5000 blogs, blocks up to 500 000 spam bots attacks and approves up to 4000 not spam comments. 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
-
 = Translations =
 * English
 * Russian (ru_RU)
