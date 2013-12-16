@@ -15,10 +15,10 @@ Cloud antispam for comments, signups and contacts.
 1. Stops spam bots contacts emails.
 = Antispam features =
 * WordPress comments and signups.
-* <a href="http://wordpress.org/plugins/buddypress/" target="_blank">BuddyPress</a>, <a href="http://wordpress.org/plugins/bbpress/" target="_blank">bbPress</a> signups.
-* <a href="http://wordpress.org/plugins/formidable/" target="_blank">Formiadble forms</a>.
-* <a href="http://wordpress.org/plugins/contact-form-7/" target="_blank">Contact form 7</a>.
-* <a href="http://wordpress.org/plugins/jetpack/" target="_blank">JetPack Contact form</a>.
+* BuddyPress, bbPress signups.
+* Formiadble forms.
+* Contact form 7.
+* JetPack Contact form.
 * no CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
