@@ -660,6 +660,7 @@ class Cleantalk {
             $response = json_decode(json_encode($response));
         } 
         
+        exit;
         return $response;
     }
 
