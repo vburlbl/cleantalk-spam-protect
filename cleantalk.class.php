@@ -616,7 +616,7 @@ class Cleantalk {
 
             $result = curl_exec($ch);
             curl_close($ch); 
-            var_dump(0, $result);
+            var_dump(0, $result, $url, $ch);
         } else {
             $allow_url_fopen = ini_get('allow_url_fopen');
             if (function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1') {
