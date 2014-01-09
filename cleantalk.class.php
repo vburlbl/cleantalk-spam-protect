@@ -616,6 +616,7 @@ class Cleantalk {
 
             $result = curl_exec($ch);
             curl_close($ch); 
+            var_dump(0, $result);
         } else {
             $allow_url_fopen = ini_get('allow_url_fopen');
             if (function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1') {
@@ -638,6 +639,7 @@ class Cleantalk {
                 
                 return $response;
             }
+            var_dump(1, $result);
         }
 
         $errstr = null;
@@ -646,7 +648,7 @@ class Cleantalk {
             $response->errno = 0;
             $response->errstr = $errstr;
         } else {
-        var_dump($response, $result);
+        var_dump(2, $response, $result);
             if ($result === false)
                 $errstr = 'Failed connect to ' . $url . '.';
             else
