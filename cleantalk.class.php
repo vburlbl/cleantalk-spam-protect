@@ -646,6 +646,7 @@ class Cleantalk {
             $response->errno = 0;
             $response->errstr = $errstr;
         } else {
+        var_dump($response, $result);
             if ($result === false)
                 $errstr = 'Failed connect to ' . $url . '.';
             else
