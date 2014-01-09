@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 1.21.14
+ * @version 1.21.15
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -174,7 +174,7 @@ class CleantalkResponse {
             $this->account_status = (isset($obj->account_status)) ? $obj->account_status : -1;
 
             if ($this->errno !== 0 && $this->errstr !== null && $this->comment === null)
-                $this->comment = '*** ' . $this->errstr . ' Automoderator cleantalk.org ***'; 
+                $this->comment = '*** ' . $this->errstr . ' Antispam service cleantalk.org ***'; 
         }
     }
 
@@ -616,8 +616,8 @@ class Cleantalk {
 
             $result = curl_exec($ch);
             curl_close($ch); 
-            var_dump(0, $result, $url, $data);
-        } else {
+        }
+        if (!$result) {
             $allow_url_fopen = ini_get('allow_url_fopen');
             if (function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1') {
                 $opts = array('http' =>
@@ -631,28 +631,24 @@ class Cleantalk {
 
                 $context  = stream_context_create($opts);
                 $result = @file_get_contents($url, false, $context);
-            } else {
-                $response = null;
-                $response['errno'] = 1;
-                $response['errstr'] = 'No CURL support compiled in. Disabled allow_url_fopen in php.ini.'; 
-                $response = json_decode(json_encode($response));
-                
-                return $response;
             }
-            var_dump(1, $result);
         }
-
+        if (!$result) {
+            $response = null;
+            $response['errno'] = 1;
+            $response['errstr'] = 'No CURL support compiled in. Disabled allow_url_fopen in php.ini.'; 
+            $response = json_decode(json_encode($response));
+            
+            return $response;
+        }
+  
         $errstr = null;
         $response = json_decode($result);
         if ($result !== false && is_object($response)) {
             $response->errno = 0;
             $response->errstr = $errstr;
         } else {
-        var_dump(2, $response, $result);
-            if ($result === false)
-                $errstr = 'Failed connect to ' . $url . '.';
-            else
-                $errstr = $result;
+            $errstr = 'Failed connect to ' . $url . '.' . ' ' . $result;
             
             $response = null;
             $response['errno'] = 1;
@@ -660,7 +656,7 @@ class Cleantalk {
             $response = json_decode(json_encode($response));
         } 
         
-        exit;
+        
         return $response;
     }
 
