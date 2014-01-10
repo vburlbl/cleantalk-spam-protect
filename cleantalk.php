@@ -280,7 +280,7 @@ function ct_frm_entries_footer_scripts($fields, $form) {
     global $current_user, $ct_checkjs_frm;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['formidable_test'] == 0) {
+    if ($options['contact_forms_test'] == 0) {
         return false;
     }
     
@@ -306,7 +306,7 @@ function ct_frm_validate_entry ($errors, $values) {
     global $wpdb, $current_user, $ct_agent_version, $ct_checkjs_frm;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['formidable_test'] == 0) {
+    if ($options['contact_forms_test'] == 0) {
         return false;
     }
 
