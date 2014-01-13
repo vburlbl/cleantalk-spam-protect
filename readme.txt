@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce
 Requires at least: 3.0
 Tested up to: 3.8
-Stable tag: 2.28
+Stable tag: 2.30
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,10 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 1. Spam bot stopped at Contact form 7. 
 
 == Changelog ==
+
+= 2.30 2014-01-13 =
+  * Changed: Improved servers connection logic.
+  * Fixed: Antispam test for Fomidable forms. 
 
 = 2.28 2013-12-19 =
   * New: Added protection against spam bots for WooCommerce review form. 
@@ -226,6 +230,10 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
   * First version
 
 == Upgrade Notice ==
+= 2.30 2014-01-13 =
+  * Changed: Improved servers connection logic.
+  * Fixed: Antispam test for Fomidable forms. 
+
 = 2.27 2013-12-06 =
   * New: Added protection against spam bots for JetPack Contact form. 
   * Fixed: JavaScript antispam logic for registrations and Contact form 7.
