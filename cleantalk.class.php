@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 1.21.15
+ * @version 1.21.16
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -613,6 +613,8 @@ class Cleantalk {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
             // receive server response ...
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            // resolve 'Expect: 100-continue' issue
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
 
             $result = curl_exec($ch);
             curl_close($ch); 
