@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.31
+  Version: 2.30
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-231';
+$ct_agent_version = 'wordpress-230';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -20,8 +20,18 @@ $ct_checkjs_jpcf = 'ct_checkjs_jpcf';
 $ct_jpcf_patched = false; 
 $ct_jpcf_fields = array('name', 'email');
 
+// Comment already proccessed
+$ct_comment_done = false;
+
+// JetPack active
+$ct_jp_active = false;
+
+// Default value for JS test   
+$ct_checkjs_def = 0;
+
+add_action('init', 'ct_init');
+
 // Comments 
-add_action('comment_form', 'ct_comment_form');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
 
 // Formidable
@@ -58,6 +68,26 @@ if (is_admin()) {
     add_filter('unspam_comment', 'ct_unspam_comment');
     
     add_action('delete_user', 'ct_delete_user');
+}
+
+/**
+ * Init functions 
+ * @return 	mixed[] Array of options
+ */
+function ct_init() {
+	global $ct_jp_active;
+
+	$jetpack_active_modules = get_option('jetpack_active_modules');
+	if ( class_exists( 'Jetpack', false ) && $jetpack_active_modules && in_array( 'comments', $jetpack_active_modules ) ) {
+		$ct_jp_active = true;
+		setcookie('ct_checkjs', 0);
+		add_action('wp_footer', 'ct_comment_form'); 
+		add_action('pre_comment_on_post', 'ct_check_jp');
+	} else {
+		add_action('comment_form', 'ct_comment_form');
+
+	}
+
 }
 
 /**
@@ -231,20 +261,39 @@ function ct_comment_form() {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false) {
-    $ct_checkjs_def = 0;
+	global $ct_jp_active, $ct_checkjs_def;
+
     $ct_checkjs_key = ct_get_checkjs_value(); 
-    $field_id = $field_name . '_' . md5(rand(0, 1000));
     ct_init_session();
     $_SESSION['formtime'] = time();
-    $html = '
-    <input type="hidden" id="%s" name="%s" value="0" />
-    <script type="text/javascript">
-        // <![CDATA[
-        document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
-        // ]]>
-    </script>
-';
-    $html = sprintf($html, $field_id, $field_name, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
+	
+	if ($ct_jp_active) {
+			$html = '
+			<script type="text/javascript">
+				// <![CDATA[
+				function setCookie(c_name, value, exdays) {
+					var exdate = new Date();
+					exdate.setDate(exdate.getDate() + exdays);
+					var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
+					document.cookie = c_name + "=" + c_value;
+				}
+				setCookie("%s", "%s", 1);	
+				// ]]>
+			</script>
+		';
+		$html = sprintf($html, $field_name, $ct_checkjs_key);
+	} else {
+    		$field_id = $field_name . '_' . md5(rand(0, 1000));
+			$html = '
+			<input type="hidden" id="%s" name="%s" value="0" />
+			<script type="text/javascript">
+				// <![CDATA[
+				document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
+				// ]]>
+			</script>
+		';
+		$html = sprintf($html, $field_id, $field_name, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
+	}
     if ($return_string === true) {
         return $html;
     } else {
@@ -379,6 +428,21 @@ function ct_frm_validate_entry ($errors, $values) {
 }
 
 /**
+ * Wrapper to ct_check from JetPack comments. 
+ * @param	$comment	
+ * @return 	null	
+ */
+function ct_check_jp ($comment) {
+	$ct_comment['comment_author'] = isset($_POST['author']) ? $_POST['author'] : '';
+	$ct_comment['comment_author_email'] = isset($_POST['email']) ? $_POST['email'] : '';
+	$ct_comment['comment_author_url'] = isset($_POST['url']) ? $_POST['url'] : '';
+	$ct_comment['comment_content'] = isset($_POST['comment']) ? $_POST['comment'] : '';
+	$ct_comment['comment_post_ID'] = isset($_POST['comment_post_ID']) ? $_POST['comment_post_ID'] : '';
+	$ct_comment['comment_parent'] = isset($_POST['comment_parent']) ? $_POST['comment_parent'] : '';
+	return ct_check($ct_comment);
+}
+
+/**
  * Public filter 'preprocess_comment' - Checks comment by cleantalk server
  * @param 	mixed[] $comment Comment data array
  * @return 	mixed[] New data array of comment
@@ -387,13 +451,13 @@ function ct_check($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id, $ct_agent_version;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['comments_test'] == 0) {
+    if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
         return $comment;
     }
-    
+   
     $local_blacklists = wp_blacklist_check(
         $comment['comment_author'],
         $comment['comment_author_email'], 
@@ -420,6 +484,8 @@ function ct_check($comment) {
     if ($comment['comment_type'] == 'pingback' && $wp_host !== null && $wp_host === $author_host) {
         return $comment;
     }
+	
+	$ct_comment_done = true;
 
     $comment_post_id = $comment['comment_post_ID'];
 
@@ -509,7 +575,7 @@ function ct_check($comment) {
                 )
         );
     }
-    
+
     if ($ct_result->stop_queue == 1) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
@@ -579,8 +645,17 @@ function ct_die($comment_id, $comment_status) {
  */
 function js_test($field_name = 'ct_checkjs') {
     $checkjs = null;
-    if (isset($_POST[$field_name])) {
-        if($_POST[$field_name] == ct_get_checkjs_value()) {
+	$js_field = null;
+    if (isset($_POST[$field_name])) 
+		$js_field = $_POST[$field_name];
+    
+	if (isset($_COOKIE[$field_name])) {
+		$js_field = $_COOKIE[$field_name];
+		setcookie($field_name, null, null, 0);
+	} 
+
+    if ($js_field !== null) {
+        if($js_field == ct_get_checkjs_value()) {
             $checkjs = 1;
         } else {
 	        $checkjs = 0; 
