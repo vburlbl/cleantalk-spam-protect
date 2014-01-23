@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.30
+  Version: 2.31
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-230';
+$ct_agent_version = 'wordpress-231';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -78,16 +78,14 @@ function ct_init() {
 	global $ct_jp_active;
 
 	$jetpack_active_modules = get_option('jetpack_active_modules');
-	if ( class_exists( 'Jetpack', false ) && $jetpack_active_modules && in_array( 'comments', $jetpack_active_modules ) ) {
+	if (class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) {
 		$ct_jp_active = true;
-		setcookie('ct_checkjs', 0);
 		add_action('wp_footer', 'ct_comment_form'); 
 		add_action('pre_comment_on_post', 'ct_check_jp');
 	} else {
 		add_action('comment_form', 'ct_comment_form');
 
 	}
-
 }
 
 /**
@@ -651,7 +649,6 @@ function js_test($field_name = 'ct_checkjs') {
     
 	if (isset($_COOKIE[$field_name])) {
 		$js_field = $_COOKIE[$field_name];
-		setcookie($field_name, null, null, 0);
 	} 
 
     if ($js_field !== null) {
@@ -1422,6 +1419,7 @@ function ct_input_comments_test() {
     echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_comments_test0' name='cleantalk_settings[comments_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_comments_test0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(__('WordPress, JetPack', 'cleantalk'));
 }
 
 /**
@@ -1433,7 +1431,7 @@ function ct_input_registrations_test() {
     echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_registrations_test0' name='cleantalk_settings[registrations_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_registrations_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('WordPress, BuddyPress', 'cleantalk'));
+    admin_addDescriptionsFields(__('WordPress, BuddyPress, bbPress', 'cleantalk'));
 }
 
 /**
