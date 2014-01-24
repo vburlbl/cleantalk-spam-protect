@@ -2,7 +2,7 @@
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce
 Requires at least: 3.0
-Tested up to: 3.8
+Tested up to: 3.8.1
 Stable tag: 2.30
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -14,8 +14,8 @@ Cloud antispam for comments, signups and contacts.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 = Antispam features =
-* WordPress comments and signups.
-* BuddyPress, bbPress signups.
+* WordPress, JetPack comments.
+* WordPress, BuddyPress, bbPress signups.
 * Formiadble forms.
 * Contact form 7.
 * JetPack Contact form.
@@ -85,6 +85,10 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
 1. Spam bot stopped at Contact form 7. 
 
 == Changelog ==
+
+= 2.31 2014-01-24 =
+  * New: Added spam protection for JetPack comments
+  * Fixed: cURL connection issue "Expect: 100-continue" 
 
 = 2.30 2014-01-13 =
   * Changed: Improved servers connection logic.
@@ -230,6 +234,10 @@ Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of sp
   * First version
 
 == Upgrade Notice ==
+= 2.31 2014-01-24 =
+  * New: Added spam protection for JetPack comments
+  * Fixed: CURL connection issue "Expect: 100-continue" 
+
 = 2.30 2014-01-13 =
   * Changed: Improved servers connection logic.
   * Fixed: Antispam test for Fomidable forms. 
