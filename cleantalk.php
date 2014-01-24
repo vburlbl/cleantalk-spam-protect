@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.28
+  Version: 2.31
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-228';
+$ct_agent_version = 'wordpress-231';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -20,8 +20,18 @@ $ct_checkjs_jpcf = 'ct_checkjs_jpcf';
 $ct_jpcf_patched = false; 
 $ct_jpcf_fields = array('name', 'email');
 
+// Comment already proccessed
+$ct_comment_done = false;
+
+// JetPack active
+$ct_jp_active = false;
+
+// Default value for JS test   
+$ct_checkjs_def = 0;
+
+add_action('init', 'ct_init');
+
 // Comments 
-add_action('comment_form', 'ct_comment_form');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
 
 // Formidable
@@ -58,6 +68,23 @@ if (is_admin()) {
     add_filter('unspam_comment', 'ct_unspam_comment');
     
     add_action('delete_user', 'ct_delete_user');
+}
+
+/**
+ * Init functions 
+ * @return 	mixed[] Array of options
+ */
+function ct_init() {
+	global $ct_jp_active;
+
+	$jetpack_active_modules = get_option('jetpack_active_modules');
+	if (class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) {
+		$ct_jp_active = true;
+		add_action('wp_footer', 'ct_comment_form'); 
+	} else {
+		add_action('comment_form', 'ct_comment_form');
+
+	}
 }
 
 /**
@@ -231,20 +258,39 @@ function ct_comment_form() {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false) {
-    $ct_checkjs_def = 0;
+	global $ct_jp_active, $ct_checkjs_def;
+
     $ct_checkjs_key = ct_get_checkjs_value(); 
-    $field_id = $field_name . '_' . md5(rand(0, 1000));
     ct_init_session();
     $_SESSION['formtime'] = time();
-    $html = '
-    <input type="hidden" id="%s" name="%s" value="0" />
-    <script type="text/javascript">
-        // <![CDATA[
-        document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
-        // ]]>
-    </script>
-';
-    $html = sprintf($html, $field_id, $field_name, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
+	
+	if ($ct_jp_active) {
+			$html = '
+			<script type="text/javascript">
+				// <![CDATA[
+				function setCookie(c_name, value, exdays) {
+					var exdate = new Date();
+					exdate.setDate(exdate.getDate() + exdays);
+					var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
+					document.cookie = c_name + "=" + c_value;
+				}
+				setCookie("%s", "%s", 1);	
+				// ]]>
+			</script>
+		';
+		$html = sprintf($html, $field_name, $ct_checkjs_key);
+	} else {
+    		$field_id = $field_name . '_' . md5(rand(0, 1000));
+			$html = '
+			<input type="hidden" id="%s" name="%s" value="0" />
+			<script type="text/javascript">
+				// <![CDATA[
+				document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
+				// ]]>
+			</script>
+		';
+		$html = sprintf($html, $field_id, $field_name, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
+	}
     if ($return_string === true) {
         return $html;
     } else {
@@ -280,7 +326,7 @@ function ct_frm_entries_footer_scripts($fields, $form) {
     global $current_user, $ct_checkjs_frm;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['formidable_test'] == 0) {
+    if ($options['contact_forms_test'] == 0) {
         return false;
     }
     
@@ -306,7 +352,7 @@ function ct_frm_validate_entry ($errors, $values) {
     global $wpdb, $current_user, $ct_agent_version, $ct_checkjs_frm;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['formidable_test'] == 0) {
+    if ($options['contact_forms_test'] == 0) {
         return false;
     }
 
@@ -387,13 +433,13 @@ function ct_check($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id, $ct_agent_version;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['comments_test'] == 0) {
+    if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
         return $comment;
     }
-    
+   
     $local_blacklists = wp_blacklist_check(
         $comment['comment_author'],
         $comment['comment_author_email'], 
@@ -420,6 +466,8 @@ function ct_check($comment) {
     if ($comment['comment_type'] == 'pingback' && $wp_host !== null && $wp_host === $author_host) {
         return $comment;
     }
+	
+	$ct_comment_done = true;
 
     $comment_post_id = $comment['comment_post_ID'];
 
@@ -509,7 +557,7 @@ function ct_check($comment) {
                 )
         );
     }
-    
+
     if ($ct_result->stop_queue == 1) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
@@ -579,8 +627,16 @@ function ct_die($comment_id, $comment_status) {
  */
 function js_test($field_name = 'ct_checkjs') {
     $checkjs = null;
-    if (isset($_POST[$field_name])) {
-        if($_POST[$field_name] == ct_get_checkjs_value()) {
+	$js_field = null;
+    if (isset($_POST[$field_name])) 
+		$js_field = $_POST[$field_name];
+    
+	if (isset($_COOKIE[$field_name])) {
+		$js_field = $_COOKIE[$field_name];
+	} 
+
+    if ($js_field !== null) {
+        if($js_field == ct_get_checkjs_value()) {
             $checkjs = 1;
         } else {
 	        $checkjs = 0; 
@@ -1347,6 +1403,7 @@ function ct_input_comments_test() {
     echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_comments_test0' name='cleantalk_settings[comments_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_comments_test0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(__('WordPress, JetPack', 'cleantalk'));
 }
 
 /**
@@ -1358,7 +1415,7 @@ function ct_input_registrations_test() {
     echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_registrations_test0' name='cleantalk_settings[registrations_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_registrations_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('WordPress, BuddyPress', 'cleantalk'));
+    admin_addDescriptionsFields(__('WordPress, BuddyPress, bbPress', 'cleantalk'));
 }
 
 /**
