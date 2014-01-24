@@ -81,7 +81,6 @@ function ct_init() {
 	if (class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) {
 		$ct_jp_active = true;
 		add_action('wp_footer', 'ct_comment_form'); 
-		add_action('pre_comment_on_post', 'ct_check_jp');
 	} else {
 		add_action('comment_form', 'ct_comment_form');
 
@@ -423,21 +422,6 @@ function ct_frm_validate_entry ($errors, $values) {
     }
     
     return $errors;
-}
-
-/**
- * Wrapper to ct_check from JetPack comments. 
- * @param	$comment	
- * @return 	null	
- */
-function ct_check_jp ($comment) {
-	$ct_comment['comment_author'] = isset($_POST['author']) ? $_POST['author'] : '';
-	$ct_comment['comment_author_email'] = isset($_POST['email']) ? $_POST['email'] : '';
-	$ct_comment['comment_author_url'] = isset($_POST['url']) ? $_POST['url'] : '';
-	$ct_comment['comment_content'] = isset($_POST['comment']) ? $_POST['comment'] : '';
-	$ct_comment['comment_post_ID'] = isset($_POST['comment_post_ID']) ? $_POST['comment_post_ID'] : '';
-	$ct_comment['comment_parent'] = isset($_POST['comment_parent']) ? $_POST['comment_parent'] : '';
-	return ct_check($ct_comment);
 }
 
 /**
