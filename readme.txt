@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce
 Requires at least: 3.0
 Tested up to: 3.8.1
-Stable tag: 2.30
+Stable tag: 2.31
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,17 +47,15 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 Plugin uses several simple tests to stop spammers.
 
 * Spam bots signatures.
-* Blacklists checks by Email, IP, web-sites domain names.
-* JavaScript availability.
-* Comment submit time.
-* Relevance test for the comment.
+* JavaScript antispam test.
+* Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists">spam activities list</a>.
+* Comment submit time. Spam bots usually send post immediately after page load.
+* Relevance test for the comment. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
 
 = How plugin works? =
-
 Plugin sends a comment's text and several previous approved comments to the cloud. Cloud evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
 
 = Will plugin works with my theme? =
-
 Plugin works with all WordPress themes. With some themes may not works JavaScript antispam method, but it's not crucial to protect your blog from spam.
 
 = How can I test antispam protection? =
@@ -75,7 +73,7 @@ Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a hr
 1. CleanTalk automatically approves relevant, not spam comments.
 
 = Should I use another antispam plugins? =
-Use other antispam plugins not necessarily, because CleanTalk stops 99.99% of spam comments. But if necessary, the plugin can work together with Akismet, Captcha and etc.
+Use other antispam plugins not necessarily, because CleanTalk stops 100% of spam comments. But if necessary, the plugin can works together with Akismet, Captcha and etc.
 
 == Screenshots ==
 1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress.
