@@ -48,7 +48,7 @@ Plugin uses several simple tests to stop spammers.
 
 * Spam bots signatures.
 * JavaScript antispam test.
-* Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists">spam activities list</a>.
+* Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
 * Comment submit time. Spam bots usually send post immediately after page load.
 * Relevance test for the comment. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
 
