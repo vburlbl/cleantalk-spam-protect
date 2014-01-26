@@ -22,17 +22,8 @@ Cloud antispam for comments, signups and contacts.
 * WooCommerce review form.
 * no CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
-The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
+The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk daily prevents 5k web-sites from spam bots. 
 
-Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
-
-The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk.org daily prevents from spam 5000 blogs, blocks up to 500 000 spam bots attacks and approves up to 4000 not spam comments. 
-= Requirements =
-WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
-= Translations =
-* English
-* Russian (ru_RU)
-* Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html?utm_expid=31925339-46.KEGZK8A6Q3yfZW0EUfEw5Q.1">WebHostingHub</a>
 
 == Installation ==
 
@@ -55,6 +46,8 @@ Plugin uses several simple tests to stop spammers.
 = How plugin works? =
 Plugin sends a comment's text and several previous approved comments to the cloud. Cloud evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
 
+Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+
 = Will plugin works with my theme? =
 Plugin works with all WordPress themes. With some themes may not works JavaScript antispam method, but it's not crucial to protect your blog from spam.
 
@@ -74,6 +67,21 @@ Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a hr
 
 = Should I use another antispam plugins? =
 Use other antispam plugins not necessarily, because CleanTalk stops 100% of spam comments. But if necessary, the plugin can works together with Akismet, Captcha and etc.
+
+= Should I use another antispam plugins? =
+Use other antispam plugins not necessarily, because CleanTalk stops 100% of spam comments. But if necessary, the plugin can works together with Akismet, Captcha and etc.
+
+= The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
+The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
+
+= What about requirements? =
+WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
+
+= Has the plugin translations? =
+* English
+* Russian (ru_RU)
+* Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html?utm_expid=31925339-46.KEGZK8A6Q3yfZW0EUfEw5Q.1">WebHostingHub</a>
+
 
 == Screenshots ==
 1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress.
