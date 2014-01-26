@@ -10,10 +10,12 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Cloud antispam for comments, signups and contacts.
 
 == Description ==
+
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
-= Antispam features =
+
+= Anti-spam protection for =
 * WordPress, JetPack comments.
 * WordPress, BuddyPress, bbPress signups.
 * Formiadble forms.
