@@ -24,7 +24,7 @@ Cloud antispam for comments, signups and contacts.
 * WooCommerce review form.
 * no CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
-The plugin is a client application for anti-spam cloud service <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>. CleanTalk daily prevents 5k web-sites from spam bots. 
+The plugin is a client application for anti-spam cloud service cleantalk.org. CleanTalk daily prevents 5k web-sites from spam bots. 
 
 
 == Installation ==
