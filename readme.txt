@@ -15,7 +15,7 @@ Cloud antispam for comments, signups and contacts.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 
-= Anti-spam protection for =
+= Anti-spam protection =
 * WordPress, JetPack comments.
 * WordPress, BuddyPress, bbPress signups.
 * Formiadble forms.
