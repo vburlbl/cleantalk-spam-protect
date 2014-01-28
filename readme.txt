@@ -32,7 +32,10 @@ The plugin is a client application for cloud anti-spam CleanTalk.org, which are 
 1. Download, install and activate the plugin. 
 1. Get Access key <a href="http://cleantalk.org/register?platform=wordpress" target="_blank">http://cleantalk.org/register</a>
 1. Enter Access key at the plugin settings. 
-1. To test anti-spam protection use email **stop_email@example.com**. 
+1. To test anti-spam protection use email **stop_email@example.com**. You shoud see server comment like this,
+
+*** Forbidden. Sender blacklisted. Request number 8aa9209204b2f521b3da16f92d9440a5. Antispam service cleantalk.org. ***
+
 1. To check and control anti-spam process use <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org. 
 
 == Frequently Asked Questions ==
