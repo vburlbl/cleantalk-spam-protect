@@ -36,7 +36,7 @@ The plugin is a client application for cloud anti-spam CleanTalk.org, which are 
 
 *** Forbidden. Sender blacklisted. Request number 8aa9209204b2f521b3da16f92d9440a5. Antispam service cleantalk.org. ***
 
-1. To check and control anti-spam process use <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org. 
+To check and control anti-spam process use <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org. 
 
 == Frequently Asked Questions ==
 
