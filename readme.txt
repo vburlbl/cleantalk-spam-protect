@@ -10,7 +10,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Cloud antispam for comments, signups and contacts.
 
 == Description ==
+No CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
+= Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
@@ -22,7 +24,6 @@ Cloud antispam for comments, signups and contacts.
 * Contact form 7.
 * JetPack Contact form.
 * WooCommerce review form.
-* no CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
 The plugin is a client application for cloud anti-spam CleanTalk.org, which are daily protects 5k web-sites from spam bots. 
 
