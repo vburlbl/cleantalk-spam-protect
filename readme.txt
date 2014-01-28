@@ -1,13 +1,13 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce
+Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce
 Requires at least: 3.0
 Tested up to: 3.8.1
 Stable tag: 2.31
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud antispam for comments, signups and contacts.
+Cloud anti-spam for comments, signups and contacts.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math.
@@ -27,13 +27,13 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
 The plugin is a client application for cloud anti-spam CleanTalk.org, which are daily protects 5k web-sites from spam bots. 
 
-
 == Installation ==
 
 1. Download, install and activate the plugin. 
-1. Get and enter the Access key in the settings
-<a href="http://cleantalk.org/register?platform=wordpress" target="_blank">http://cleantalk.org/register</a>
-1. Enjoy the blog without spam.
+1. Get Access key <a href="http://cleantalk.org/register?platform=wordpress" target="_blank">http://cleantalk.org/register</a>
+1. Enter Access key at the plugin settings. 
+1. To test anti-spam protection use email **stop_email@example.com**. 
+1. To check and control anti-spam process use <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org. 
 
 == Frequently Asked Questions ==
 
@@ -47,21 +47,19 @@ Plugin uses several simple tests to stop spammers.
 * Relevance test for the comment. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
 
 = How plugin works? =
-Plugin sends a comment's text and several previous approved comments to the cloud. Cloud evaluates the relevance of the comment's text on the topic, tests on spam and finaly provides a solution - to publish or put on manual moderation of comments. If a comment is placed on manual moderation, the plugin adds to the text of a comment explaining the reason for the ban server publishing.
-
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 = Will plugin works with my theme? =
-Plugin works with all WordPress themes. With some themes may not works JavaScript antispam method, but it's not crucial to protect your blog from spam.
+Plugin works with all WordPress themes. With some themes may not works JavaScript anti-spam method, but it's not crucial to protect your blog from spam bots.
 
-= How can I test antispam protection? =
-Please use test email stop_email@example.com for comments. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
+= How can I test anti-spam protection? =
+Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = How the plugin is effective against spam bots? =
-Plugin Antispam by CleanTalk stops about 99.99% of spam comments by spam bots. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
+Plugin Anti-spam by CleanTalk stops about 100% of spam bots comments. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
 
 = What about pingback, trackback spam? = 
-Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">Blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the Blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
+Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
 
 = Why do I need one more anti-spam plugin? =
 1. The plugin is more effective than CAPTCHA because use several methods to stop spammers.
@@ -69,10 +67,7 @@ Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a hr
 1. CleanTalk automatically approves relevant, not spam comments.
 
 = Should I use another antispam plugins? =
-Use other antispam plugins not necessarily, because CleanTalk stops 100% of spam comments. But if necessary, the plugin can works together with Akismet, Captcha and etc.
-
-= Should I use another antispam plugins? =
-Use other antispam plugins not necessarily, because CleanTalk stops 100% of spam comments. But if necessary, the plugin can works together with Akismet, Captcha and etc.
+Use other antispam plugins not necessarily, because CleanTalk stops 100% of spam comments. 
 
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
