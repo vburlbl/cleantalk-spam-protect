@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/wordpress
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.31
+  Version: 2.32
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-231';
+$ct_agent_version = 'wordpress-232';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -29,10 +29,17 @@ $ct_jp_active = false;
 // Default value for JS test   
 $ct_checkjs_def = 0;
 
+// COOKIE label to store request id for last approved  
+$ct_approved_request_id_label = 'ct_approved_request_id';
+
+// Last request id approved for publication 
+$ct_approved_request_id = null;
+
 add_action('init', 'ct_init');
 
 // Comments 
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
+add_filter( 'comment_text', 'ct_comment_text' );
 
 // Formidable
 add_action('frm_validate_entry', 'ct_frm_validate_entry', 20, 2);
@@ -83,7 +90,6 @@ function ct_init() {
 		add_action('wp_footer', 'ct_comment_form'); 
 	} else {
 		add_action('comment_form', 'ct_comment_form');
-
 	}
 }
 
@@ -433,7 +439,7 @@ function ct_check($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label;
     
     $options = ct_get_options();
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
@@ -588,6 +594,7 @@ function ct_check($comment) {
 
             if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
                 add_filter('pre_comment_approved', 'ct_set_approved');
+                setcookie($ct_approved_request_id_label, $ct_result->id, 0);
             }
             if ($ct_result->allow == 0) {
                 if (isset($ct_result->stop_words)) {
@@ -1291,7 +1298,6 @@ function ct_wpcf7_spam($spam) {
  * Changes CF7 status message 
  * @param 	string $hook URL of hooked page
  */
-
 function ct_wpcf7_display_message($message, $status) {
     global $ct_cf7_comment;
 
@@ -1464,6 +1470,27 @@ function ct_settings_page() {
     <?php echo __('Plugin Homepage at', 'cleantalk'); ?> <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
     </div>
     <?php
+}
+
+/**
+ * Notice for commentators which comment has automatically approved by plugin 
+ * @param 	string $hook URL of hooked page
+ */
+function ct_comment_text($comment_text) {
+    global $comment, $ct_approved_request_id_label;
+    
+    
+    if (isset($_COOKIE[$ct_approved_request_id_label])) {
+        $ct_hash = get_comment_meta($comment->comment_ID, 'ct_hash', true);
+
+        if ($ct_hash !== '' && $_COOKIE[$ct_approved_request_id_label] == $ct_hash) {
+            ct_init_locale();
+            $comment_text .= '<br /><br /> <em class="comment-awaiting-moderation">' . __('Comment approved. Anti-spam by CleanTalk.', 'cleantalk') . '</em>'; 
+        }
+         
+    }
+
+    return $comment_text;
 }
 
 ?>
