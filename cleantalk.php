@@ -1,7 +1,7 @@
 <?php
 /*
   Plugin Name: Anti-spam by CleanTalk 
-  Plugin URI: http://cleantalk.org/wordpress
+  Plugin URI: http://cleantalk.org/my
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
   Version: 2.32
   Author: СleanTalk <welcome@cleantalk.ru>
@@ -34,6 +34,15 @@ $ct_approved_request_id_label = 'ct_approved_request_id';
 
 // Last request id approved for publication 
 $ct_approved_request_id = null;
+
+// COOKIE label for trial notice flag
+$ct_notice_trial_label = 'ct_notice_trial';
+
+// Flag to show trial notice
+$show_ct_notice_trial = false;
+
+// Timeout before new check for trial notice in minutes
+$trial_notice_check_timeout = 10;
 
 add_action('init', 'ct_init');
 
@@ -75,6 +84,8 @@ if (is_admin()) {
     add_filter('unspam_comment', 'ct_unspam_comment');
     
     add_action('delete_user', 'ct_delete_user');
+    
+    add_filter('plugin_row_meta', 'ct_register_plugin_links', 10, 2);
 }
 
 /**
@@ -846,15 +857,22 @@ function ct_unmark_red($message) {
  * @return bool 
  */
 function admin_notice_message(){    
+    global $ct_notice_trial_label, $show_ct_notice_trial;
 
 	if (ct_active() === false)
 		return false;
 
     $options = ct_get_options();
-	if (ct_valid_key($options['apikey']) === false) {
+    $show_notice = true;
+	if ($show_notice && ct_valid_key($options['apikey']) === false) {
 	    echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
     }
-	
+
+    if ($show_notice && $show_ct_notice_trial) {
+	    echo '<div class="updated"><p>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</p></div>';
+        $show_notice = false;
+    }
+
     ct_send_feedback();
     
     delete_spam_comments();
@@ -1328,8 +1346,52 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    ct_init_locale();
+    global $show_ct_notice_trial, $ct_notice_trial_label, $trial_notice_check_timeout;
+    
+    $show_ct_notice_trial = false;
+    if (isset($_COOKIE[$ct_notice_trial_label])) {
+        if ($_COOKIE[$ct_notice_trial_label] == 1)
+            $show_ct_notice_trial = true;
+    } else {
+        $options = ct_get_options();
+	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey'])) {
+            $url = 'https://cleantalk.org/app_notice';
+            $server_timeout = 1;
+            $data['auth_key'] = $options['apikey']; 
+            $data['param'] = 'notice_paid_till'; 
 
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $server_timeout);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            
+            // receive server response ...
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            // resolve 'Expect: 100-continue' issue
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+            
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+            $result = curl_exec($ch);
+            curl_close($ch);
+
+            if ($result) {
+                $result = json_decode($result, true);
+                if (isset($result['show_notice']) && $result['show_notice'] == 1) {
+                    if (isset($result['trial']) && $result['trial'] == 1) {
+                        $show_ct_notice_trial = true;
+                    }
+                }
+            }
+        }
+
+        setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"));
+    }
+
+    ct_init_locale();
     ct_init_session();
 
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
@@ -1491,6 +1553,23 @@ function ct_comment_text($comment_text) {
     }
 
     return $comment_text;
+}
+
+
+/**
+ * Manage links and plugins page
+ * @return array
+*/
+if (!function_exists ( 'ct_register_plugin_links')) {
+	function ct_register_plugin_links($links, $file) {
+		$base = plugin_basename(__FILE__);
+		if ( $file == $base ) {
+			$links[] = '<a href="options-general.php?page=cleantalk">' . __( 'Settings','cleantalk' ) . '</a>';
+			$links[] = '<a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/" target="_blank">' . __( 'FAQ','cleantalk' ) . '</a>';
+			$links[] = '<a href="http://cleantalk.org/forum" target="_blank">' . __( 'Support','cleantalk' ) . '</a>';
+		}
+		return $links;
+	}
 }
 
 ?>
