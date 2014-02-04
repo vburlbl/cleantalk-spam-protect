@@ -1,14 +1,14 @@
 <?php
 /*
   Plugin Name: Anti-spam by CleanTalk 
-  Plugin URI: http://cleantalk.org/wordpress
+  Plugin URI: http://cleantalk.org/my
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.28
+  Version: 2.32
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-228';
+$ct_agent_version = 'wordpress-232';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -20,9 +20,35 @@ $ct_checkjs_jpcf = 'ct_checkjs_jpcf';
 $ct_jpcf_patched = false; 
 $ct_jpcf_fields = array('name', 'email');
 
+// Comment already proccessed
+$ct_comment_done = false;
+
+// JetPack active
+$ct_jp_active = false;
+
+// Default value for JS test   
+$ct_checkjs_def = 0;
+
+// COOKIE label to store request id for last approved  
+$ct_approved_request_id_label = 'ct_approved_request_id';
+
+// Last request id approved for publication 
+$ct_approved_request_id = null;
+
+// COOKIE label for trial notice flag
+$ct_notice_trial_label = 'ct_notice_trial';
+
+// Flag to show trial notice
+$show_ct_notice_trial = false;
+
+// Timeout before new check for trial notice in minutes
+$trial_notice_check_timeout = 10;
+
+add_action('init', 'ct_init');
+
 // Comments 
-add_action('comment_form', 'ct_comment_form');
 add_filter('preprocess_comment', 'ct_check');     // param - comment data array
+add_filter( 'comment_text', 'ct_comment_text' );
 
 // Formidable
 add_action('frm_validate_entry', 'ct_frm_validate_entry', 20, 2);
@@ -58,6 +84,24 @@ if (is_admin()) {
     add_filter('unspam_comment', 'ct_unspam_comment');
     
     add_action('delete_user', 'ct_delete_user');
+    
+    add_filter('plugin_row_meta', 'ct_register_plugin_links', 10, 2);
+}
+
+/**
+ * Init functions 
+ * @return 	mixed[] Array of options
+ */
+function ct_init() {
+	global $ct_jp_active;
+
+	$jetpack_active_modules = get_option('jetpack_active_modules');
+	if (class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) {
+		$ct_jp_active = true;
+		add_action('wp_footer', 'ct_comment_form'); 
+	} else {
+		add_action('comment_form', 'ct_comment_form');
+	}
 }
 
 /**
@@ -231,20 +275,39 @@ function ct_comment_form() {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false) {
-    $ct_checkjs_def = 0;
+	global $ct_jp_active, $ct_checkjs_def;
+
     $ct_checkjs_key = ct_get_checkjs_value(); 
-    $field_id = $field_name . '_' . md5(rand(0, 1000));
     ct_init_session();
     $_SESSION['formtime'] = time();
-    $html = '
-    <input type="hidden" id="%s" name="%s" value="0" />
-    <script type="text/javascript">
-        // <![CDATA[
-        document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
-        // ]]>
-    </script>
-';
-    $html = sprintf($html, $field_id, $field_name, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
+	
+	if ($ct_jp_active) {
+			$html = '
+			<script type="text/javascript">
+				// <![CDATA[
+				function setCookie(c_name, value, exdays) {
+					var exdate = new Date();
+					exdate.setDate(exdate.getDate() + exdays);
+					var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
+					document.cookie = c_name + "=" + c_value;
+				}
+				setCookie("%s", "%s", 1);	
+				// ]]>
+			</script>
+		';
+		$html = sprintf($html, $field_name, $ct_checkjs_key);
+	} else {
+    		$field_id = $field_name . '_' . md5(rand(0, 1000));
+			$html = '
+			<input type="hidden" id="%s" name="%s" value="0" />
+			<script type="text/javascript">
+				// <![CDATA[
+				document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
+				// ]]>
+			</script>
+		';
+		$html = sprintf($html, $field_id, $field_name, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
+	}
     if ($return_string === true) {
         return $html;
     } else {
@@ -280,7 +343,7 @@ function ct_frm_entries_footer_scripts($fields, $form) {
     global $current_user, $ct_checkjs_frm;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['formidable_test'] == 0) {
+    if ($options['contact_forms_test'] == 0) {
         return false;
     }
     
@@ -306,7 +369,7 @@ function ct_frm_validate_entry ($errors, $values) {
     global $wpdb, $current_user, $ct_agent_version, $ct_checkjs_frm;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['formidable_test'] == 0) {
+    if ($options['contact_forms_test'] == 0) {
         return false;
     }
 
@@ -387,13 +450,13 @@ function ct_check($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id, $ct_agent_version;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label;
     
     $options = ct_get_options();
-    if (ct_is_user_enable() === false || $options['comments_test'] == 0) {
+    if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
         return $comment;
     }
-    
+   
     $local_blacklists = wp_blacklist_check(
         $comment['comment_author'],
         $comment['comment_author_email'], 
@@ -420,6 +483,8 @@ function ct_check($comment) {
     if ($comment['comment_type'] == 'pingback' && $wp_host !== null && $wp_host === $author_host) {
         return $comment;
     }
+	
+	$ct_comment_done = true;
 
     $comment_post_id = $comment['comment_post_ID'];
 
@@ -509,7 +574,7 @@ function ct_check($comment) {
                 )
         );
     }
-    
+
     if ($ct_result->stop_queue == 1) {
         $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_result->comment;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
@@ -540,6 +605,7 @@ function ct_check($comment) {
 
             if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
                 add_filter('pre_comment_approved', 'ct_set_approved');
+                setcookie($ct_approved_request_id_label, $ct_result->id, 0);
             }
             if ($ct_result->allow == 0) {
                 if (isset($ct_result->stop_words)) {
@@ -579,8 +645,16 @@ function ct_die($comment_id, $comment_status) {
  */
 function js_test($field_name = 'ct_checkjs') {
     $checkjs = null;
-    if (isset($_POST[$field_name])) {
-        if($_POST[$field_name] == ct_get_checkjs_value()) {
+	$js_field = null;
+    if (isset($_POST[$field_name])) 
+		$js_field = $_POST[$field_name];
+    
+	if (isset($_COOKIE[$field_name])) {
+		$js_field = $_COOKIE[$field_name];
+	} 
+
+    if ($js_field !== null) {
+        if($js_field == ct_get_checkjs_value()) {
             $checkjs = 1;
         } else {
 	        $checkjs = 0; 
@@ -783,15 +857,22 @@ function ct_unmark_red($message) {
  * @return bool 
  */
 function admin_notice_message(){    
+    global $ct_notice_trial_label, $show_ct_notice_trial;
 
 	if (ct_active() === false)
 		return false;
 
     $options = ct_get_options();
-	if (ct_valid_key($options['apikey']) === false) {
+    $show_notice = true;
+	if ($show_notice && ct_valid_key($options['apikey']) === false) {
 	    echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
     }
-	
+
+    if ($show_notice && $show_ct_notice_trial) {
+	    echo '<div class="updated"><p>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</p></div>';
+        $show_notice = false;
+    }
+
     ct_send_feedback();
     
     delete_spam_comments();
@@ -1235,7 +1316,6 @@ function ct_wpcf7_spam($spam) {
  * Changes CF7 status message 
  * @param 	string $hook URL of hooked page
  */
-
 function ct_wpcf7_display_message($message, $status) {
     global $ct_cf7_comment;
 
@@ -1266,8 +1346,52 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    ct_init_locale();
+    global $show_ct_notice_trial, $ct_notice_trial_label, $trial_notice_check_timeout;
+    
+    $show_ct_notice_trial = false;
+    if (isset($_COOKIE[$ct_notice_trial_label])) {
+        if ($_COOKIE[$ct_notice_trial_label] == 1)
+            $show_ct_notice_trial = true;
+    } else {
+        $options = ct_get_options();
+	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey'])) {
+            $url = 'https://cleantalk.org/app_notice';
+            $server_timeout = 1;
+            $data['auth_key'] = $options['apikey']; 
+            $data['param'] = 'notice_paid_till'; 
 
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $server_timeout);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            
+            // receive server response ...
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            // resolve 'Expect: 100-continue' issue
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+            
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+            $result = curl_exec($ch);
+            curl_close($ch);
+
+            if ($result) {
+                $result = json_decode($result, true);
+                if (isset($result['show_notice']) && $result['show_notice'] == 1) {
+                    if (isset($result['trial']) && $result['trial'] == 1) {
+                        $show_ct_notice_trial = true;
+                    }
+                }
+            }
+        }
+
+        setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"));
+    }
+
+    ct_init_locale();
     ct_init_session();
 
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
@@ -1347,6 +1471,7 @@ function ct_input_comments_test() {
     echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_comments_test0' name='cleantalk_settings[comments_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_comments_test0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(__('WordPress, JetPack', 'cleantalk'));
 }
 
 /**
@@ -1358,7 +1483,7 @@ function ct_input_registrations_test() {
     echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_registrations_test0' name='cleantalk_settings[registrations_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_registrations_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('WordPress, BuddyPress', 'cleantalk'));
+    admin_addDescriptionsFields(__('WordPress, BuddyPress, bbPress', 'cleantalk'));
 }
 
 /**
@@ -1407,6 +1532,44 @@ function ct_settings_page() {
     <?php echo __('Plugin Homepage at', 'cleantalk'); ?> <a href="http://cleantalk.org" target="_blank">cleantalk.org</a>.
     </div>
     <?php
+}
+
+/**
+ * Notice for commentators which comment has automatically approved by plugin 
+ * @param 	string $hook URL of hooked page
+ */
+function ct_comment_text($comment_text) {
+    global $comment, $ct_approved_request_id_label;
+    
+    
+    if (isset($_COOKIE[$ct_approved_request_id_label])) {
+        $ct_hash = get_comment_meta($comment->comment_ID, 'ct_hash', true);
+
+        if ($ct_hash !== '' && $_COOKIE[$ct_approved_request_id_label] == $ct_hash) {
+            ct_init_locale();
+            $comment_text .= '<br /><br /> <em class="comment-awaiting-moderation">' . __('Comment approved. Anti-spam by CleanTalk.', 'cleantalk') . '</em>'; 
+        }
+         
+    }
+
+    return $comment_text;
+}
+
+
+/**
+ * Manage links and plugins page
+ * @return array
+*/
+if (!function_exists ( 'ct_register_plugin_links')) {
+	function ct_register_plugin_links($links, $file) {
+		$base = plugin_basename(__FILE__);
+		if ( $file == $base ) {
+			$links[] = '<a href="options-general.php?page=cleantalk">' . __( 'Settings','cleantalk' ) . '</a>';
+			$links[] = '<a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/" target="_blank">' . __( 'FAQ','cleantalk' ) . '</a>';
+			$links[] = '<a href="http://cleantalk.org/forum" target="_blank">' . __( 'Support','cleantalk' ) . '</a>';
+		}
+		return $links;
+	}
 }
 
 ?>
