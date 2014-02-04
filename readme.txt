@@ -3,11 +3,11 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce
 Requires at least: 3.0
 Tested up to: 3.8.1
-Stable tag: 2.31
+Stable tag: 2.32
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud anti-spam for comments, signups and contacts.
+Anti-spam for comments, signups and contacts.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math.
@@ -92,6 +92,11 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Spam bot stopped at Contact form 7. 
 
 == Changelog ==
+
+= 2.32 2014-02-04 =
+  * New: Added notice about automatically approved comment. The notice shows only for first approved comment and only for new commentators (without approved comments) of the blog.  
+  * New: At WordPress console added banner for notices. 
+  * Changed: Screenshots updated. 
 
 = 2.31 2014-01-24 =
   * New: Added spam protection for JetPack comments
@@ -241,6 +246,11 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.32 2014-02-04 =
+  * New: Added notice about automatically approved comment. The notice shows only for first approved comment and only for new commentators (without approved comments) of the blog.  
+  * New: At WordPress console added banner for notices. 
+  * Changed: Screenshots updated. 
+
 = 2.31 2014-01-24 =
   * New: Added spam protection for JetPack comments
   * Fixed: CURL connection issue "Expect: 100-continue" 
