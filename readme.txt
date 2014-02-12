@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce
 Requires at least: 3.0
 Tested up to: 3.8.1
-Stable tag: 2.32
+Stable tag: 2.33
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Spam bot stopped at Contact form 7. 
 
 == Changelog ==
+
+= 2.33 2014-02-12 =
+  * Fixed: CURLOPT_FOLLOWLOCATION bug at admin notice 
 
 = 2.32 2014-02-04 =
   * New: Added notice about automatically approved comment. The notice shows only for first approved comment and only for new commentators (without approved comments) of the blog.  
@@ -246,6 +249,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.33 2014-02-12 =
+  * Fixed: CURLOPT_FOLLOWLOCATION bug at admin notice 
+
 = 2.32 2014-02-04 =
   * New: Added notice about automatically approved comment. The notice shows only for first approved comment and only for new commentators (without approved comments) of the blog.  
   * New: At WordPress console added banner for notices. 
