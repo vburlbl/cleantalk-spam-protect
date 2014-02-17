@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/my
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.33
+  Version: 2.34
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-233';
+$ct_agent_version = 'wordpress-234';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -456,7 +456,7 @@ function ct_check($comment) {
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
         return $comment;
     }
-   
+
     $local_blacklists = wp_blacklist_check(
         $comment['comment_author'],
         $comment['comment_author_email'], 
@@ -601,14 +601,14 @@ function ct_check($comment) {
         $approved_comments = get_comments(array('status' => 'approve', 'count' => true, 'author_email' => $comment['comment_author_email']));
 
         // Change comment flow only for new authors
-        if ((int) $approved_comments == 0) {
+        if ((int) $approved_comments == 0 || $ct_result->stop_words !== null) {
 
             if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
                 add_filter('pre_comment_approved', 'ct_set_approved');
                 setcookie($ct_approved_request_id_label, $ct_result->id, 0);
             }
             if ($ct_result->allow == 0) {
-                if (isset($ct_result->stop_words)) {
+                if ($ct_result->stop_words !== null) {
                     global $ct_stop_words;
                     $ct_stop_words = $ct_result->stop_words;
                     add_action('comment_post', 'ct_mark_red', 11, 2);
