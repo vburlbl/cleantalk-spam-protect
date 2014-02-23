@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/my
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.34
+  Version: 2.35
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-234';
+$ct_agent_version = 'wordpress-235';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -402,7 +402,7 @@ function ct_frm_validate_entry ($errors, $values) {
         }
         $message .= ' ' . $v;
     }
-
+    
     $config = get_option('cleantalk_server');
 
     $ct = new Cleantalk();
@@ -456,7 +456,7 @@ function ct_check($comment) {
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
         return $comment;
     }
-
+   
     $local_blacklists = wp_blacklist_check(
         $comment['comment_author'],
         $comment['comment_author_email'], 
@@ -601,14 +601,14 @@ function ct_check($comment) {
         $approved_comments = get_comments(array('status' => 'approve', 'count' => true, 'author_email' => $comment['comment_author_email']));
 
         // Change comment flow only for new authors
-        if ((int) $approved_comments == 0 || $ct_result->stop_words !== null) {
+        if ((int) $approved_comments == 0) {
 
             if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
                 add_filter('pre_comment_approved', 'ct_set_approved');
                 setcookie($ct_approved_request_id_label, $ct_result->id, 0);
             }
             if ($ct_result->allow == 0) {
-                if ($ct_result->stop_words !== null) {
+                if (isset($ct_result->stop_words)) {
                     global $ct_stop_words;
                     $ct_stop_words = $ct_result->stop_words;
                     add_action('comment_post', 'ct_mark_red', 11, 2);
@@ -1016,6 +1016,13 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         
     $sender_email = $user_email;
     
+    ct_init_session();
+    if (array_key_exists('formtime', $_SESSION)) {
+        $submit_time = time() - (int) $_SESSION['formtime'];
+    } else {
+        $submit_time = null;
+    }
+    
     $config = get_option('cleantalk_server');
 
     $ct = new Cleantalk();
@@ -1033,6 +1040,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     $ct_request->agent = $ct_agent_version; 
     $ct_request->sender_info = $user_info;
     $ct_request->js_on = $checkjs;
+    $ct_request->submit_time = $submit_time;
 
     $ct_result = $ct->isAllowUser($ct_request);
     if ($ct->server_change) {
