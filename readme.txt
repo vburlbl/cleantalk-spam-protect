@@ -25,9 +25,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math.
 * JetPack Contact form.
 * WooCommerce review form.
 
-The plugin is a client application for cloud anti-spam CleanTalk.org, which are daily protects 5k web-sites from spam bots.
-
-Also you can use CleanTalk app for iPhone/iPad to control anti-spam service on web-site or control comments, signups, contacts and orders
+The plugin is a client application for cloud anti-spam CleanTalk.org, which are daily protects 5k web-sites from spam bots. Also you can use CleanTalk app for iPhone/iPad to control anti-spam service on web-site or control comments, signups, contacts and orders
 
 = We recommend =
 Social survey plugin <a href="http://wordpress.org/support/view/plugin-reviews/feedweb">Feedweb</a>
