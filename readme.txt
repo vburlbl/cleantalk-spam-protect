@@ -88,11 +88,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 
 == Screenshots ==
-1. The comment from spammer (sender blacklisted by IP/Email, comment text not relevant for the post) prohibited to place in the queue WordPress.
 1. Not spam, not relevant to article comment has moved to approval. 
 1. Antispam stoppped spam bot at the registration form. 
-1. Spam bot stopped at Formidable contact form. 
-1. Spam bot stopped at Contact form 7. 
+1. iPhone/iPad app to control comments, signup and spam filtration at the blog. 
 
 == Changelog ==
 
