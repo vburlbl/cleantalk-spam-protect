@@ -256,6 +256,7 @@ function ct_init_session() {
  * Adds hidden filed to comment form 
  */
 function ct_comment_form() {
+	global $ct_jp_active;
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -265,7 +266,7 @@ function ct_comment_form() {
         return false;
     }
     
-    ct_add_hidden_fields(0, 'ct_checkjs', false);
+    ct_add_hidden_fields(0, 'ct_checkjs', false, $ct_jp_active);
     
     return null;
 }
@@ -274,14 +275,14 @@ function ct_comment_form() {
  * Adds hidden filed to define avaialbility of client's JavaScript
  * @param 	int $post_id Post ID, not used
  */
-function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false) {
+function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
 	global $ct_jp_active, $ct_checkjs_def;
 
     $ct_checkjs_key = ct_get_checkjs_value(); 
     ct_init_session();
     $_SESSION['formtime'] = time();
 	
-	if ($ct_jp_active) {
+	if ($cookie_check) {
 			$html = '
 			<script type="text/javascript">
 				// <![CDATA[
@@ -302,7 +303,7 @@ function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_
 			<input type="hidden" id="%s" name="%s" value="0" />
 			<script type="text/javascript">
 				// <![CDATA[
-				document.getElementById("%s").value = document.getElementById("%s").value.replace("%s", "%s");
+				document.getElementById("%s").value = document.getElementById("%s").value.replace(/^%s$/, "%s");
 				// ]]>
 			</script>
 		';
@@ -652,7 +653,6 @@ function js_test($field_name = 'ct_checkjs') {
 	if (isset($_COOKIE[$field_name])) {
 		$js_field = $_COOKIE[$field_name];
 	} 
-
     if ($js_field !== null) {
         if($js_field == ct_get_checkjs_value()) {
             $checkjs = 1;
