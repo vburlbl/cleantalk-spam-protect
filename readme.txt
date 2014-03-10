@@ -29,6 +29,7 @@ The plugin is a client application for cloud anti-spam CleanTalk.org, which are 
 
 = We recommend =
 Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
+The Best Content Editor plugin <a href="http://wordpress.org/plugins/zedity/">Zedity</a>
 
 == Installation ==
 
