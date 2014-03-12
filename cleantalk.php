@@ -999,6 +999,13 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         $user_info = '';
 
     $sender_email = $user_email;
+    
+    ct_init_session();
+    if (array_key_exists('formtime', $_SESSION)) {
+        $submit_time = time() - (int) $_SESSION['formtime'];
+    } else {
+        $submit_time = null;
+    }
 
     $config = get_option('cleantalk_server');
 
@@ -1017,6 +1024,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     $ct_request->agent = $ct_agent_version; 
     $ct_request->sender_info = $user_info;
     $ct_request->js_on = $checkjs;
+    $ct_request->submit_time = $submit_time;
 
     $ct_result = $ct->isAllowUser($ct_request);
     if ($ct->server_change) {
