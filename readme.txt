@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad
 Requires at least: 3.0
 Tested up to: 3.8.1
-Stable tag: 2.35
+Stable tag: 2.36
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -325,4 +325,3 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 = 2.4.13 2013-08-19 =
   * Fixed: "Fail connect to servers..." error on hostings with disabled 'allow_url_fopen' PHP option.
-
