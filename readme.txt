@@ -95,7 +95,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 == Changelog ==
 
 = 2.36 2014-03-12 =
-  * Reveversed to patches from old revisions. 
+  * Reversed to patches from old revisions. 
 
 = 2.35 2014-03-12 =
   * New: Notifications about disabled account 
@@ -260,7 +260,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 == Upgrade Notice ==
 = 2.36 2014-03-12 =
-  * Reveversed to patches from old revisions. 
+  * Reversed to patches from old revisions. 
 
 = 2.35 2014-03-12 =
   * New: Notifications about disabled account 
