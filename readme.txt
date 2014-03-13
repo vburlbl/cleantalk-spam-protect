@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad
 Requires at least: 3.0
 Tested up to: 3.8.1
-Stable tag: 2.33
+Stable tag: 2.35
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. iPhone/iPad app to control comments, signup and spam filtration at the blog. 
 
 == Changelog ==
+
+= 2.35 2014-03-12 =
+  * New: Notifications about disabled account 
+  * New: Improved JavaScript spam test.
+  * Fixed: Code optimization 
+  * Fixed: JavaScript test for signups.
 
 = 2.33 2014-02-12 =
   * Fixed: CURLOPT_FOLLOWLOCATION bug at admin notice 
@@ -250,6 +256,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.35 2014-03-12 =
+  * New: Notifications about disabled account 
+  * New: Improved JavaScript spam test.
+  * Fixed: Code optimization 
+  * Fixed: JavaScript test for signups.
+
 = 2.33 2014-02-12 =
   * Fixed: CURLOPT_FOLLOWLOCATION bug at admin notice 
 
