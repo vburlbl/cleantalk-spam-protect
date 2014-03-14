@@ -1361,7 +1361,7 @@ function ct_admin_init() {
             }
         }
 
-        setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"));
+        @setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"));
     }
 
     ct_init_session();
