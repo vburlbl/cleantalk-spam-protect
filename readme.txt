@@ -56,7 +56,7 @@ Plugin uses several simple tests to stop spammers.
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 = Will plugin works with my theme? =
-Plugin works with all WordPress themes. With some themes may not works JavaScript anti-spam method, but it's not crucial to protect your blog from spam bots.
+Plugin works with all WordPress themes, for example - Responsive, Twenty Eleven, Twenty Twelve, Twenty Ten, Twenty Thirteen, Sixteen, Radiate, Alexandria, Swift Basic, Ridizain, Customizr, Catch Box, Twenty Fourteen, Virtue, Tempera, Pinboard, hemingway, Vantage, Weaver II, Buzz, Omega, iFeature, Simple Catch and etc. With some themes may not works JavaScript anti-spam method, but it's not crucial to protect your blog from spam bots.
 
 = How can I test anti-spam protection? =
 Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
