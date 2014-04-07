@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org/my
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.40
+  Version: 2.39
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-240';
+$ct_agent_version = 'wordpress-239';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -75,6 +75,10 @@ add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 // JetPack Contact form
 add_filter('grunion_contact_form_field_html', 'ct_grunion_contact_form_field_html', 10, 2);
 add_filter('contact_form_is_spam', 'ct_contact_form_is_spam');
+
+// Fast Secure contact form
+add_filter('si_contact_display_after_fields', 'ct_si_contact_display_after_fields');
+add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
@@ -1221,6 +1225,7 @@ function ct_contact_form_is_spam($form) {
     return (bool) $ct_result->spam;
 }
 
+
 /**
  * Inserts anti-spam hidden to CF7
  */
@@ -1305,6 +1310,70 @@ function ct_wpcf7_display_message($message, $status) {
     }
 
     return $message;
+}
+
+/**
+ * Inserts anti-spam hidden to Fast Secure contact form
+ */
+function ct_si_contact_display_after_fields($string = '', $style = '', $form_errors = array(), $form_id_num = 0) {
+    $string .= ct_add_hidden_fields(0, 'ct_checkjs', true);
+    return $string;
+}
+
+/**
+ * Test for Fast Secure contact form
+ */
+function ct_si_contact_form_validate($form_errors = array(), $form_id_num = 0) {
+    if (!empty($form_errors))
+	return $form_errors;
+
+    $options = ct_get_options();
+    if ($options['contact_forms_test'] == 0)
+	return $form_errors;
+
+    $checkjs = js_test('ct_checkjs');
+
+    $post_info['comment_type'] = 'feedback';
+    $post_info = json_encode($post_info);
+    if ($post_info === false)
+        $post_info = '';
+
+    $sender_email = null;
+    $sender_nickname = null;
+    $subject = '';
+    $message = '';
+    if (isset($_POST['email']))
+        $sender_email = $_POST['email']; 
+
+    if (isset($_POST['full_name']))
+        $sender_nickname = $_POST['full_name']; 
+
+    if (isset($_POST['subject']))
+        $subject = $_POST['subject'];
+
+    if (isset($_POST['message']))
+        $message = $_POST['message'];
+
+    $ct_base_call_result = ct_base_call(array(
+        'message' => $subject . "\n\n" . $message,
+        'example' => null,
+        'sender_email' => $sender_email,
+        'sender_nickname' => $sender_nickname,
+        'post_info' => $post_info,
+	'sender_info' => $sender_info,
+        'checkjs' => $checkjs
+    ));
+    $ct = $ct_base_call_result['ct'];
+    $ct_result = $ct_base_call_result['ct_result'];
+
+    if ($ct_result->spam == 1) {
+        global $ct_comment;
+        $ct_comment = $ct_result->comment;
+        ct_die(null, null);
+        exit;
+    }
+
+    return $form_errors;
 }
 
 /**
@@ -1474,7 +1543,7 @@ function ct_input_contact_forms_test() {
     echo "<input type='radio' id='cleantalk_contact_forms_test1' name='cleantalk_settings[contact_forms_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_contact_forms_test0' name='cleantalk_settings[contact_forms_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('Contact Form 7, Formiadble forms, JetPack', 'cleantalk'));
+    admin_addDescriptionsFields(__('Contact Form 7, Formiadble forms, JetPack, Fast Secure Contact Form', 'cleantalk'));
 }
 
 /**
