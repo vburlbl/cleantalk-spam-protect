@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad
+Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad, android
 Requires at least: 3.0
 Tested up to: 3.8.1
 Stable tag: 2.38
@@ -25,7 +25,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math.
 * JetPack Contact form.
 * WooCommerce review form.
 
-The plugin is a client application for cloud anti-spam CleanTalk.org, which are daily protects 5k web-sites from spam bots. Also you can use CleanTalk app for iPhone/iPad to control anti-spam service on web-site or control comments, signups, contacts and orders
+The plugin is client application for cloud anti-spam service CleanTalk.org, which daily protects 5k web-sites from spam bots. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders
 
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
