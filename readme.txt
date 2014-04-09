@@ -29,7 +29,6 @@ The plugin is client application for cloud anti-spam service CleanTalk.org, whic
 
 = Protection from manual spam = 
 For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
-
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
 * The Best Content Editor plugin <a href="http://wordpress.org/plugins/zedity/">Zedity</a>
