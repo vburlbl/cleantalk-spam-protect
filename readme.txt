@@ -2,7 +2,7 @@
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad, android
 Requires at least: 3.0
-Tested up to: 3.8.1
+Tested up to: 3.8.2
 Stable tag: 2.38
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -27,6 +27,9 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
 The plugin is client application for cloud anti-spam service CleanTalk.org, which daily protects 5k web-sites from spam bots. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders
 
+= Protection from manual spam = 
+For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
+
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
 * The Best Content Editor plugin <a href="http://wordpress.org/plugins/zedity/">Zedity</a>
@@ -35,11 +38,11 @@ The plugin is client application for cloud anti-spam service CleanTalk.org, whic
 1. Download, install and activate the plugin. 
 1. Get Access key <a href="http://cleantalk.org/register?platform=wordpress" target="_blank">http://cleantalk.org/register</a>
 1. Enter Access key at the plugin settings. 
-1. To test anti-spam protection use email **stop_email@example.com**. You shoud see server comment like this,
+1. Make dummy spam comment with email **stop_email@example.com**. You should see notice,
 
 *** Forbidden. Sender blacklisted. Request number 8aa9209204b2f521b3da16f92d9440a5. Antispam service cleantalk.org. ***
 
-1. To check and control anti-spam process use <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org. 
+The setup is done! You can control anti-spam plugin by <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org or use <a href="https://play.google.com/store/apps/details?id=org.cleantalk.app">Adnroid</a>, <a href="https://itunes.apple.com/us/app/cleantalk/id825479913?mt=8">iPhone</a> anti-spam app. 
 
 == Frequently Asked Questions ==
 
