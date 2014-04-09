@@ -7,7 +7,7 @@ Stable tag: 2.38
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Anti-spam for comments, signups and contacts. With Android, iPhone apps control anti spam. Automatically publication not spam comments.
+Anti-spam for comments, signups and contacts. With Android, iPhone apps to control anti spam. Automatically publication not spam comments.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math.
