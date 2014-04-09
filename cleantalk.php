@@ -95,10 +95,9 @@ if (is_admin()) {
     add_action('comment_approved_to_spam', 'ct_comment_spam');   // param - comment object
     add_filter('get_comment_text', 'ct_get_comment_text');   // param - current comment text
     add_filter('unspam_comment', 'ct_unspam_comment');
-
     add_action('delete_user', 'ct_delete_user');
-
     add_filter('plugin_row_meta', 'ct_register_plugin_links', 10, 2);
+    add_filter('plugin_action_links', 'ct_plugin_action_links', 10, 2);
 }
 
 /**
@@ -1609,7 +1608,7 @@ if (!function_exists ( 'ct_register_plugin_links')) {
     function ct_register_plugin_links($links, $file) {
 	$base = plugin_basename(__FILE__);
     	    if ( $file == $base ) {
-		$links[] = '<a href="options-general.php?page=cleantalk">' . __( 'Settings','cleantalk' ) . '</a>';
+		$links[] = '<a href="options-general.php?page=cleantalk">' . __( 'Settings' ) . '</a>';
 		$links[] = '<a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/" target="_blank">' . __( 'FAQ','cleantalk' ) . '</a>';
 		$links[] = '<a href="http://cleantalk.org/forum" target="_blank">' . __( 'Support','cleantalk' ) . '</a>';
 	    }
@@ -1617,5 +1616,20 @@ if (!function_exists ( 'ct_register_plugin_links')) {
     }
 }
 
+
+/**
+ * Manage links in plugins list
+ * @return array
+*/
+if (!function_exists ( 'ct_plugin_action_links')) {
+    function ct_plugin_action_links($links, $file) {
+	$base = plugin_basename(__FILE__);
+    	if ( $file == $base ) {
+		$settings_link = '<a href="options-general.php?page=cleantalk">' . __( 'Settings' ) . '</a>';
+		array_unshift( $links, $settings_link ); // before other links
+	}
+	return $links;
+    }
+}
 
 ?>
