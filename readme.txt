@@ -35,8 +35,8 @@ For manual spam filtering plugin evaluates the relevance of the comments text ac
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
 * The Best Content Editor plugin <a href="http://wordpress.org/plugins/zedity/">Zedity</a>
-== Installation ==
 
+== Installation ==
 1. Download, install and activate the plugin. 
 1. Get Access key <a href="http://cleantalk.org/register?platform=wordpress" target="_blank">http://cleantalk.org/register</a>
 1. Enter Access key at the plugin settings. 
