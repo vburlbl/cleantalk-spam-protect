@@ -42,6 +42,12 @@ $ct_notice_trial_label = 'ct_notice_trial';
 // Flag to show trial notice
 $show_ct_notice_trial = false;
 
+// COOKIE label for online notice flag
+$ct_notice_online_label = 'ct_notice_online';
+
+// Flag to show online notice - 'Y' or 'N'
+$show_ct_notice_online = '';
+
 // Timeout before new check for trial notice in minutes
 $trial_notice_check_timeout = 10;
 
@@ -83,7 +89,6 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
 
-
 if (is_admin()) {
     add_action('admin_init', 'ct_admin_init', 1);
     add_action('admin_menu', 'ct_admin_add_page');
@@ -98,6 +103,7 @@ if (is_admin()) {
     add_action('delete_user', 'ct_delete_user');
     add_filter('plugin_row_meta', 'ct_register_plugin_links', 10, 2);
     add_filter('plugin_action_links', 'ct_plugin_action_links', 10, 2);
+    add_action('updated_option', 'ct_update_option'); // param - option name, i.e. 'cleantalk_settings'
 }
 
 /**
@@ -858,23 +864,33 @@ function ct_unmark_red($message) {
 }
 
 /**
- * Notice blog owner if plugin using without Access key 
+ * Notice blog owner if plugin is used without Access key 
  * @return bool 
  */
-function admin_notice_message(){    
-    global $ct_notice_trial_label, $show_ct_notice_trial;
+function admin_notice_message(){
+    global $show_ct_notice_trial, $show_ct_notice_online;
 
     if (ct_active() === false)
 	return false;
 
     $options = ct_get_options();
     $show_notice = true;
-	if ($show_notice && ct_valid_key($options['apikey']) === false) {
-	    echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
+    if ($show_notice && ct_valid_key($options['apikey']) === false) {
+        echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
+    }
+
+    if ($show_notice && !empty($show_ct_notice_online)) {
+        echo '<div class="updated"><p><b>';
+	if($show_ct_notice_online === 'Y'){
+    	    echo __("Please don’t forget to disable CAPTCHA if you have it!", 'cleantalk');
+	}else{
+    	    echo __("Wrong </b><b style=\"color: #49C73B;\">Clean</b><b style=\"color: #349ebf;\">Talk</b><b> access key! Please check it or ask <a target=\"_blank\" href=\"https://cleantalk.org/forum/\">support</a>.", 'cleantalk');
+	}
+        echo '</b></p></div>';
     }
 
     if ($show_notice && $show_ct_notice_trial) {
-	    echo '<div class="updated"><p>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</p></div>';
+        echo '<div class="updated"><p>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</p></div>';
         $show_notice = false;
     }
 
@@ -1395,7 +1411,7 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $trial_notice_check_timeout;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout;
 
     $show_ct_notice_trial = false;
     if (isset($_COOKIE[$ct_notice_trial_label])) {
@@ -1437,6 +1453,15 @@ function ct_admin_init() {
         }
 
         setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"));
+    }
+
+    $show_ct_notice_online = '';
+    if (isset($_COOKIE[$ct_notice_online_label])) {
+        if ($_COOKIE[$ct_notice_online_label] == 1) {
+            $show_ct_notice_online = 'Y';
+	}else{
+            $show_ct_notice_online = 'N';
+	}
     }
 
     ct_init_session();
@@ -1629,6 +1654,32 @@ if (!function_exists ( 'ct_plugin_action_links')) {
 		array_unshift( $links, $settings_link ); // before other links
 	}
 	return $links;
+    }
+}
+
+/**
+ * After options update
+ * @return array
+*/
+function ct_update_option($option_name) {
+    global $show_ct_notice_online, $ct_notice_online_label;
+    if($option_name !== 'cleantalk_settings')
+        return;
+    $ct_base_call_result = ct_base_call(array(
+        'message' => 'CleanTalk setup comment',
+        'example' => null,
+        'sender_email' => 'stop_email@example.com',
+        'sender_nickname' => 'CleanTalk',
+        'post_info' => '',
+        'checkjs' => 1
+    ));
+    $ct = $ct_base_call_result['ct'];
+    $ct_result = $ct_base_call_result['ct_result'];
+
+    if ($ct_result->inactive == 1) {
+        setcookie($ct_notice_online_label, 0, strtotime("+5 seconds"));
+    }else{
+        setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"));
     }
 }
 
