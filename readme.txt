@@ -1,6 +1,10 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad, android
+Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu,
+network, multisite, forms, registration, login, contact form, buddypress,
+bbpress, admin, user, users, post, posts, wordpress, javascript, plugin,
+blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone,
+ipad, android, security
 Requires at least: 3.0
 Tested up to: 3.8.2
 Stable tag: 2.38
@@ -16,6 +20,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math.
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
+1. Stops spam pingbacks, trackbacks.
 
 We have developed an anti-spam service CleanTalk that would provide maximum protection from spam, and you can provide for your visitors - a simple and convenient form of comments / registration without annoying CAPTCHAs and puzzles. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
@@ -90,12 +95,6 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 * English
 * Russian (ru_RU)
 * Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html?utm_expid=31925339-46.KEGZK8A6Q3yfZW0EUfEw5Q.1">WebHostingHub</a>
-
-
-== Screenshots ==
-1. Not spam, not relevant to article comment has moved to approval. 
-1. Antispam stoppped spam bot at the registration form. 
-1. iPhone/iPad app to control comments, signup and spam filtration at the blog. 
 
 == Changelog ==
 
