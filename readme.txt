@@ -1,10 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu,
-network, multisite, forms, registration, login, contact form, buddypress,
-bbpress, admin, user, users, post, posts, wordpress, javascript, plugin,
-blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone,
-ipad, android, security
+Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad, android, security
 Requires at least: 3.0
 Tested up to: 3.8.2
 Stable tag: 2.38
