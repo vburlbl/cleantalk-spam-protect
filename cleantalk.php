@@ -621,7 +621,6 @@ function ct_preprocess_comment($comment) {
 
         // Change comment flow only for new authors
         if ((int) $approved_comments == 0 || $ct_result->stop_words !== null) { 
-
             if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
                 add_filter('pre_comment_approved', 'ct_set_approved');
                 setcookie($ct_approved_request_id_label, $ct_result->id, 0);
@@ -954,7 +953,11 @@ function ct_plugin_active($plugin_name){
  */
 function ct_get_checkjs_value() {
     $options = ct_get_options();
-    return md5($options['apikey'] . '+' . get_option('admin_email'));
+    $remote_addr = '';
+    if (isset($_SERVER['REMOTE_ADDR']))
+        $remote_addr = $_SERVER['REMOTE_ADDR'];
+
+    return md5($options['apikey'] . '+' . get_option('admin_email') . '+' . $remote_addr);
 }
 
 /**
