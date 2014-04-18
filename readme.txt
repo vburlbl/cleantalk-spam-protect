@@ -10,17 +10,17 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Anti-spam for comments, signups and contacts. With Android, iPhone apps to control anti-spam.
 
 == Description ==
-We have developed an anti-spam service CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
-
-The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders
+**No CAPTCHA, no questions, no counting animals, no puzzles, no math.**
 
 = Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
-1. No CAPTCHA, no questions, no counting animals, no puzzles, no math.
 
+We have developed an anti-spam service CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
+
+The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
@@ -73,24 +73,30 @@ Plugin Anti-spam by CleanTalk stops about 100% of spam bots comments. More over,
 = What about pingback, trackback spam? = 
 Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
 
-= Why do I need one more anti-spam plugin? =
-1. The plugin is more effective than CAPTCHA because use several methods to stop spammers.
-1. This plugin stops spam bots automatically, plugin invisible for blog visitors and admins.
-1. CleanTalk automatically approves relevant, not spam comments.
-
 = Should I use another antispam plugins? =
-Use other antispam plugins not necessarily, because CleanTalk stops 100% of spam comments. 
+Use other antispam plugins not necessarily, because CleanTalk stops up to 100% of spam bots. 
 
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
-= What about requirements? =
+== Other notes ==
+<a href="http://wordpress.org/support/plugin/cleantalk-spam-protect">Anti-spam by CleanTalk support forum</a> | <a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/">Plugin FAQ</a>
+
+= Troubleshooting Guide =
+If you're having trouble getting things to work after installing the plugin, here are a few things to check:
+
+1. If you haven't yet, please upgrade plugin to the latest version.
+1. If you have error '*** Forbidden. Enable JavaScript. Anti-spam service cleantalk.org. ***' please check JavaScript support in your browser and do JavaScript test at this page <a href="http://cleantalk.org/checkout-javascript-support">Check out JavaScript support</a>.
+1. If you have spam comments, signups or contacts please check the Access key at plugin settings. The key should be same as you can find in service <a href="https://cleantalk.org/my/">Control panel</a>.
+1. If you have spam contact emails after plugin installation, please check your plugin with list of supported contact forms (see section **Anti-spam protection**). 
+
+= Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
 
-= Has the plugin translations? =
+= Translations =
 * English
 * Russian (ru_RU)
-* Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html?utm_expid=31925339-46.KEGZK8A6Q3yfZW0EUfEw5Q.1">WebHostingHub</a>
+* Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html">WebHostingHub</a>
 
 == Changelog ==
 
