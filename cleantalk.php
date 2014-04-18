@@ -972,7 +972,12 @@ function ct_plugin_active($plugin_name){
  */
 function ct_get_checkjs_value() {
     $options = ct_get_options();
-    return md5($options['apikey'] . '+' . get_option('admin_email'));
+    
+    $remote_addr = '';
+    if (isset($_SERVER['REMOTE_ADDR']))
+        $remote_addr = $_SERVER['REMOTE_ADDR'];
+
+    return md5($options['apikey'] . '+' . $remote_addr);
 }
 
 /**
