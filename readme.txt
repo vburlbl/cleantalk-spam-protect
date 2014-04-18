@@ -30,9 +30,6 @@ The plugin is client application for cloud anti-spam service CleanTalk.org, whic
 * JetPack Contact form.
 * WooCommerce review form.
 
-= Protection from manual spam = 
-For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
-
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
 * The Best Content Editor plugin <a href="http://wordpress.org/plugins/zedity/">Zedity</a>
@@ -89,6 +86,9 @@ If you're having trouble getting things to work after installing the plugin, her
 1. If you have error '*** Forbidden. Enable JavaScript. Anti-spam service cleantalk.org. ***' please check JavaScript support in your browser and do JavaScript test at this page <a href="http://cleantalk.org/checkout-javascript-support">Check out JavaScript support</a>.
 1. If you have spam comments, signups or contacts please check the Access key at plugin settings. The key should be same as you can find in service <a href="https://cleantalk.org/my/">Control panel</a>.
 1. If you have spam contact emails after plugin installation, please check your plugin with list of supported contact forms (see section **Anti-spam protection**). 
+
+= Protection from manual spam = 
+For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
