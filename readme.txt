@@ -10,17 +10,16 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Anti-spam for comments, signups and contacts. With Android, iPhone apps to control anti-spam.
 
 == Description ==
-**No CAPTCHA, no questions, no counting animals, no puzzles, no math.**
 
 = Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
+1. **No CAPTCHA, no questions, no counting animals, no puzzles, no math.**
 
 We have developed an anti-spam service CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
-The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
@@ -77,9 +76,10 @@ Use other antispam plugins not necessarily, because CleanTalk stops up to 100% o
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
 
 == Other notes ==
-<a href="http://wordpress.org/support/plugin/cleantalk-spam-protect">Anti-spam by CleanTalk support forum</a> | <a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/">Plugin FAQ</a>
 
 = Troubleshooting Guide =
+<a href="http://wordpress.org/support/plugin/cleantalk-spam-protect">Anti-spam by CleanTalk support forum</a> | <a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/">Plugin FAQ</a>
+
 If you're having trouble getting things to work after installing the plugin, here are a few things to check:
 
 1. If you haven't yet, please upgrade plugin to the latest version.
@@ -96,6 +96,8 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 = Translations =
 * Russian (ru_RU)
 * Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html">WebHostingHub</a>
+
+The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders.
 
 == Changelog ==
 
