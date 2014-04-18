@@ -51,6 +51,9 @@ $show_ct_notice_online = '';
 // Timeout before new check for trial notice in minutes
 $trial_notice_check_timeout = 10;
 
+// COOKIE label for WP Landing Page proccessing result
+$ct_wplp_result_label = 'ct_wplp_result';
+
 // Init action.
 add_action('init', 'ct_init');
 
@@ -85,6 +88,11 @@ add_filter('contact_form_is_spam', 'ct_contact_form_is_spam');
 // Fast Secure contact form
 add_filter('si_contact_display_after_fields', 'ct_si_contact_display_after_fields');
 add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
+
+// WordPress Landing Page
+add_filter('get_post_metadata', 'ct_get_post_metadata', 10, 4);
+add_filter('inboundnow_store_lead_pre_filter_data', 'ct_inboundnow_store_lead_pre_filter_data', 10, 1);
+add_action('wp_footer', 'ct_wp_footer_wplp');
 
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
@@ -379,29 +387,29 @@ function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_
 
     if ($cookie_check) { 
 			$html = '
-			<script type="text/javascript">
-				// <![CDATA[
-				function setCookie(c_name, value, exdays) {
-					var exdate = new Date();
-					exdate.setDate(exdate.getDate() + exdays);
-					var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
-					document.cookie = c_name + "=" + c_value;
-				}
-				setCookie("%s", "%s", 1);	
-				// ]]>
-			</script>
-		';
+<script type="text/javascript">
+// <![CDATA[
+function setCookie(c_name, value, exdays) {
+    var exdate = new Date();
+    exdate.setDate(exdate.getDate() + exdays);
+    var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
+    document.cookie = c_name + "=" + c_value;
+}
+setCookie("%s", "%s", 1);	
+// ]]>
+</script>
+';
 		$html = sprintf($html, $field_name, $ct_checkjs_key);
     } else {
     		$field_id = $field_name . '_' . md5(rand(0, 1000));
 			$html = '
-			<input type="hidden" id="%s" name="%s" value="%s" />
-			<script type="text/javascript">
-				// <![CDATA[
-                document.getElementById("%s").value = document.getElementById("%s").value.replace(/^%s$/, "%s");
-				// ]]>
-			</script>
-		';
+<input type="hidden" id="%s" name="%s" value="%s" />
+<script type="text/javascript">
+// <![CDATA[
+document.getElementById("%s").value = document.getElementById("%s").value.replace(/^%s$/, "%s");
+// ]]>
+</script>
+';
 		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
     }
     if ($return_string === true) {
@@ -621,6 +629,7 @@ function ct_preprocess_comment($comment) {
 
         // Change comment flow only for new authors
         if ((int) $approved_comments == 0 || $ct_result->stop_words !== null) { 
+
             if ($ct_result->allow == 1 && $options['autoPubRevelantMess'] == 1) {
                 add_filter('pre_comment_approved', 'ct_set_approved');
                 setcookie($ct_approved_request_id_label, $ct_result->id, 0);
@@ -652,6 +661,16 @@ function ct_preprocess_comment($comment) {
 function ct_die($comment_id, $comment_status) {
     global $ct_comment;
     $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $ct_comment;
+        $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
+        wp_die($err_text, 'Blacklisted', array('back_link' => true));
+}
+
+/**
+ * Set die page with Cleantalk comment from parameter.
+ * @param type $comment_body
+ */
+function ct_die_extended($comment_body) {
+    $err_text = '<center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> ' . __('Spam protection', 'cleantalk') . "</center><br><br>\n" . $comment_body;
         $err_text .= '<script>setTimeout("history.back()", 5000);</script>';
         wp_die($err_text, 'Blacklisted', array('back_link' => true));
 }
@@ -953,11 +972,7 @@ function ct_plugin_active($plugin_name){
  */
 function ct_get_checkjs_value() {
     $options = ct_get_options();
-    $remote_addr = '';
-    if (isset($_SERVER['REMOTE_ADDR']))
-        $remote_addr = $_SERVER['REMOTE_ADDR'];
-
-    return md5($options['apikey'] . '+' . get_option('admin_email') . '+' . $remote_addr);
+    return md5($options['apikey'] . '+' . get_option('admin_email'));
 }
 
 /**
@@ -1570,7 +1585,7 @@ function ct_input_contact_forms_test() {
     echo "<input type='radio' id='cleantalk_contact_forms_test1' name='cleantalk_settings[contact_forms_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_contact_forms_test0' name='cleantalk_settings[contact_forms_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('Contact Form 7, Formiadble forms, JetPack, Fast Secure Contact Form', 'cleantalk'));
+    admin_addDescriptionsFields(__('Contact Form 7, Formiadble forms, JetPack, Fast Secure Contact Form, WordPress Landing Pages', 'cleantalk'));
 }
 
 /**
@@ -1684,6 +1699,85 @@ function ct_update_option($option_name) {
     }else{
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"));
     }
+}
+
+/**
+ * Add actrion to check JavaScript for WordPress Landing Page
+ @param string Not used
+*/
+//function ct_lp_conversion_area_post($content, $post){
+//function ct_lp_selected_template($template){
+//function ct_inboundnow_forms_settings($template){
+function ct_get_post_metadata($p1 = null, $p2 = null, $p3 = null, $p4 = null){
+    global $ct_wplp_result_label;
+    if ($p3 === 'inbound_form_conversion_count') {
+	$options = ct_get_options();
+	if ($options['contact_forms_test'] == 0)
+    	    return $lead_data;
+	if (isset($_COOKIE[$ct_wplp_result_label]) && $_COOKIE[$ct_wplp_result_label] !== 'OK')
+		ct_die_extended($_COOKIE[$ct_wplp_result_label]);
+    }
+    // we can return null
+}
+
+// Calling in AJAX
+function ct_inboundnow_store_lead_pre_filter_data($lead_data = null){
+    global $ct_wplp_result_label;
+    if (!isset($_COOKIE[$ct_wplp_result_label])) {
+        // First AJAX submit of WPLP form
+	$options = ct_get_options();
+	if ($options['contact_forms_test'] == 0)
+    	    return $lead_data;
+
+	$checkjs = js_test('ct_checkjs_wplp');
+        
+	$post_info['comment_type'] = 'feedback';
+	$post_info = json_encode($post_info);
+	if ($post_info === false)
+    	    $post_info = '';
+
+	$sender_email = $lead_data['email'];
+
+        $message = '';
+        $form_input_values = json_decode(stripslashes($lead_data['form_input_values']), true);
+        if (is_array($form_input_values) && array_key_exists('null', $form_input_values))
+            $message = $form_input_values['null'];
+
+	$ct_base_call_result = ct_base_call(array(
+    	    'message' => $message,
+    	    'example' => null,
+    	    'sender_email' => $sender_email,
+    	    'sender_nickname' => null,
+    	    'post_info' => $post_info,
+    	    'checkjs' => $checkjs
+	));
+	$ct = $ct_base_call_result['ct'];
+	$ct_result = $ct_base_call_result['ct_result'];
+
+	if ($ct_result->spam == 1) {
+            $cleantalk_comment = $ct_result->comment;
+	} else {
+            $cleantalk_comment = 'OK';
+        }
+
+	setcookie($ct_wplp_result_label, $cleantalk_comment, strtotime("+5 seconds"), '/');
+    } else {
+        // Next AJAX submit(s) of same WPLP form
+        $cleantalk_comment = $_COOKIE[$ct_wplp_result_label];
+    }
+    if ($cleantalk_comment !== 'OK')
+        ct_die_extended($cleantalk_comment);
+    
+    return $lead_data;
+}
+
+/**
+ * Footer - add JavaScript checking for WordPress Landing Page
+*/
+function ct_wp_footer_wplp(){
+    $options = ct_get_options();
+    if ($options['contact_forms_test'] != 0)
+	echo ct_add_hidden_fields(0, 'ct_checkjs_wplp', true, true);
 }
 
 ?>

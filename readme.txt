@@ -28,6 +28,7 @@ We have developed an anti-spam service CleanTalk that would provide **maximum pr
 * Contact form 7.
 * JetPack Contact form.
 * WooCommerce review form.
+* WordPress Landing Pages.
 
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
