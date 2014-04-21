@@ -1,13 +1,13 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad, android, security
+Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad, android, security, theme, template, formidable, contact form 7, registration
 Requires at least: 3.0
 Tested up to: 3.9
 Stable tag: 2.38
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Anti-spam for comments, signups and contacts. With Android, iPhone apps to control anti-spam.
+Cloud anti spam for comments, signups and contacts. With Android, iPhone apps to control anti spam.
 
 == Description ==
 
@@ -16,10 +16,7 @@ Anti-spam for comments, signups and contacts. With Android, iPhone apps to contr
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
-1. **No CAPTCHA, no questions, no counting animals, no puzzles, no math.**
-
-We have developed an anti-spam service CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
-
+1. **No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.**
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
@@ -29,6 +26,23 @@ We have developed an anti-spam service CleanTalk that would provide **maximum pr
 * JetPack Contact form.
 * WooCommerce review form.
 * WordPress Landing Pages.
+
+= Anti spam plugin info = 
+The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders.
+
+We have developed an anti-spam service CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
+
+= Spam protection methods =
+Plugin uses several simple tests to stop spammers.
+
+* Spam bots signatures.
+* JavaScript anti spam test.
+* Checks by Email, IP, domains at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
+* Comment submit time. Spam bots usually send post immediately after page load.
+* Relevance test for the comments. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
+
+= Protection from manual spam = 
+For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
 
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
@@ -55,26 +69,26 @@ Plugin uses several simple tests to stop spammers.
 * Comment submit time. Spam bots usually send post immediately after page load.
 * Relevance test for the comment. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
 
-= How plugin works? =
+= How plugin works with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-= Will plugin works with my theme? =
+= Will anti spam protects my theme? =
 Plugin works with all WordPress themes, for example - Responsive, Twenty Eleven, Twenty Twelve, Twenty Ten, Twenty Thirteen, Sixteen, Radiate, Alexandria, Swift Basic, Ridizain, Customizr, Catch Box, Twenty Fourteen, Virtue, Tempera, Pinboard, hemingway, Vantage, Weaver II, Buzz, Omega, iFeature, Simple Catch and etc. With some themes may not works JavaScript anti-spam method, but it's not crucial to protect your blog from spam bots.
 
 = How can I test anti-spam protection? =
 Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = How the plugin is effective against spam bots? =
-Plugin Anti-spam by CleanTalk stops about 100% of spam bots comments. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
+Plugin Anti-spam by CleanTalk stops up to 100% of spam comments, spam signups (registrations) and spam contact emails. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
 
 = What about pingback, trackback spam? = 
 Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
 
 = Should I use another antispam plugins? =
-Use other antispam plugins not necessarily, because CleanTalk stops up to 100% of spam bots. 
+Use other antispam plugins not necessarily, because CleanTalk stops up to 100% of spam bots. In some cases serveral anti-spam plugins can conflist, so it will be better use just one plugin.  
 
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
-The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anitspam options for spam bots protection.
+The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anit spam options for spam bots protection.
 
 == Other notes ==
 
@@ -88,9 +102,6 @@ If you're having trouble getting things to work after installing the plugin, her
 1. If you have spam comments, signups or contacts please check the Access key at plugin settings. The key should be same as you can find in service <a href="https://cleantalk.org/my/">Control panel</a>.
 1. If you have spam contact emails after plugin installation, please check your plugin with list of supported contact forms (see section **Anti-spam protection**). 
 
-= Protection from manual spam = 
-For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
-
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
 
@@ -98,7 +109,6 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 * Russian (ru_RU)
 * Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html">WebHostingHub</a>
 
-The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders.
 
 == Changelog ==
 
