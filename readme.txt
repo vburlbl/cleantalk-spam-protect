@@ -34,6 +34,7 @@ We have developed an anti-spam service CleanTalk that would provide **maximum pr
 
 = Spam protection methods =
 Plugin uses several simple tests to stop spammers.
+
 * Spam bots signatures.
 * JavaScript anti spam test.
 * Checks by Email, IP, domains at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
