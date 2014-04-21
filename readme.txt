@@ -1,22 +1,22 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, captcha, comment, comments, wpmu, network, multisite, forms, registration, login, contact form, buddypress, bbpress, admin, user, users, post, posts, wordpress, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, ios, iphone, ipad, android, security, theme, template, formidable, contact form 7, registration
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comment, comments, wpmu, multisite, forms, registration, login, contact form, buddypress, bbpress, users, post, posts, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, iphone, android, security, formidable, contact form 7, bot, spam bots
 Requires at least: 3.0
 Tested up to: 3.9
 Stable tag: 2.38
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud anti spam for comments, signups and contacts. With Android, iPhone apps to control anti spam.
+Cloud anti-spam. No spam comments, no spam registations, no spam contact emails. With Android, iPhone apps to control anti-spam.
 
 == Description ==
+No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
 = Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
-1. **No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.**
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
