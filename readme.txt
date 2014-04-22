@@ -7,7 +7,7 @@ Stable tag: 2.38
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud anti-spam. No spam comments, no spam registrations, no spam contact emails. With Android, iPhone apps to control anti-spam.
+No spam comments, no spam registrations, no spam contact emails. All in one anti-spam with Android, iPhone apps to control anti-spam.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
@@ -76,7 +76,7 @@ Spam comments moves to SPAM folder. First comment from a new author plugin compa
 Plugin works with all WordPress themes, for example - Responsive, Twenty Eleven, Twenty Twelve, Twenty Ten, Twenty Thirteen, Sixteen, Radiate, Alexandria, Swift Basic, Ridizain, Customizr, Catch Box, Twenty Fourteen, Virtue, Tempera, Pinboard, hemingway, Vantage, Weaver II, Buzz, Omega, iFeature, Simple Catch and etc. With some themes may not works JavaScript anti-spam method, but it's not crucial to protect your blog from spam bots.
 
 = How can I test anti-spam protection? =
-Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments proccessed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
+Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments processed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = How the plugin is effective against spam bots? =
 Plugin Anti-spam by CleanTalk stops up to 100% of spam comments, spam signups (registrations) and spam contact emails. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
@@ -85,7 +85,7 @@ Plugin Anti-spam by CleanTalk stops up to 100% of spam comments, spam signups (r
 Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
 
 = Should I use another antispam plugins? =
-Use other antispam plugins not necessarily, because CleanTalk stops up to 100% of spam bots. In some cases serveral anti-spam plugins can conflist, so it will be better use just one plugin.  
+Use other antispam plugins not necessarily, because CleanTalk stops up to 100% of spam bots. In some cases several anti-spam plugins can conflict, so it will be better use just one plugin.  
 
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anit spam options for spam bots protection.
