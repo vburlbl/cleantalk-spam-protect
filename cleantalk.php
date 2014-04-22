@@ -24,8 +24,8 @@ $ct_jpcf_fields = array('name', 'email');
 // Comment already proccessed
 $ct_comment_done = false;
 
-// JetPack active
-$ct_jp_active = false;
+// Check JS by cookie - when JetPack is active
+$ct_checkjs_cookie = false;
 
 // Default value for JS test
 $ct_checkjs_def = 0;
@@ -55,7 +55,7 @@ $trial_notice_check_timeout = 10;
 $ct_wplp_result_label = 'ct_wplp_result';
 
 // Init action.
-add_action('init', 'ct_init');
+add_action('init', 'ct_init', 1);
 
 // After plugin loaded - to load locale as described in manual
 add_action( 'plugins_loaded', 'ct_plugin_loaded' );
@@ -90,9 +90,8 @@ add_filter('si_contact_display_after_fields', 'ct_si_contact_display_after_field
 add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 
 // WordPress Landing Page
-add_filter('get_post_metadata', 'ct_get_post_metadata', 10, 4);
-add_filter('inboundnow_store_lead_pre_filter_data', 'ct_inboundnow_store_lead_pre_filter_data', 10, 1);
-add_action('wp_footer', 'ct_wp_footer_wplp');
+//add_filter('get_post_metadata', 'ct_get_post_metadata', 10, 4);
+//add_filter('inboundnow_store_lead_pre_filter_data', 'ct_inboundnow_store_lead_pre_filter_data', 10, 1);
 
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
@@ -119,14 +118,26 @@ if (is_admin()) {
  * @return 	mixed[] Array of options
  */
 function ct_init() {
-    global $ct_jp_active;
+    global $ct_checkjs_cookie, $ct_wplp_result_label;
 
     $jetpack_active_modules = get_option('jetpack_active_modules');
-    if (class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) {
-	$ct_jp_active = true;
+    if (
+	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
+	(defined('LANDINGPAGES_CURRENT_VERSION'))
+    ) {
+	$ct_checkjs_cookie = true;
 	add_action('wp_footer', 'ct_comment_form'); 
     } else {
 	add_action('comment_form', 'ct_comment_form');
+    }
+    
+    //intercept WordPress Landing Pages POST
+    if (defined('LANDINGPAGES_CURRENT_VERSION') && !empty($_POST)){
+        if(array_key_exists('action', $_POST) && $_POST['action'] === 'inbound_store_lead'){ // AJAX action(s)
+            ct_check_wplp();
+        }else if(array_key_exists('inbound_submitted', $_POST) && $_POST['inbound_submitted'] == '1'){ // Final submit
+            ct_check_wplp();
+        }
     }
 }
 
@@ -357,8 +368,8 @@ function ct_base_call($params = array()) {
  * Adds hidden filed to comment form 
  */
 function ct_comment_form() {
-    global $ct_jp_active;  
-    
+    global $ct_checkjs_cookie;
+
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -368,7 +379,7 @@ function ct_comment_form() {
         return false;
     }
 
-    ct_add_hidden_fields(0, 'ct_checkjs', false, $ct_jp_active); 
+    ct_add_hidden_fields(0, 'ct_checkjs', false, $ct_checkjs_cookie);
 
     return null;
 }
@@ -377,9 +388,9 @@ function ct_comment_form() {
  * Adds hidden filed to define avaialbility of client's JavaScript
  * @param 	int $post_id Post ID, not used
  */
-function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) { 
+function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
 
-    global $ct_jp_active, $ct_checkjs_def;
+    global $ct_checkjs_def;
 
     $ct_checkjs_key = ct_get_checkjs_value(); 
     ct_init_session();
@@ -1734,7 +1745,7 @@ function ct_inboundnow_store_lead_pre_filter_data($lead_data = null){
 	if ($options['contact_forms_test'] == 0)
     	    return $lead_data;
 
-	$checkjs = js_test('ct_checkjs_wplp');
+	$checkjs = js_test('ct_checkjs');
         
 	$post_info['comment_type'] = 'feedback';
 	$post_info = json_encode($post_info);
@@ -1777,12 +1788,66 @@ function ct_inboundnow_store_lead_pre_filter_data($lead_data = null){
 }
 
 /**
- * Footer - add JavaScript checking for WordPress Landing Page
+ * Checks WordPress Landing Pages raw $_POST values
 */
-function ct_wp_footer_wplp(){
-    $options = ct_get_options();
-    if ($options['contact_forms_test'] != 0)
-	echo ct_add_hidden_fields(0, 'ct_checkjs_wplp', true, true);
+function ct_check_wplp(){
+    global $ct_wplp_result_label;
+    if (!isset($_COOKIE[$ct_wplp_result_label])) {
+        // First AJAX submit of WPLP form
+	$options = ct_get_options();
+	if ($options['contact_forms_test'] == 0)
+    	    return;
+
+	$checkjs = js_test('ct_checkjs');
+        if (null === $checkjs)
+            $checkjs = 0;
+        
+	$post_info['comment_type'] = 'feedback';
+	$post_info = json_encode($post_info);
+	if ($post_info === false)
+    	    $post_info = '';
+
+        $sender_email = '';
+        foreach ($_POST as $v) {
+            if (preg_match("/^\S+@\S+\.\S+$/", $v)) {
+                $sender_email = $v;
+                break;
+            }
+        }
+
+        $message = '';
+        if(array_key_exists('form_input_values', $_POST)){
+            $form_input_values = json_decode(stripslashes($_POST['form_input_values']), true);
+            if (is_array($form_input_values) && array_key_exists('null', $form_input_values))
+                $message = $form_input_values['null'];
+        }else if(array_key_exists('null', $_POST)){
+            $message = $_POST['null'];
+        }
+
+	$ct_base_call_result = ct_base_call(array(
+    	    'message' => $message,
+    	    'example' => null,
+    	    'sender_email' => $sender_email,
+    	    'sender_nickname' => null,
+    	    'post_info' => $post_info,
+    	    'checkjs' => $checkjs
+	));
+	$ct = $ct_base_call_result['ct'];
+	$ct_result = $ct_base_call_result['ct_result'];
+
+	if ($ct_result->spam == 1) {
+            $cleantalk_comment = $ct_result->comment;
+	} else {
+            $cleantalk_comment = 'OK';
+        }
+
+	setcookie($ct_wplp_result_label, $cleantalk_comment, strtotime("+3 seconds"), '/');
+    } else {
+        // Next POST/AJAX submit(s) of same WPLP form
+        $cleantalk_comment = $_COOKIE[$ct_wplp_result_label];
+    }
+    if ($cleantalk_comment !== 'OK')
+        ct_die_extended($cleantalk_comment);
 }
 
 ?>
