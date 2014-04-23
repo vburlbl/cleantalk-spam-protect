@@ -18,7 +18,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
 
-We have developed an anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
+We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
