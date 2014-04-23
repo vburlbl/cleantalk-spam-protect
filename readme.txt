@@ -7,7 +7,7 @@ Stable tag: 2.38
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam contact emails. All in one anti-spam with Android, iPhone apps to control anti-spam.
+No spam comments, no spam registrations, no spam contact emails. All in one WordPress anti-spam. 
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
@@ -28,9 +28,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 * WordPress Landing Pages.
 
 = Anti spam plugin info = 
-The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. Also you can use CleanTalk app for iPhone, Android to control anti-spam service on web-site or control comments, signups, contacts and orders.
-
-We have developed an anti-spam service CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
+The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. We have developed an anti-spam service CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
 = Spam protection methods =
 Plugin uses several simple tests to stop spammers.
@@ -43,6 +41,10 @@ Plugin uses several simple tests to stop spammers.
 
 = Protection from manual spam = 
 For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
+
+= Additional features =
+* Weekly anti spam report traffic VS spam.
+* Apps for iPhone, Android to control anti spam service, comments, signups, contacts. With traffic and spam statistics for last 7 days.
 
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
