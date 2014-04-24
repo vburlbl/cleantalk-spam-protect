@@ -408,13 +408,10 @@ function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_
 			$html = '
 <script type="text/javascript">
 // <![CDATA[
-function ctSetCookie(c_name, value, exdays) {
-    var exdate = new Date();
-    exdate.setDate(exdate.getDate() + exdays);
-    var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString()) + "; path=" + escape("/");
-    document.cookie = c_name + "=" + c_value;
+function ctSetCookie(c_name, value) {
+    document.cookie = c_name + "=" + escape(value) + "; path=/";
 }
-ctSetCookie("%s", "%s", 1);	
+ctSetCookie("%s", "%s");
 // ]]>
 </script>
 ';
