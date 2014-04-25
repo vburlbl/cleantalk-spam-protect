@@ -7,16 +7,17 @@ Stable tag: 2.38
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam contact emails. All in one WordPress anti-spam. 
+No spam comments, no spam registrations, no spam contact emails.
 
 == Description ==
-No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
+All in one WordPress anti-spam.
 
 = Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
+1. No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
@@ -25,33 +26,23 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 * WooCommerce review form.
 * WordPress Landing Pages.
 
-= Anti spam plugin info = 
-The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. The plugin sends the data to cloud where the anti-spam logic tests the data over several spam tests. 
-
-We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
-
 = Spam protection methods =
 Plugin uses several simple tests to stop spammers.
 
-**1. JavaScript anti spam test**
+1. JavaScript anti spam test. 99% spam bots doesn't have all JavaScript functions support. So, the plugin has code which can run normal visitor and can't run the spam bot.
+1. Checks by Email, IP, domains at spam activities list. The plugin online use spam activity database at cleantalk.org, which are consist more then 1 billion records about spam activity IPs, Email, Domains and ASN.If the senders IP or Email matches with database, the sender gets some spam scores. To reduce false/positive rate the plugin doesn't use only blacklist test to ban spammers. The sender will be banned only if multiple spam test failed. 
+1. Comment submit time. Spam bots usually send post immediately after page load, because spam bots not really fill the web form, they are only send $_POST data to the blog. The normal visitor send the data within several seconds or minutes.
+1. Relevance test for the comments. Spam bots posts send to the blog comments which are not matched with article by relevance, so the plugin can filter spam bots with offtop filter.
 
-99% spam bots doesn't have all JavaScript functions support. So, the plugin has code which can run normal visitor and can't run the spam bot.
-
-**2. Checks by Email, IP, domains at spam activities list**
-
-The plugin online use spam activity database at cleantalk.org, which are consist more then 1 billion records about spam activity IPs, Email, Domains and ASN.If the senders IP or Email matches with database, the sender gets some spam scores. To reduce false/positive rate the plugin doesn't use only blacklist test to ban spammers. The sender will be banned only if multiple spam test failed. 
-
-**3. Comment submit time**
-
-Spam bots usually send post immediately after page load, because spam bots not really fill the web form, they are only send $_POST data to the blog. The normal visitor send the data within several seconds or minutes.
-
-**4.Relevance test for the comments**
-
-Spam bots posts send to the blog comments which are not matched with article by relevance, so the plugin can filter spam bots with offtop filter.
+= Anti spam plugin info = 
+This is client application for cloud anti-spam service CleanTalk.org, which **daily protects 10k web-sites from spam bots**. The plugin sends the data to cloud where the anti-spam logic tests the data over several spam tests.  
+We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.  
+The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So they started an anti-spam project called CleanTalk.
 
 = Additional features =
-* Weekly anti spam report traffic VS spam.
+* Online, daily and weekly anti spam reports traffic VS spam. 
 * Apps for iPhone, Android to control anti spam service, comments, signups, contacts. With traffic and spam statistics for last 7 days.
+* Anti-spam apps for most popular CMS on cleantalk.org. 
 
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
@@ -115,9 +106,13 @@ If you're having trouble getting things to work after installing the plugin, her
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
 
 = Translations =
-* Russian (ru_RU)
 * Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html">WebHostingHub</a>
+* Russian (ru_RU)
 
+== Screenshots ==
+1. Plugin settings screen. 
+1. Android app main screen. 
+1. Anti spam stoppped spam bot at the registration form. 
 
 == Changelog ==
 
