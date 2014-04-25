@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 No spam comments, no spam registrations, no spam contact emails.
 
 == Description ==
-All in one WordPress anti-spam.
+We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.  
 
 = Anti-spam features =
 1. Stops spam bots comments.
@@ -35,11 +35,7 @@ Plugin uses several simple tests to stop spammers.
 1. Relevance test for the comments. Spam bots posts send to the blog comments which are not matched with article by relevance, so the plugin can filter spam bots with offtop filter.
 
 = Anti spam plugin info = 
-This is client application for cloud anti-spam service CleanTalk.org, which **daily protects 10k web-sites from spam bots**. The plugin sends the data to cloud where the anti-spam logic tests the data over several spam tests.  
-
-We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.  
-
-The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So they started an anti-spam project called CleanTalk.
+The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So, we are started an anti-spam project called CleanTalk.
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
