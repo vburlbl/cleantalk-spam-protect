@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comment, comments, wpmu, multisite, forms, registration, login, contact form, buddypress, bbpress, users, post, posts, javascript, plugin, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, iphone, android, security, formidable, contact form 7, bot, spam bots, спам
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comment, comments, wpmu, multisite, forms, registration, login, contact form, buddypress, bbpress, users, post, posts, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, formidable, contact form 7, bot, spam bots, спам
 Requires at least: 3.0
 Tested up to: 3.9
 Stable tag: 2.38
@@ -18,32 +18,36 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
 
-We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
-
 = Anti-spam protection =
 * WordPress, JetPack comments.
 * WordPress, BuddyPress, bbPress signups.
-* Formiadble forms.
-* Contact form 7.
-* JetPack Contact form.
+* Formiadble forms, Contact form 7, JetPack Contact form.
 * WooCommerce review form.
 * WordPress Landing Pages.
 
 = Anti spam plugin info = 
-The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. 
+The plugin is client application for cloud anti-spam service CleanTalk.org, which **daily protects 5k web-sites from spam bots**. The plugin sends the data to cloud where the anti-spam logic tests the data over several spam tests. 
 
+We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
 = Spam protection methods =
 Plugin uses several simple tests to stop spammers.
 
-* Spam bots signatures.
-* JavaScript anti spam test.
-* Checks by Email, IP, domains at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
-* Comment submit time. Spam bots usually send post immediately after page load.
-* Relevance test for the comments. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
+**1. JavaScript anti spam test**
 
-= Protection from manual spam = 
-For manual spam filtering plugin evaluates the relevance of the comments text according to the subject and the content of the blog. Relevance is determined by keyword and topic of each keyword separately. Comments which have been tested for manual spam are automatically published in the blog.
+99% spam bots doesn't have all JavaScript functions support. So, the plugin has code which can run normal visitor and can't run the spam bot.
+
+**2. Checks by Email, IP, domains at spam activities list**
+
+The plugin online use spam activity database at cleantalk.org, which are consist more then 1 billion records about spam activity IPs, Email, Domains and ASN.If the senders IP or Email matches with database, the sender gets some spam scores. To reduce false/positive rate the plugin doesn't use only blacklist test to ban spammers. The sender will be banned only if multiple spam test failed. 
+
+**3. Comment submit time**
+
+Spam bots usually send post immediately after page load, because spam bots not really fill the web form, they are only send $_POST data to the blog. The normal visitor send the data within several seconds or minutes.
+
+**4.Relevance test for the comments**
+
+Spam bots posts send to the blog comments which are not matched with article by relevance, so the plugin can filter spam bots with offtop filter.
 
 = Additional features =
 * Weekly anti spam report traffic VS spam.
