@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comment, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz
 Requires at least: 3.0
 Tested up to: 3.9
-Stable tag: 2.38
+Stable tag: 2.40
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,7 @@ We have developed anti-spam CleanTalk that would provide **maximum protection fr
 * WordPress, BuddyPress, bbPress signups.
 * Formiadble forms, Contact form 7, JetPack Contact form.
 * WooCommerce review form.
+* Fast Secure Contact form.
 * WordPress Landing Pages.
 
 = Spam protection methods =
@@ -110,9 +111,13 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 == Screenshots ==
 1. Plugin settings screen. 
 1. Android app main screen. 
-1. Anti spam stoppped spam bot at the registration form. 
+1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+
+= 2.40 2014-04-25 =
+  * New: Fast Secure Contact form support.
+  * New: WordPress Landing Pages support 
 
 = 2.38 2014-03-27 =
   * Fixed: Registraion form submit time spam test. 
