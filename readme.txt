@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comment, comments, wpmu, multisite, forms, registration, login, contact form, buddypress, bbpress, users, post, posts, blacklists, cloud, math, signup, akismet, JetPack, WooCommerce, formidable, contact form 7, bot, spam bots, спам
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comment, comments, wpmu, multisite, forms, registration, login, contact form, buddypress, bbpress, users, post, posts, blacklists, math, signup, akismet, JetPack, WooCommerce, formidable, contact form 7, bot, spam bots, спам
 Requires at least: 3.0
 Tested up to: 3.9
 Stable tag: 2.38
