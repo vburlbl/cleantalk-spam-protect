@@ -27,14 +27,6 @@ We have developed anti-spam CleanTalk that would provide **maximum protection fr
 * Fast Secure Contact form.
 * WordPress Landing Pages.
 
-= Spam protection methods =
-Plugin uses several simple tests to stop spammers.
-
-1. JavaScript anti spam test.
-1. Checks by Email, IP, domains at spam activities list.
-1. Comment submit time. 
-1. Relevance test for the comments. 
-
 = Anti spam plugin info = 
 The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So, we are started an anti-spam project called CleanTalk.
 
