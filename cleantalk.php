@@ -51,6 +51,9 @@ $trial_notice_check_timeout = 10;
 // COOKIE label for WP Landing Page proccessing result
 $ct_wplp_result_label = 'ct_wplp_result';
 
+// JetPack comment form loaded
+$ct_jp_comments = false;
+
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -120,7 +123,8 @@ function ct_init() {
 	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
 	(defined('LANDINGPAGES_CURRENT_VERSION'))
     ) {
-	add_action('wp_footer', 'ct_footer_add_cookie');
+	    add_action('wp_footer', 'ct_footer_add_cookie');
+        $ct_jp_comments = true;
     }
 
     //intercept WordPress Landing Pages POST
@@ -543,7 +547,7 @@ function ct_frm_validate_entry ($errors, $values) {
         return false;
     }
 
-    $checkjs = js_test_post($ct_checkjs_frm);
+    $checkjs = js_test($ct_checkjs_frm);
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
@@ -587,7 +591,7 @@ function ct_preprocess_comment($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label, $ct_jp_comments;
 
     $options = ct_get_options();
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
@@ -626,8 +630,12 @@ function ct_preprocess_comment($comment) {
     $comment_post_id = $comment['comment_post_ID'];
 
     $post = get_post($comment_post_id);
+    
+    $simple_mode = true;
+    if ($ct_jp_comments)
+        $simple_mode = false;
 
-    $checkjs = js_test_post('ct_checkjs', true);
+    $checkjs = js_test('ct_checkjs', $simple_mode);
 
     $example = null;
 
@@ -745,37 +753,15 @@ function ct_die_extended($comment_body) {
  *
  *
  */
-function js_test_post($field_name = 'ct_checkjs', $simple_mode = false) {
+function js_test($field_name = 'ct_checkjs', $simple_mode = false) {
     $checkjs = null;
     $js_field = null;
 
-    if (isset($_POST[$field_name]))
-	    $js_field = $_POST[$field_name];
+    if (isset($_REQUEST[$field_name]))
+	    $js_field = $_REQUEST[$field_name];
 
     if ($js_field !== null) {
         if($js_field == ct_get_checkjs_value($simple_mode)) {
-            $checkjs = 1;
-        } else {
-            $checkjs = 0; 
-        }
-    }
-
-    return $checkjs;
-}
-
-/**
- *
- *
- */
-function js_test_cookie($field_name = 'ct_checkjs') {
-    $checkjs = null;
-    $js_field = null;
-
-    if (isset($_COOKIE[$field_name]))
-	$js_field = $_COOKIE[$field_name];
-
-    if ($js_field !== null) {
-        if($js_field == ct_get_checkjs_value()) {
             $checkjs = 1;
         } else {
             $checkjs = 0; 
@@ -1157,7 +1143,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         return $errors;
     }
 
-    $checkjs = js_test_post($ct_checkjs_register_form); 
+    $checkjs = js_test($ct_checkjs_register_form); 
 
     require_once('cleantalk.class.php');
 
@@ -1304,7 +1290,7 @@ function ct_contact_form_is_spam($form) {
         if (preg_match("/^.+$ct_checkjs_jpcf$/", $k))
            $js_field_name = $k; 
     }
-    $checkjs = js_test_cookie($js_field_name);
+    $checkjs = js_test($js_field_name);
 
     $sender_info = array(
 	'sender_url' => @$form['comment_author_url']
@@ -1381,7 +1367,7 @@ function ct_wpcf7_spam($spam) {
         return $spam;
     }
 
-    $checkjs = js_test_post($ct_checkjs_cf7);
+    $checkjs = js_test($ct_checkjs_cf7);
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
@@ -1455,7 +1441,7 @@ function ct_si_contact_form_validate($form_errors = array(), $form_id_num = 0) {
     if ($options['contact_forms_test'] == 0)
 	return $form_errors;
 
-    $checkjs = js_test_post('ct_checkjs');
+    $checkjs = js_test('ct_checkjs');
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
@@ -1803,9 +1789,9 @@ function ct_check_wplp(){
 	if ($options['contact_forms_test'] == 0)
     	    return;
 
-	$checkjs = js_test_cookie('ct_checkjs');
-        if (null === $checkjs)
-            $checkjs = 0;
+	$checkjs = js_test('ct_checkjs');
+    if (null === $checkjs)
+        $checkjs = 0;
 
 	$post_info['comment_type'] = 'feedback';
 	$post_info = json_encode($post_info);
