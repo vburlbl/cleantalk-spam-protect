@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.40
+  Version: 2.41
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-240';
+$ct_agent_version = 'wordpress-241';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -369,7 +369,10 @@ function ct_comment_form() {
         return false;
     }
 
-    ct_add_hidden_fields(0, 'ct_checkjs', false, false);
+    ct_add_hidden_fields2('ct_checkjs');
+    
+    ct_init_session();
+    $_SESSION['formtime'] = time();
 
     return null;
 }
@@ -417,8 +420,9 @@ ctSetCookie("%s", "%s");
 ';
 		$html = sprintf($html, $field_name, $ct_checkjs_key);
     } else {
-    		$field_id = $field_name . '_' . md5(rand(0, 1000));
-			$html = '
+
+        $field_id = $field_name . '_' . md5(rand(0, 1000));
+        $html = '
 <input type="hidden" id="%s" name="%s" value="%s" />
 <script type="text/javascript">
 // <![CDATA[
@@ -433,6 +437,52 @@ document.getElementById("%s").value = document.getElementById("%s").value.replac
     } else {
         echo $html;
     } 
+}
+
+/**
+ * Adds hidden filed to define avaialbility of client's JavaScript
+ * @param 	int $post_id Post ID, not used
+ */
+function ct_add_hidden_fields2($field_name = 'ct_checkjs', $return_string = false) {
+    global $ct_checkjs_def;
+
+    $field_id = $field_name . '_' . md5(rand(0, 1000));
+    $field_id_div = 'div_' . $field_id;
+    $html = '
+<div id="%s">
+<span style="font-weight: bold;">Fill current <span style="color: red;">y_e_a_r</a>:</span>
+<input type="text" id="%s" name="%s" value="%s" maxlength="4" size="4" style="width: 5em;" />
+</div>
+<script type="text/javascript">
+// <![CDATA[
+    var date = new Date();
+
+    document.getElementById("%s").value = date.getFullYear();
+    if (document.getElementById("%s").value != %d) {
+        document.getElementById("%s").style.display = \'none\';
+    } 
+// ]]>
+</script>
+';
+    $html = sprintf(
+        $html, 
+        $field_id_div, 
+        $field_id, 
+        $field_name, 
+        $ct_checkjs_def, 
+        $field_id, 
+        $field_id, 
+        $ct_checkjs_def, 
+        $field_id_div 
+    );
+
+    if ($return_string === true) {
+        return $html;
+    } else {
+        echo $html;
+    }
+
+    return null;
 }
 
 /**
@@ -577,7 +627,7 @@ function ct_preprocess_comment($comment) {
 
     $post = get_post($comment_post_id);
 
-    $checkjs = js_test_post('ct_checkjs');
+    $checkjs = js_test_post('ct_checkjs', true);
 
     $example = null;
 
@@ -695,15 +745,15 @@ function ct_die_extended($comment_body) {
  *
  *
  */
-function js_test_post($field_name = 'ct_checkjs') {
+function js_test_post($field_name = 'ct_checkjs', $simple_mode = false) {
     $checkjs = null;
     $js_field = null;
 
     if (isset($_POST[$field_name]))
-	$js_field = $_POST[$field_name];
+	    $js_field = $_POST[$field_name];
 
     if ($js_field !== null) {
-        if($js_field == ct_get_checkjs_value()) {
+        if($js_field == ct_get_checkjs_value($simple_mode)) {
             $checkjs = 1;
         } else {
             $checkjs = 0; 
@@ -1005,10 +1055,15 @@ function ct_plugin_active($plugin_name){
  * Get ct_get_checkjs_value 
  * @return string
  */
-function ct_get_checkjs_value() {
-    $options = ct_get_options();
+function ct_get_checkjs_value($simple_mode = false) {
+    if ($simple_mode) {
+        $return = date("Y");
+    } else {
+        $options = ct_get_options();
+        $return = md5($options['apikey'] . '+' . get_option('admin_email')); 
+    }
     
-    return md5($options['apikey'] . '+' . get_option('admin_email')); 
+    return $return;
 }
 
 /**
