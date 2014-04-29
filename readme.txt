@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz
 Requires at least: 3.0
 Tested up to: 3.9
-Stable tag: 2.40
+Stable tag: 2.42
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
