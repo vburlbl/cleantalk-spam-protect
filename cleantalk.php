@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.40
+  Version: 2.42
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-240';
+$ct_agent_version = 'wordpress-242';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -1008,11 +1008,7 @@ function ct_plugin_active($plugin_name){
 function ct_get_checkjs_value() {
     $options = ct_get_options();
     
-    $remote_addr = '';
-    if (isset($_SERVER['REMOTE_ADDR']))
-        $remote_addr = $_SERVER['REMOTE_ADDR'];
-
-    return md5($options['apikey'] . '+' . $remote_addr);
+    return md5($options['apikey'] . '+' . get_option('admin_email')); 
 }
 
 /**
