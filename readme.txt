@@ -106,6 +106,8 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 2.42 2014-04-29 =
+  * Fixed: JavaScript anti-spam test for comments. 
 
 = 2.40 2014-04-25 =
   * New: Fast Secure Contact form support.
@@ -279,6 +281,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.42 2014-04-29 =
+  * Fixed: JavaScript anti-spam test for comments.
+   
 = 2.38 2014-03-27 =
   * Fixed: Registraion form submit time spam test. 
 
