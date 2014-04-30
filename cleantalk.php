@@ -3,12 +3,12 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.42
+  Version: 2.43
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
-$ct_agent_version = 'wordpress-242';
+$ct_agent_version = 'wordpress-243';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -50,6 +50,9 @@ $trial_notice_check_timeout = 10;
 
 // COOKIE label for WP Landing Page proccessing result
 $ct_wplp_result_label = 'ct_wplp_result';
+
+// Post id
+$ct_post_id = null;
 
 // Init action.
 add_action('init', 'ct_init', 1);
@@ -120,7 +123,7 @@ function ct_init() {
 	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
 	(defined('LANDINGPAGES_CURRENT_VERSION'))
     ) {
-	add_action('wp_footer', 'ct_footer_add_cookie');
+	    add_action('wp_footer', 'ct_footer_add_cookie');
     }
 
     //intercept WordPress Landing Pages POST
@@ -359,7 +362,11 @@ function ct_base_call($params = array()) {
 /**
  * Adds hidden filed to comment form 
  */
-function ct_comment_form() {
+function ct_comment_form($post_id) {
+    global $ct_post_id;
+    
+    $ct_post_id = $post_id;
+    
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -368,9 +375,9 @@ function ct_comment_form() {
     if ($options['comments_test'] == 0) {
         return false;
     }
-
+    
     ct_add_hidden_fields(0, 'ct_checkjs', false, false);
-
+    
     return null;
 }
 
@@ -422,12 +429,26 @@ ctSetCookie("%s", "%s");
 <input type="hidden" id="%s" name="%s" value="%s" />
 <script type="text/javascript">
 // <![CDATA[
-document.getElementById("%s").value = document.getElementById("%s").value.replace(/^%s$/, "%s");
+var ct_input_name = \'%s\';
+var ct_input_value = document.getElementById(ct_input_name).value;
+var ct_input_challenge = \'%s\'; 
+
+document.getElementById(ct_input_name).value = document.getElementById(ct_input_name).value.replace(ct_input_value, ct_input_challenge);
+
+if (document.getElementById(ct_input_name).value == ct_input_value) {
+    document.getElementById(ct_input_name).value = ct_set_challenge(ct_input_challenge); 
+}
+
+function ct_set_challenge(val) {
+    return val; 
+}; 
+
 // ]]>
 </script>
 ';
-		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $field_id, $ct_checkjs_def, $ct_checkjs_key);
-    }
+		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_checkjs_key);
+    };
+
     if ($return_string === true) {
         return $html;
     } else {
@@ -493,7 +514,7 @@ function ct_frm_validate_entry ($errors, $values) {
         return false;
     }
 
-    $checkjs = js_test_post($ct_checkjs_frm);
+    $checkjs = js_test($ct_checkjs_frm);
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
@@ -537,7 +558,7 @@ function ct_preprocess_comment($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label, $ct_post_id;
 
     $options = ct_get_options();
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
@@ -574,10 +595,11 @@ function ct_preprocess_comment($comment) {
     $ct_comment_done = true;
 
     $comment_post_id = $comment['comment_post_ID'];
+    $ct_post_id = $comment_post_id;
 
     $post = get_post($comment_post_id);
 
-    $checkjs = js_test_post('ct_checkjs');
+    $checkjs = js_test('ct_checkjs');
 
     $example = null;
 
@@ -692,40 +714,17 @@ function ct_die_extended($comment_body) {
 }
 
 /**
- *
- *
- */
-function js_test_post($field_name = 'ct_checkjs') {
-    $checkjs = null;
-    $js_field = null;
-
-    if (isset($_POST[$field_name]))
-	$js_field = $_POST[$field_name];
-
-    if ($js_field !== null) {
-        if($js_field == ct_get_checkjs_value()) {
-            $checkjs = 1;
-        } else {
-            $checkjs = 0; 
-        }
-    }
-
-    return $checkjs;
-}
-
-/**
- *
+ * Validates JavaScript anti-spam test
  *
  */
-function js_test_cookie($field_name = 'ct_checkjs') {
+function js_test($field_name = 'ct_checkjs') {
     $checkjs = null;
-    $js_field = null;
+    $js_post_value = null;
 
-    if (isset($_COOKIE[$field_name]))
-	$js_field = $_COOKIE[$field_name];
-
-    if ($js_field !== null) {
-        if($js_field == ct_get_checkjs_value()) {
+    if (isset($_REQUEST[$field_name])) {
+	    $js_post_value = $_REQUEST[$field_name];
+        $ct_challenge = ct_get_checkjs_value();
+        if(preg_match("/$ct_challenge/", $js_post_value)) {
             $checkjs = 1;
         } else {
             $checkjs = 0; 
@@ -924,26 +923,26 @@ function admin_notice_message(){
     global $show_ct_notice_trial, $show_ct_notice_online;
 
     if (ct_active() === false)
-	return false;
+	    return false;
 
     $options = ct_get_options();
     $show_notice = true;
     if ($show_notice && ct_valid_key($options['apikey']) === false) {
-        echo '<div class="updated"><p>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam in comments!", 'cleantalk') . '</p></div>';
+        echo '<div class="updated"><h3>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam!", 'cleantalk') . '</h3></div>';
     }
 
     if ($show_notice && !empty($show_ct_notice_online)) {
-        echo '<div class="updated"><p><b>';
+        echo '<div class="updated"><h3><b>';
 	if($show_ct_notice_online === 'Y'){
     	    echo __("Please don’t forget to disable CAPTCHA if you have it!", 'cleantalk');
 	}else{
     	    echo __("Wrong </b><b style=\"color: #49C73B;\">Clean</b><b style=\"color: #349ebf;\">Talk</b><b> access key! Please check it or ask <a target=\"_blank\" href=\"https://cleantalk.org/forum/\">support</a>.", 'cleantalk');
 	}
-        echo '</b></p></div>';
+        echo '</b></h3></div>';
     }
 
     if ($show_notice && $show_ct_notice_trial) {
-        echo '<div class="updated"><p>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</p></div>';
+        echo '<div class="updated"><h3>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
         $show_notice = false;
     }
 
@@ -1006,9 +1005,15 @@ function ct_plugin_active($plugin_name){
  * @return string
  */
 function ct_get_checkjs_value() {
+    global $ct_post_id;
+
     $options = ct_get_options();
-    
-    return md5($options['apikey'] . '+' . get_option('admin_email')); 
+
+    $salt = $options['apikey'] . '+' . get_option('admin_email');
+    if ($ct_post_id)
+        $salt .= '+' . $ct_post_id;
+
+    return md5($salt); 
 }
 
 /**
@@ -1102,7 +1107,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         return $errors;
     }
 
-    $checkjs = js_test_post($ct_checkjs_register_form); 
+    $checkjs = js_test($ct_checkjs_register_form); 
 
     require_once('cleantalk.class.php');
 
@@ -1249,7 +1254,7 @@ function ct_contact_form_is_spam($form) {
         if (preg_match("/^.+$ct_checkjs_jpcf$/", $k))
            $js_field_name = $k; 
     }
-    $checkjs = js_test_cookie($js_field_name);
+    $checkjs = js_test($js_field_name);
 
     $sender_info = array(
 	'sender_url' => @$form['comment_author_url']
@@ -1326,7 +1331,7 @@ function ct_wpcf7_spam($spam) {
         return $spam;
     }
 
-    $checkjs = js_test_post($ct_checkjs_cf7);
+    $checkjs = js_test($ct_checkjs_cf7);
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
@@ -1400,7 +1405,7 @@ function ct_si_contact_form_validate($form_errors = array(), $form_id_num = 0) {
     if ($options['contact_forms_test'] == 0)
 	return $form_errors;
 
-    $checkjs = js_test_post('ct_checkjs');
+    $checkjs = js_test('ct_checkjs');
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
@@ -1582,7 +1587,7 @@ function ct_input_apikey() {
     $value = $options['apikey'];
 
     $def_value = ''; 
-    echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='10' type='text' value='$value' />";
+    echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='20' type='text' value='$value' style=\"font-size: 14pt;\"/>";
     if (ct_valid_key($value) === false) {
         echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
     }
@@ -1637,6 +1642,15 @@ function ct_settings_validate($input) {
  */
 function ct_settings_page() {
     ?>
+<style type="text/css">
+input[type=submit] {padding: 10px; background: #3399FF; color: #fff; border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px; 
+    font-size: 12pt;
+}
+</style>
+
     <div>
         <h2><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b></h2>
         <form action="options.php" method="post">
@@ -1731,7 +1745,7 @@ function ct_update_option($option_name) {
     $ct_result = $ct_base_call_result['ct_result'];
 
     if ($ct_result->inactive == 1) {
-        setcookie($ct_notice_online_label, 0, strtotime("+5 seconds"), '/');
+        setcookie($ct_notice_online_label, 0, null, '/');
     }else{
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
     }
@@ -1748,7 +1762,7 @@ function ct_check_wplp(){
 	if ($options['contact_forms_test'] == 0)
     	    return;
 
-	$checkjs = js_test_cookie('ct_checkjs');
+	$checkjs = js_test('ct_checkjs');
         if (null === $checkjs)
             $checkjs = 0;
 
