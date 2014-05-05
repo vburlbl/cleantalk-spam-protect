@@ -375,8 +375,9 @@ function ct_base_call($params = array()) {
  * Adds hidden filed to comment form 
  */
 function ct_comment_form($post_id) {
-    global $ct_post_id, $ct_jp_comments;
+    global $ct_jp_comments;
     
+    $ct_post_id = null;
     if (!$ct_jp_comments)
         $ct_post_id = $post_id;
     
@@ -389,7 +390,7 @@ function ct_comment_form($post_id) {
         return false;
     }
     
-    ct_add_hidden_fields(0, 'ct_checkjs', false, false);
+    ct_add_hidden_fields($ct_post_id, 'ct_checkjs', false, false);
     
     return null;
 }
@@ -416,11 +417,11 @@ function ct_footer_add_cookie() {
  * Adds hidden filed to define avaialbility of client's JavaScript
  * @param 	int $post_id Post ID, not used
  */
-function ct_add_hidden_fields($post_id = 0, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
+function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
 
     global $ct_checkjs_def;
 
-    $ct_checkjs_key = ct_get_checkjs_value(); 
+    $ct_checkjs_key = ct_get_checkjs_value($post_id); 
     ct_init_session();
     $_SESSION['formtime'] = time();
 
@@ -611,12 +612,13 @@ function ct_preprocess_comment($comment) {
 
     // Skip using $ct_post_id in MD5 hash for JavaScript test, becuase
     // JetPack doesn't have post_id in MD5 hash
+    $ct_post_id = null;
     if (!$ct_jp_comments)
         $ct_post_id = $comment_post_id;
 
     $post = get_post($comment_post_id);
 
-    $checkjs = js_test('ct_checkjs', $_POST);
+    $checkjs = js_test('ct_checkjs', $_POST, $ct_post_id);
 
     $example = null;
 
@@ -734,7 +736,7 @@ function ct_die_extended($comment_body) {
  * Validates JavaScript anti-spam test
  *
  */
-function js_test($field_name = 'ct_checkjs', $data = null) {
+function js_test($field_name = 'ct_checkjs', $data = null, $post_id = null) {
     $checkjs = null;
     $js_post_value = null;
     
@@ -743,7 +745,7 @@ function js_test($field_name = 'ct_checkjs', $data = null) {
 
     if (isset($data[$field_name])) {
 	    $js_post_value = $data[$field_name];
-        $ct_challenge = ct_get_checkjs_value();
+        $ct_challenge = ct_get_checkjs_value($post_id);
         if(preg_match("/$ct_challenge/", $js_post_value)) {
             $checkjs = 1;
         } else {
@@ -887,14 +889,13 @@ function ct_plugin_active($plugin_name){
  * Get ct_get_checkjs_value 
  * @return string
  */
-function ct_get_checkjs_value() {
-    global $ct_post_id;
+function ct_get_checkjs_value($post_id = null) {
 
     $options = ct_get_options();
 
     $salt = $options['apikey'] . '+' . get_option('admin_email');
-    if ($ct_post_id)
-        $salt .= '+' . $ct_post_id;
+    if ($post_id)
+        $salt .= '+' . $post_id;
 
     return md5($salt); 
 }
@@ -1354,6 +1355,7 @@ function ct_check_wplp(){
     	    return;
 
     $checkjs = js_test('ct_checkjs', $_COOKIE);
+
     if (null === $checkjs)
         $checkjs = 0;
 

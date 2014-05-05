@@ -1,5 +1,7 @@
 <?php
 
+$ct_plugin_basename = 'cleantalk-spam-protect/cleantalk.php';
+
 /**
  * Admin action 'admin_enqueue_scripts' - Enqueue admin script of reloading admin page after needed AJAX events
  * @param 	string $hook URL of hooked page
@@ -376,11 +378,12 @@ function ct_delete_user($user_id) {
 */
 if (!function_exists ( 'ct_register_plugin_links')) {
     function ct_register_plugin_links($links, $file) {
-	$base = plugin_basename(__FILE__);
-    	    if ( $file == $base ) {
-		$links[] = '<a href="options-general.php?page=cleantalk">' . __( 'Settings' ) . '</a>';
-		$links[] = '<a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/" target="_blank">' . __( 'FAQ','cleantalk' ) . '</a>';
-		$links[] = '<a href="http://cleantalk.org/forum" target="_blank">' . __( 'Support','cleantalk' ) . '</a>';
+        global $ct_plugin_basename;
+	    
+    	if ($file == $ct_plugin_basename) {
+		    $links[] = '<a href="options-general.php?page=cleantalk">' . __( 'Settings' ) . '</a>';
+		    $links[] = '<a href="http://wordpress.org/plugins/cleantalk-spam-protect/faq/" target="_blank">' . __( 'FAQ','cleantalk' ) . '</a>';
+		    $links[] = '<a href="http://cleantalk.org/forum" target="_blank">' . __( 'Support','cleantalk' ) . '</a>';
 	    }
 	    return $links;
     }
@@ -393,12 +396,13 @@ if (!function_exists ( 'ct_register_plugin_links')) {
 */
 if (!function_exists ( 'ct_plugin_action_links')) {
     function ct_plugin_action_links($links, $file) {
-	$base = plugin_basename(__FILE__);
-    	if ( $file == $base ) {
-		$settings_link = '<a href="options-general.php?page=cleantalk">' . __( 'Settings' ) . '</a>';
-		array_unshift( $links, $settings_link ); // before other links
-	}
-	return $links;
+        global $ct_plugin_basename;
+
+        if ($file == $ct_plugin_basename) {
+            $settings_link = '<a href="options-general.php?page=cleantalk">' . __( 'Settings' ) . '</a>';
+            array_unshift( $links, $settings_link ); // before other links
+        }
+        return $links;
     }
 }
 
