@@ -81,6 +81,13 @@ Use other antispam plugins not necessarily, because CleanTalk stops up to 100% o
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anit spam options for spam bots protection.
 
+= After installing the plugin, I noticed in the statistics that spam attacks became more =
+This may be influenced by several factors:
+
+* As the indexing of your site by search engines, the appearance of external links and growth positions in the search results, your website becomes aware of an increasing number of spam bots.
+* On the opaque protection systems such as CAPTCHA or question&answer, which do not have statistics on incoming spam attacks, you do not see the real picture or it is not complete.
+* Calculation methods for spam attacks and spam bots from system to system may differ, so maybe the difference. We try to provide detailed statistics.
+
 == Other notes ==
 
 = Troubleshooting Guide =
