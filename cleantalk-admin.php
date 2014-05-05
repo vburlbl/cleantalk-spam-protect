@@ -389,7 +389,6 @@ if (!function_exists ( 'ct_register_plugin_links')) {
     }
 }
 
-
 /**
  * Manage links in plugins list
  * @return array

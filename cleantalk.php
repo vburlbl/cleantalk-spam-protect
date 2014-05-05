@@ -59,6 +59,9 @@ $ct_post_id = null;
 // Flag indicates active JetPack comments 
 $ct_jp_comments = false;
 
+// S2member post data label
+$ct_post_data_label = 's2member_pro_paypal_registration'; 
+
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -121,7 +124,7 @@ if (is_admin()) {
  * @return 	mixed[] Array of options
  */
 function ct_init() {
-    global $ct_wplp_result_label, $ct_jp_comments;
+    global $ct_wplp_result_label, $ct_jp_comments, $ct_post_data_label;
 
     add_action('comment_form', 'ct_comment_form');
 
@@ -129,6 +132,7 @@ function ct_init() {
     if (
 	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
 	(defined('LANDINGPAGES_CURRENT_VERSION'))
+	|| (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION'))
     ) {
 	    add_action('wp_footer', 'ct_footer_add_cookie');
     }
@@ -145,6 +149,11 @@ function ct_init() {
         }else if(array_key_exists('inbound_submitted', $_POST) && $_POST['inbound_submitted'] == '1'){ // Final submit
             ct_check_wplp();
         }
+    }
+    
+    // intercept S2member POST
+    if (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION') && isset($_POST[$ct_post_data_label]['email'])){
+        ct_s2member_registration_test(); 
     }
 }
 
@@ -1405,6 +1414,87 @@ function ct_check_wplp(){
     }
     if ($cleantalk_comment !== 'OK')
         ct_die_extended($cleantalk_comment);
+}
+
+/**
+ * Test S2member registration
+ * @return array with errors 
+ */
+function ct_s2member_registration_test() {
+    global $ct_agent_version, $ct_post_data_label;
+    
+    $options = ct_get_options();
+    if ($options['registrations_test'] == 0) {
+        return null;
+    }
+    
+    ct_init_session();
+    if (array_key_exists('formtime', $_SESSION)) {
+        $submit_time = time() - (int) $_SESSION['formtime'];
+    } else {
+        $submit_time = null;
+    }
+
+    $checkjs = js_test('ct_checkjs', $_COOKIE);
+
+    require_once('cleantalk.class.php');
+
+    $blog_lang = substr(get_locale(), 0, 2);
+    $user_info = array(
+        'cms_lang' => $blog_lang,
+        'REFFERRER' => @$_SERVER['HTTP_REFERER'],
+        'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
+    );
+    $user_info = json_encode($user_info);
+    if ($user_info === false)
+        $user_info = '';
+    
+    $sender_email = null;
+    if (isset($_POST[$ct_post_data_label]['email']))
+        $sender_email = $_POST[$ct_post_data_label]['email'];
+
+    $sender_nickname = null;
+    if (isset($_POST[$ct_post_data_label]['username']))
+        $sender_nickname = $_POST[$ct_post_data_label]['username'];
+
+    $config = get_option('cleantalk_server');
+
+    $ct = new Cleantalk();
+    $ct->work_url = $config['ct_work_url'];
+    $ct->server_url = $options['server'];
+    $ct->server_ttl = $config['ct_server_ttl'];
+    $ct->server_changed = $config['ct_server_changed'];
+
+    $ct_request = new CleantalkRequest();
+
+    $ct_request->auth_key = $options['apikey'];
+    $ct_request->sender_email = $sender_email; 
+    $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+    $ct_request->sender_nickname = $sender_nickname; 
+    $ct_request->agent = $ct_agent_version; 
+    $ct_request->sender_info = $user_info;
+    $ct_request->js_on = $checkjs;
+    $ct_request->submit_time = $submit_time; 
+
+    $ct_result = $ct->isAllowUser($ct_request);
+    if ($ct->server_change) {
+        update_option(
+                'cleantalk_server', array(
+                'ct_work_url' => $ct->work_url,
+                'ct_server_ttl' => $ct->server_ttl,
+                'ct_server_changed' => time()
+                )
+        );
+    }
+
+    if ($ct_result->errno != 0) {
+        return false;
+    }
+    if ($ct_result->allow == 0) {
+        ct_die_extended($ct_result->comment);
+    }
+
+    return true;
 }
 
 ?>
