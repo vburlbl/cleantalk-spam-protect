@@ -53,14 +53,14 @@ $trial_notice_check_timeout = 10;
 // COOKIE label for WP Landing Page proccessing result
 $ct_wplp_result_label = 'ct_wplp_result';
 
-// Post id
-$ct_post_id = null;
-
 // Flag indicates active JetPack comments 
 $ct_jp_comments = false;
 
 // S2member post data label
 $ct_post_data_label = 's2member_pro_paypal_registration'; 
+
+// Form time load label  
+$ct_formtime_label = 'formtime'; 
 
 // Init action.
 add_action('init', 'ct_init', 1);
@@ -70,7 +70,7 @@ add_action( 'plugins_loaded', 'ct_plugin_loaded' );
 
 // Comments 
 add_filter('preprocess_comment', 'ct_preprocess_comment');     // param - comment data array
-add_filter( 'comment_text', 'ct_comment_text' );
+add_filter('comment_text', 'ct_comment_text' );
 
 // Formidable
 add_action('frm_validate_entry', 'ct_frm_validate_entry', 20, 2);
@@ -125,6 +125,8 @@ if (is_admin()) {
  */
 function ct_init() {
     global $ct_wplp_result_label, $ct_jp_comments, $ct_post_data_label;
+
+    ct_init_session();
 
     add_action('comment_form', 'ct_comment_form');
 
@@ -238,7 +240,6 @@ function ct_feedback($hash, $message = null, $allow) {
     }
 
     $ct_feedback = $hash . ':' . $allow . ';';
-    ct_init_session();
     if (empty($_SESSION['feedback_request'])) {
 	$_SESSION['feedback_request'] = $ct_feedback; 
     } else {
@@ -255,7 +256,6 @@ function ct_feedback($hash, $message = null, $allow) {
  */
 function ct_send_feedback($feedback_request = null) {
 
-    ct_init_session();
     if (empty($feedback_request) && isset($_SESSION['feedback_request']) && preg_match("/^[a-z0-9\;\:]+$/", $_SESSION['feedback_request'])) {
 	$feedback_request = $_SESSION['feedback_request'];
 	unset($_SESSION['feedback_request']);
@@ -299,8 +299,8 @@ function ct_send_feedback($feedback_request = null) {
  * @return null;
  */
 function ct_init_session() {
-    if(!session_id()) {
-    	session_name('cleantalksession');
+    if(session_id() === '') {
+        session_name('cleantalksession');
         @session_start();
     }
 
@@ -323,13 +323,8 @@ function ct_base_call($params = array()) {
     global $wpdb, $ct_agent_version;
 
     require_once('cleantalk.class.php');
-
-    ct_init_session();
-    if (array_key_exists('formtime', $_SESSION)) {
-        $submit_time = time() - (int) $_SESSION['formtime'];
-    } else {
-        $submit_time = null;
-    }
+        
+    $submit_time = submit_time_test();
 
     $sender_info = array(
         'cms_lang' => substr(get_locale(), 0, 2),
@@ -386,10 +381,6 @@ function ct_base_call($params = array()) {
 function ct_comment_form($post_id) {
     global $ct_jp_comments;
     
-    $ct_post_id = null;
-    if (!$ct_jp_comments)
-        $ct_post_id = $post_id;
-    
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -399,7 +390,7 @@ function ct_comment_form($post_id) {
         return false;
     }
     
-    ct_add_hidden_fields($ct_post_id, 'ct_checkjs', false, false);
+    ct_add_hidden_fields(null, 'ct_checkjs', false, false);
     
     return null;
 }
@@ -416,8 +407,7 @@ function ct_footer_add_cookie() {
     if ($options['comments_test'] == 0) {
         return false;
     }
-
-    ct_add_hidden_fields(0, 'ct_checkjs', false, true);
+    ct_add_hidden_fields(null, 'ct_checkjs', false, true);
 
     return null;
 }
@@ -427,12 +417,11 @@ function ct_footer_add_cookie() {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
+    global $ct_checkjs_def, $ct_formtime_label;
 
-    global $ct_checkjs_def;
-
-    $ct_checkjs_key = ct_get_checkjs_value($post_id); 
-    ct_init_session();
-    $_SESSION['formtime'] = time();
+    $ct_checkjs_key = ct_get_checkjs_value(); 
+    
+    $_SESSION[$ct_formtime_label] = time();
 
     if ($cookie_check) { 
 			$html = '
@@ -504,12 +493,14 @@ function ct_is_user_enable() {
 * return null;
 */
 function ct_frm_entries_footer_scripts($fields, $form) {
-    global $current_user, $ct_checkjs_frm;
+    global $current_user, $ct_checkjs_frm, $ct_formtime_label;
 
     $options = ct_get_options();
     if ($options['contact_forms_test'] == 0) {
         return false;
     }
+    
+    $_SESSION[$ct_formtime_label] = time();
 
     $ct_checkjs_key = ct_get_checkjs_value();
     $ct_frm_name = 'form_' . $form->form_key;
@@ -581,7 +572,7 @@ function ct_preprocess_comment($comment) {
     // this action is called just when WP process POST request (adds new comment)
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
-    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label, $ct_post_id, $ct_jp_comments;
+    global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label, $ct_jp_comments;
 
     $options = ct_get_options();
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
@@ -619,15 +610,9 @@ function ct_preprocess_comment($comment) {
 
     $comment_post_id = $comment['comment_post_ID'];
 
-    // Skip using $ct_post_id in MD5 hash for JavaScript test, becuase
-    // JetPack doesn't have post_id in MD5 hash
-    $ct_post_id = null;
-    if (!$ct_jp_comments)
-        $ct_post_id = $comment_post_id;
-
     $post = get_post($comment_post_id);
 
-    $checkjs = js_test('ct_checkjs', $_POST, $ct_post_id);
+    $checkjs = js_test('ct_checkjs', $_POST);
 
     $example = null;
 
@@ -745,7 +730,7 @@ function ct_die_extended($comment_body) {
  * Validates JavaScript anti-spam test
  *
  */
-function js_test($field_name = 'ct_checkjs', $data = null, $post_id = null) {
+function js_test($field_name = 'ct_checkjs', $data = null) {
     $checkjs = null;
     $js_post_value = null;
     
@@ -754,7 +739,7 @@ function js_test($field_name = 'ct_checkjs', $data = null, $post_id = null) {
 
     if (isset($data[$field_name])) {
 	    $js_post_value = $data[$field_name];
-        $ct_challenge = ct_get_checkjs_value($post_id);
+        $ct_challenge = ct_get_checkjs_value();
         if(preg_match("/$ct_challenge/", $js_post_value)) {
             $checkjs = 1;
         } else {
@@ -763,6 +748,21 @@ function js_test($field_name = 'ct_checkjs', $data = null, $post_id = null) {
     }
 
     return $checkjs;
+}
+
+/**
+ * Validate form submit time 
+ *
+ */
+function submit_time_test() {
+    global $ct_formtime_label;
+
+    $submit_time = null;
+    if (isset($_SESSION[$ct_formtime_label])) {
+        $submit_time = time() - (int) $_SESSION[$ct_formtime_label];
+    }
+
+    return $submit_time;
 }
 
 /**
@@ -777,8 +777,8 @@ function ct_post_url($comment_id = null, $comment_post_id) {
 	return null;
 
     if ($comment_id === null) {
-	$last_comment = get_comments('number=1');
-	$comment_id = isset($last_comment[0]->comment_ID) ? (int) $last_comment[0]->comment_ID + 1 : 1;
+	    $last_comment = get_comments('number=1');
+	    $comment_id = isset($last_comment[0]->comment_ID) ? (int) $last_comment[0]->comment_ID + 1 : 1;
     }
     $permalink = get_permalink($comment_post_id);
 
@@ -898,13 +898,10 @@ function ct_plugin_active($plugin_name){
  * Get ct_get_checkjs_value 
  * @return string
  */
-function ct_get_checkjs_value($post_id = null) {
-
+function ct_get_checkjs_value() {
     $options = ct_get_options();
 
     $salt = $options['apikey'] . '+' . get_option('admin_email');
-    if ($post_id)
-        $salt .= '+' . $post_id;
 
     return md5($salt); 
 }
@@ -942,7 +939,7 @@ function ct_register_form() {
         return false;
     }
 
-    ct_add_hidden_fields(0, $ct_checkjs_register_form, false);
+    ct_add_hidden_fields(null, $ct_checkjs_register_form, false);
 
     return null;
 }
@@ -957,7 +954,6 @@ function ct_login_message($message) {
     $options = ct_get_options();
     if ($options['registrations_test'] != 0) {
         if( isset($_GET['checkemail']) && 'registered' == $_GET['checkemail'] ) {
-            ct_init_session();
 	    if (isset($_SESSION[$ct_session_register_ok_label])) {
 		unset($_SESSION[$ct_session_register_ok_label]);
 		if(is_wp_error($errors))
@@ -988,12 +984,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         $buddypress = true;
     }
     
-    ct_init_session();
-    if (array_key_exists('formtime', $_SESSION)) {
-        $submit_time = time() - (int) $_SESSION['formtime'];
-    } else {
-        $submit_time = null;
-    }
+    $submit_time = submit_time_test();
 
     $options = ct_get_options();
     if ($options['registrations_test'] == 0) {
@@ -1072,7 +1063,6 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         }
     } else {
         if ($ct_result->id !== null) {
-            ct_init_session();
             $_SESSION[$ct_session_request_id_label] = $ct_result->id;
             $_SESSION[$ct_session_register_ok_label] = $ct_result->id;
         }
@@ -1088,7 +1078,6 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
 function ct_user_register($user_id) {
     global $ct_session_request_id_label;
 
-    ct_init_session();
     if (isset($_SESSION[$ct_session_request_id_label])) {
         update_user_meta($user_id, 'ct_hash', $_SESSION[$ct_session_request_id_label]);
 	unset($_SESSION[$ct_session_request_id_label]);
@@ -1114,7 +1103,7 @@ function ct_grunion_contact_form_field_html($r, $field_label) {
             }
         }
 
-        $r .= ct_add_hidden_fields(0, $ct_checkjs_jpcf, true);
+        $r .= ct_add_hidden_fields(null, $ct_checkjs_jpcf, true);
         $ct_jpcf_patched = true;
     }
 
@@ -1195,7 +1184,7 @@ function ct_wpcf7_form_elements($html) {
         return $html;
     }
 
-    $html .= ct_add_hidden_fields(0, $ct_checkjs_cf7, true);
+    $html .= ct_add_hidden_fields(null, $ct_checkjs_cf7, true);
 
     return $html;
 }
@@ -1273,7 +1262,7 @@ function ct_wpcf7_display_message($message, $status) {
  * Inserts anti-spam hidden to Fast Secure contact form
  */
 function ct_si_contact_display_after_fields($string = '', $style = '', $form_errors = array(), $form_id_num = 0) {
-    $string .= ct_add_hidden_fields(0, 'ct_checkjs', true);
+    $string .= ct_add_hidden_fields(null, 'ct_checkjs', true);
     return $string;
 }
 
@@ -1428,12 +1417,7 @@ function ct_s2member_registration_test() {
         return null;
     }
     
-    ct_init_session();
-    if (array_key_exists('formtime', $_SESSION)) {
-        $submit_time = time() - (int) $_SESSION['formtime'];
-    } else {
-        $submit_time = null;
-    }
+    $submit_time = submit_time_test();
 
     $checkjs = js_test('ct_checkjs', $_COOKIE);
 
