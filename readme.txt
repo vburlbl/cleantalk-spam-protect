@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 No spam comments, no spam registrations, no spam contact emails in WordPress.
 
 == Description ==
-CleanTalk is an antispam protection **4 in 1 for WordPress** that protects login, comment, and WooCommerce forms all at once. You don't need to install separate antispam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
+CleanTalk is an antispam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate antispam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
 
 CleanTalk is a transparent antispam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see antispam statistics wherever whenever.
 
