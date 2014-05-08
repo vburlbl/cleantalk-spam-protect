@@ -7,11 +7,10 @@ Stable tag: 2.42
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam contact emails.
+No spam comments, no spam registrations, no spam contact emails in WordPress.
 
 == Description ==
-We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.  
-
+We have developed anti-spam for WordPress that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.  
 = Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
@@ -81,12 +80,19 @@ Use other antispam plugins not necessarily, because CleanTalk stops up to 100% o
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anit spam options for spam bots protection.
 
-= After installing the plugin, I noticed in the statistics that spam attacks became more =
-This may be influenced by several factors:
+= After the installation I noticed in the statistics that the number of spam attacks had increased =
+There are a few reasons for this:
 
-* As the indexing of your site by search engines, the appearance of external links and growth positions in the search results, your website becomes aware of an increasing number of spam bots.
-* On the opaque protection systems such as CAPTCHA or question&answer, which do not have statistics on incoming spam attacks, you do not see the real picture or it is not complete.
-* Calculation methods for spam attacks and spam bots from system to system may differ, so maybe the difference. We try to provide detailed statistics.
+* With the indexing of your web-site by the search systems, appearance of external links and better search results position, your web-site attracts more and more spambots.
+* Non-transparent protection systems like CAPTCHA or question/answer, that don't have spam attacks statistics, don't let you see the whole picture, or the picture is incomplete.
+* Counting methods for spam attacks and spambots are different for different systems, which explains the diversity. We seek to provide detailed statistics.
+
+= Why my dummy "spam" comment passed to the WordPress? =
+The plugin has several options to detect spam bots and humans. If you just post spammy text like this,
+
+    "I want to sell something", "Buy something here.." and etc
+
+The comments will be passed, becuase the plugin detect sender as a human. So, use special email *stop_email@example.com* to test anti-spam or wait a few days to see how the plugin works. 
 
 == Other notes ==
 
