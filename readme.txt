@@ -10,17 +10,13 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 No spam comments, no spam registrations, no spam contact emails in WordPress.
 
 == Description ==
-CleanTalk is an antispam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate antispam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
+No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
-CleanTalk is a transparent antispam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see antispam statistics wherever whenever.
-
-We have developed anti-spam for WordPress that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.  
 = Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 1. Stops spam pingbacks, trackbacks.
-1. No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
@@ -31,6 +27,12 @@ We have developed anti-spam for WordPress that would provide **maximum protectio
 * WordPress Landing Pages.
 
 = Anti spam plugin info = 
+CleanTalk is an antispam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate antispam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
+
+CleanTalk is a transparent antispam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see antispam statistics wherever whenever.
+
+We have developed anti-spam for WordPress that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
+
 The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So, we are started an anti-spam project called CleanTalk.
 
 = Additional features =
