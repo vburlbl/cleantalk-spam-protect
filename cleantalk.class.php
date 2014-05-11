@@ -899,7 +899,7 @@ class Cleantalk {
 
             $encoding = mb_detect_encoding($str);
             if ($encoding)
-                return mb_convert_encoding($str, 'UTF-8', $encoding);
+                return @mb_convert_encoding($str, 'UTF-8', $encoding);
         }
         
         return $str;
