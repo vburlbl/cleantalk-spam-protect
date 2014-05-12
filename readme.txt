@@ -35,6 +35,13 @@ We have developed anti-spam for WordPress that would provide **maximum protectio
 
 The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So, we are started an anti-spam project called CleanTalk.
 
+The CleanTalk is premium anti-spam for WordPress, please look at the <a href="http://cleantalk.org/price">pricing</a>. We try to provide the service at the highest level and we can not afford to offer a free version of our service, as this will immediately affect the quality of providing anti spam protection. Paying for a year of service, you save a lot more and get:
+
+* Up to 100% protection from spam bots.
+* Simple and convenient form of commenting/registrations without captcha.
+* Always actual and regular updates.
+* Technical support.
+
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
 * Apps for iPhone, Android to control anti spam service, comments, signups, contacts. With traffic and spam statistics for last 7 days.
