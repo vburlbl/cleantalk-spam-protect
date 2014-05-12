@@ -1,8 +1,8 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz, spammy, капча
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz, spammy, капча, s2member
 Requires at least: 3.0
-Tested up to: 3.9
+Tested up to: 3.9.1
 Stable tag: 2.42
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
-* WordPress, BuddyPress, bbPress signups.
+* WordPress, BuddyPress, bbPress, S2Member signups.
 * Formiadble forms, Contact form 7, JetPack Contact form.
 * WooCommerce review form.
 * Fast Secure Contact form.
@@ -125,6 +125,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 2.44 2014-05-12 =
+  * Added: Anti-spam protection for S2Member framework. 
+  * Improved: JavaScript anti-spam test. 
+  * Improved: Plugin load time for backend and frontend. 
+  * Fixed: PHP warning mb_convert_encoding()  
+
 = 2.42 2014-04-29 =
   * Fixed: JavaScript anti-spam test for comments. 
 
@@ -300,6 +306,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.44 2014-05-12 =
+  * Added: Anti-spam protection for S2Member framework. 
+  * Improved: Plugin load time for backend and frontend. 
+  * Improved: JavaScript anti-spam test. 
+  * Fixed: PHP warning mb_convert_encoding()
+
 = 2.42 2014-04-29 =
   * Fixed: JavaScript anti-spam test for comments.
    
