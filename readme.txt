@@ -70,7 +70,6 @@ Plugin uses several simple tests to stop spammers.
 * JavaScript antispam test.
 * Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
 * Comment submit time. Spam bots usually send post immediately after page load.
-* Relevance test for the comment. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
 
 = How plugin works with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.

@@ -898,8 +898,12 @@ class Cleantalk {
                 return mb_convert_encoding($str, 'UTF-8', $data_codepage);
 
             $encoding = mb_detect_encoding($str);
-            if ($encoding)
-                return @mb_convert_encoding($str, 'UTF-8', $encoding);
+            if ($encoding && $encoding != 'UTF-8') {
+                $str = mb_convert_encoding($str, 'UTF-8', $encoding);
+            } else {
+                // Final cut of non UTF-8 characters 
+                $str = preg_replace('/[^(\x20-\x7F)]*/','', $str);
+            }
         }
         
         return $str;
