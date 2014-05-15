@@ -62,6 +62,15 @@ $ct_post_data_label = 's2member_pro_paypal_registration';
 // Form time load label  
 $ct_formtime_label = 'formtime'; 
 
+// Characters list for random password generation
+$ct_password_list = '0123456789';
+
+// Random password length
+$ct_password_length = 4; 
+
+// Name of the array with random passwords
+$ct_post_id_label = 'ct_post_id';
+
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -117,6 +126,9 @@ if (is_admin()) {
     add_filter('plugin_row_meta', 'ct_register_plugin_links', 10, 2);
     add_filter('plugin_action_links', 'ct_plugin_action_links', 10, 2);
     add_action('updated_option', 'ct_update_option'); // param - option name, i.e. 'cleantalk_settings'
+} else {
+	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-utils.php');
+    wp_enqueue_script('ct_utills', plugins_url('/cleantalk-utils.js', __FILE__));
 }
 
 /**
@@ -417,14 +429,13 @@ function ct_footer_add_cookie() {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
-    global $ct_checkjs_def, $ct_formtime_label;
-
-    $ct_checkjs_key = ct_get_checkjs_value(); 
+    global $ct_checkjs_def, $ct_formtime_label, $ct_password_list, $ct_password_length, $ct_post_id_label;
     
     $_SESSION[$ct_formtime_label] = time();
 
     if ($cookie_check) { 
-			$html = '
+        $ct_checkjs_key = ct_get_checkjs_value(); 
+		$html = '
 <script type="text/javascript">
 // <![CDATA[
 function ctSetCookie(c_name, value) {
@@ -436,29 +447,43 @@ ctSetCookie("%s", "%s");
 ';
 		$html = sprintf($html, $field_name, $ct_checkjs_key);
     } else {
-    		$field_id = $field_name . '_' . md5(rand(0, 1000));
-			$html = '
+        $post_id = md5(time() . '_' . rand(0, 1000));
+    	$field_id = $field_name . '_' . $post_id;
+
+        $password = ct_random_password($ct_password_length, $ct_password_list);
+        $ct_checkjs_key = ct_get_checkjs_value($password);
+
+		$html = '
 <input type="hidden" id="%s" name="%s" value="%s" />
+<input type="hidden" name="ct_post_id" value="%s" />
 <script type="text/javascript">
 // <![CDATA[
 var ct_input_name = \'%s\';
 var ct_input_value = document.getElementById(ct_input_name).value;
-var ct_input_challenge = \'%s\'; 
+var ct_password_length = %d; 
+var ct_password_list = \'%s\'; 
 
-document.getElementById(ct_input_name).value = document.getElementById(ct_input_name).value.replace(ct_input_value, ct_input_challenge);
+window.setTimeout(ct_find_password(), 1000);
 
-if (document.getElementById(ct_input_name).value == ct_input_value) {
-    document.getElementById(ct_input_name).value = ct_set_challenge(ct_input_challenge); 
-}
+function ct_find_password(){
+    var ct_password = ""; 
+    var ct_password_encrypted = "";
+    var i = 0;
+    while (ct_password_encrypted != ct_input_value) {
+        ct_password = ct_random_password(ct_password_length, ct_password_list);
+        ct_password_encrypted = md5(ct_password);
+        i++;
+    }
+    document.getElementById(ct_input_name).value = ct_password_encrypted; 
+};
 
-function ct_set_challenge(val) {
-    return val; 
-}; 
 
 // ]]>
 </script>
 ';
-		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_checkjs_key);
+		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_key, $post_id, $field_id, $ct_password_length, $ct_password_list);
+
+        $_SESSION[$ct_post_id_label][$post_id] =  $password;
     };
 
     if ($return_string === true) {
@@ -731,6 +756,8 @@ function ct_die_extended($comment_body) {
  *
  */
 function js_test($field_name = 'ct_checkjs', $data = null) {
+    global $ct_post_id_label;
+
     $checkjs = null;
     $js_post_value = null;
     
@@ -738,12 +765,23 @@ function js_test($field_name = 'ct_checkjs', $data = null) {
         return $checkjs;
 
     if (isset($data[$field_name])) {
+        $checkjs = 0;
+
 	    $js_post_value = $data[$field_name];
-        $ct_challenge = ct_get_checkjs_value();
-        if(preg_match("/$ct_challenge/", $js_post_value)) {
-            $checkjs = 1;
+        
+        if (isset($data[$ct_post_id_label])) {
+            // Cryptograhic test
+            if (isset($_SESSION[$ct_post_id_label][$data[$ct_post_id_label]])) {
+                $ct_challenge = md5($_SESSION[$ct_post_id_label][$data[$ct_post_id_label]]); 
+            }
+            if($ct_challenge == $js_post_value) {
+                $checkjs = 1;
+            }
         } else {
-            $checkjs = 0; 
+            $ct_challenge = ct_get_checkjs_value();
+            if(preg_match("/$ct_challenge/", $js_post_value)) {
+                $checkjs = 1;
+            }
         }
     }
 
@@ -898,10 +936,11 @@ function ct_plugin_active($plugin_name){
  * Get ct_get_checkjs_value 
  * @return string
  */
-function ct_get_checkjs_value() {
-    $options = ct_get_options();
-
-    $salt = $options['apikey'] . '+' . get_option('admin_email');
+function ct_get_checkjs_value($salt = null) {
+    if (!$salt) {
+        $options = ct_get_options();
+        $salt = $options['apikey'] . '+' . get_option('admin_email');
+    }
 
     return md5($salt); 
 }
