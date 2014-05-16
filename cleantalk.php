@@ -11,6 +11,8 @@
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 $ct_agent_version = 'wordpress-244';
+$ct_plugin_name = 'Anti-spam by CleanTalk';
+$ct_session_name = 'cleantalksession';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
@@ -66,7 +68,7 @@ $ct_formtime_label = 'formtime';
 $ct_password_list = '0123456789';
 
 // Random password length
-$ct_password_length = 4; 
+$ct_password_length = 3; 
 
 // Name of the array with random passwords
 $ct_post_id_label = 'ct_post_id';
@@ -311,8 +313,10 @@ function ct_send_feedback($feedback_request = null) {
  * @return null;
  */
 function ct_init_session() {
+    global $ct_session_name;
+
     if(session_id() === '') {
-        session_name('cleantalksession');
+        session_name($ct_session_name);
         @session_start();
     }
 
@@ -429,7 +433,7 @@ function ct_footer_add_cookie() {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
-    global $ct_checkjs_def, $ct_formtime_label, $ct_password_list, $ct_password_length, $ct_post_id_label;
+    global $ct_checkjs_def, $ct_formtime_label, $ct_password_list, $ct_password_length, $ct_post_id_label, $ct_plugin_name;
     
     $_SESSION[$ct_formtime_label] = time();
 
@@ -450,7 +454,8 @@ ctSetCookie("%s", "%s");
         $post_id = md5(time() . '_' . rand(0, 1000));
     	$field_id = $field_name . '_' . $post_id;
 
-        $password = ct_random_password($ct_password_length, $ct_password_list);
+        $password = ct_random_password($ct_password_length, $ct_password_list) . $post_id;
+        
         $ct_checkjs_key = ct_get_checkjs_value($password);
 
 		$html = '
@@ -462,29 +467,32 @@ var ct_input_name = \'%s\';
 var ct_input_value = document.getElementById(ct_input_name).value;
 var ct_password_length = %d; 
 var ct_password_list = \'%s\'; 
+var ct_post_id = \'%s\'; 
 
-window.setTimeout(ct_find_password(), 1000);
+window.setTimeout(ct_find_password(), 500);
 
 function ct_find_password(){
     var ct_password = ""; 
     var ct_password_encrypted = "";
-    var i = 0;
+    var ct_password_mixed = "";
     while (ct_password_encrypted != ct_input_value) {
         ct_password = ct_random_password(ct_password_length, ct_password_list);
-        ct_password_encrypted = md5(ct_password);
-        i++;
+        ct_password_mixed = ct_password +  ct_post_id;
+        ct_password_encrypted = md5(ct_password_mixed);
     }
-    document.getElementById(ct_input_name).value = ct_password_encrypted; 
+    document.getElementById(ct_input_name).value = ct_password_mixed;
+
+    return null;
 };
-
-
 // ]]>
 </script>
 ';
-		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_key, $post_id, $field_id, $ct_password_length, $ct_password_list);
+		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_key, $post_id, $field_id, $ct_password_length, $ct_password_list, $post_id);
 
-        $_SESSION[$ct_post_id_label][$post_id] =  $password;
+        $_SESSION[$ct_post_id_label][$post_id] = $password;
     };
+    
+    $html .= '<noscript><p><b>Please enable JavaScript and Cookies to pass anti-spam protection!</b><br />Here are the instructions how to enable JavaScript in your web browser <a href="http://www.enable-javascript.com" rel="nofollow" target="_blank">http://www.enable-javascript.com</a>.<br />' . $ct_plugin_name . '.</p></noscript>';
 
     if ($return_string === true) {
         return $html;
@@ -552,6 +560,8 @@ function ct_frm_validate_entry ($errors, $values) {
     if ($options['contact_forms_test'] == 0) {
         return false;
     }
+    
+    ct_check_cookies();
 
     $checkjs = js_test($ct_checkjs_frm, $_POST);
 
@@ -598,7 +608,7 @@ function ct_preprocess_comment($comment) {
     // this action is called by wp-comments-post.php
     // after processing WP makes redirect to post page with comment's form by GET request (see above)
     global $wpdb, $current_user, $comment_post_id, $ct_agent_version, $ct_comment_done, $ct_approved_request_id_label, $ct_jp_comments;
-
+    
     $options = ct_get_options();
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || $ct_comment_done) {
         return $comment;
@@ -637,6 +647,7 @@ function ct_preprocess_comment($comment) {
 
     $post = get_post($comment_post_id);
 
+    ct_check_cookies();
     $checkjs = js_test('ct_checkjs', $_POST);
 
     $example = null;
@@ -772,7 +783,7 @@ function js_test($field_name = 'ct_checkjs', $data = null) {
         if (isset($data[$ct_post_id_label])) {
             // Cryptograhic test
             if (isset($_SESSION[$ct_post_id_label][$data[$ct_post_id_label]])) {
-                $ct_challenge = md5($_SESSION[$ct_post_id_label][$data[$ct_post_id_label]]); 
+                $ct_challenge = $_SESSION[$ct_post_id_label][$data[$ct_post_id_label]]; 
             }
             if($ct_challenge == $js_post_value) {
                 $checkjs = 1;
@@ -1153,6 +1164,8 @@ function ct_grunion_contact_form_field_html($r, $field_label) {
  */
 function ct_contact_form_is_spam($form) {
     global $ct_checkjs_jpcf;
+    
+    ct_check_cookies();
 
     $options = ct_get_options();
 
@@ -1165,6 +1178,7 @@ function ct_contact_form_is_spam($form) {
         if (preg_match("/^.+$ct_checkjs_jpcf$/", $k))
            $js_field_name = $k; 
     }
+
     $checkjs = js_test($js_field_name, $_COOKIE);
 
     $sender_info = array(
@@ -1242,6 +1256,8 @@ function ct_wpcf7_spam($spam) {
         return $spam;
     }
 
+    ct_check_cookies();
+
     $checkjs = js_test($ct_checkjs_cf7, $_POST);
 
     $post_info['comment_type'] = 'feedback';
@@ -1316,6 +1332,7 @@ function ct_si_contact_form_validate($form_errors = array(), $form_id_num = 0) {
     if ($options['contact_forms_test'] == 0)
 	return $form_errors;
 
+    ct_check_cookies();
     $checkjs = js_test('ct_checkjs', $_POST);
 
     $post_info['comment_type'] = 'feedback';
@@ -1366,13 +1383,13 @@ function ct_si_contact_form_validate($form_errors = array(), $form_id_num = 0) {
  * @param 	string $hook URL of hooked page
  */
 function ct_comment_text($comment_text) {
-    global $comment, $ct_approved_request_id_label;
+    global $comment, $ct_approved_request_id_label, $ct_plugin_name;
 
     if (isset($_COOKIE[$ct_approved_request_id_label])) {
         $ct_hash = get_comment_meta($comment->comment_ID, 'ct_hash', true);
 
         if ($ct_hash !== '' && $_COOKIE[$ct_approved_request_id_label] == $ct_hash) {
-            $comment_text .= '<br /><br /> <em class="comment-awaiting-moderation">' . __('Comment is approved. Anti-spam by CleanTalk.', 'cleantalk') . '</em>'; 
+            $comment_text .= '<br /><br /> <em class="comment-awaiting-moderation">' . __("Comment is approved. $ct_plugin_name.", 'cleantalk') . '</em>'; 
         }
     }
 
@@ -1390,6 +1407,8 @@ function ct_check_wplp(){
 	$options = ct_get_options();
 	if ($options['contact_forms_test'] == 0)
     	    return;
+    
+    ct_check_cookies();
 
     $checkjs = js_test('ct_checkjs', $_COOKIE);
 
@@ -1457,6 +1476,8 @@ function ct_s2member_registration_test() {
     }
     
     $submit_time = submit_time_test();
+    
+    ct_check_cookies();
 
     $checkjs = js_test('ct_checkjs', $_COOKIE);
 
