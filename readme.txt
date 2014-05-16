@@ -16,7 +16,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
-1. Stops spam pingbacks, trackbacks.
+1. Stops spam trackbacks.
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
