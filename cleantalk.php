@@ -462,7 +462,7 @@ function ct_set_challenge(val) {
 		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_checkjs_key);
     };
     
-    $html .= '<noscript><p><b>Please enable JavaScript and Cookies to pass anti-spam protection!</b><br />Here are the instructions how to enable JavaScript in your web browser <a href="http://www.enable-javascript.com" rel="nofollow" target="_blank">http://www.enable-javascript.com</a>.<br />' . $ct_plugin_name . '.</p></noscript>';
+    $html .= '<noscript><p><b>Please enable JavaScript to pass anti-spam protection!</b><br />Here are the instructions how to enable JavaScript in your web browser <a href="http://www.enable-javascript.com" rel="nofollow" target="_blank">http://www.enable-javascript.com</a>.<br />' . $ct_plugin_name . '.</p></noscript>';
 
     if ($return_string === true) {
         return $html;
