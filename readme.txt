@@ -1,42 +1,46 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comment, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz, spammy, капча, s2member
 Requires at least: 3.0
-Tested up to: 3.9
-Stable tag: 2.40
+Tested up to: 3.9.1
+Stable tag: 2.46
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam contact emails.
+No spam comments, no spam registrations, no spam contact emails in WordPress.
 
 == Description ==
-We have developed anti-spam CleanTalk that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.  
+No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
 = Anti-spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
-1. Stops spam pingbacks, trackbacks.
-1. No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
+1. Stops spam trackbacks.
 
 = Anti-spam protection =
 * WordPress, JetPack comments.
-* WordPress, BuddyPress, bbPress signups.
+* WordPress, BuddyPress, bbPress, S2Member signups.
 * Formiadble forms, Contact form 7, JetPack Contact form.
 * WooCommerce review form.
 * Fast Secure Contact form.
 * WordPress Landing Pages.
 
-= Spam protection methods =
-Plugin uses several simple tests to stop spammers.
-
-1. JavaScript anti spam test. 99% spam bots doesn't have all JavaScript functions support. So, the plugin has code which can run normal visitor and can't run the spam bot.
-1. Checks by Email, IP, domains at spam activities list. The plugin online use spam activity database at cleantalk.org, which are consist more then 1 billion records about spam activity IPs, Email, Domains and ASN.If the senders IP or Email matches with database, the sender gets some spam scores. To reduce false/positive rate the plugin doesn't use only blacklist test to ban spammers. The sender will be banned only if multiple spam test failed. 
-1. Comment submit time. Spam bots usually send post immediately after page load, because spam bots not really fill the web form, they are only send $_POST data to the blog. The normal visitor send the data within several seconds or minutes.
-1. Relevance test for the comments. Spam bots posts send to the blog comments which are not matched with article by relevance, so the plugin can filter spam bots with offtop filter.
-
 = Anti spam plugin info = 
+CleanTalk is an antispam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate antispam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
+
+CleanTalk is a transparent antispam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see antispam statistics wherever whenever.
+
+We have developed anti-spam for WordPress that would provide **maximum protection from spam** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
+
 The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So, we are started an anti-spam project called CleanTalk.
+
+The CleanTalk is premium anti-spam for WordPress, please look at the <a href="http://cleantalk.org/price">pricing</a>. We try to provide the service at the highest level and we can not afford to offer a free version of our service, as this will immediately affect the quality of providing anti spam protection. Paying for a year of service, you save a lot more and get: 
+
+* Up to 100% protection from spam bots.
+* Simple and convenient form of commenting/registrations without captcha.
+* Always actual and regular updates.
+* Technical support.
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
@@ -59,15 +63,6 @@ The setup is done! You can control anti-spam plugin by <a href="http://cleantalk
 
 == Frequently Asked Questions ==
 
-= How plugin stops spam? =
-Plugin uses several simple tests to stop spammers.
-
-* Spam bots signatures.
-* JavaScript antispam test.
-* Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
-* Comment submit time. Spam bots usually send post immediately after page load.
-* Relevance test for the comment. Spam bots send offtop posts, so the plugin can filter spam bots by oftop.
-
 = How plugin works with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
@@ -88,6 +83,20 @@ Use other antispam plugins not necessarily, because CleanTalk stops up to 100% o
 
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
 The plugin is WordPress MultiUser (WPMU or WordPress network) compatible. Each blog in multisite environment has individual anit spam options for spam bots protection.
+
+= After the installation I noticed in the statistics that the number of spam attacks had increased =
+There are a few reasons for this:
+
+* With the indexing of your web-site by the search systems, appearance of external links and better search results position, your web-site attracts more and more spambots.
+* Non-transparent protection systems like CAPTCHA or question/answer, that don't have spam attacks statistics, don't let you see the whole picture, or the picture is incomplete.
+* Counting methods for spam attacks and spambots are different for different systems, which explains the diversity. We seek to provide detailed statistics.
+
+= Why my dummy "spam" comment passed to the WordPress? =
+The plugin has several options to detect spam bots and humans. If you just post spammy text like this,
+
+    "I want to sell something", "Buy something here.." and etc
+
+The comments will be passed, becuase the plugin detect sender as a human. So, use special email *stop_email@example.com* to test anti-spam or wait a few days to see how the plugin works. 
 
 == Other notes ==
 
@@ -114,6 +123,18 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 2.44 2014-05-19 =
+  * Added: HTML notice about the need to enable JavaScript. 
+  * Fixed: Fixed pingbacks anti-spam test. 
+
+= 2.44 2014-05-12 =
+  * Added: Anti-spam protection for S2Member framework. 
+  * Improved: JavaScript anti-spam test. 
+  * Improved: Plugin load time for backend and frontend. 
+  * Fixed: PHP warning mb_convert_encoding()  
+
+= 2.42 2014-04-29 =
+  * Fixed: JavaScript anti-spam test for comments. 
 
 = 2.40 2014-04-25 =
   * New: Fast Secure Contact form support.
@@ -287,6 +308,19 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.44 2014-05-19 =
+  * Added: HTML notice about the need to enable JavaScript. 
+  * Fixed: Fixed pingbacks anti-spam test. 
+
+= 2.44 2014-05-12 =
+  * Added: Anti-spam protection for S2Member framework. 
+  * Improved: Plugin load time for backend and frontend. 
+  * Improved: JavaScript anti-spam test. 
+  * Fixed: PHP warning mb_convert_encoding()
+
+= 2.42 2014-04-29 =
+  * Fixed: JavaScript anti-spam test for comments.
+   
 = 2.38 2014-03-27 =
   * Fixed: Registraion form submit time spam test. 
 
