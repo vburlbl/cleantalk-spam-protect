@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz, spammy, капча, s2member
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 2.44
+Stable tag: 2.46
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,14 +62,6 @@ The CleanTalk is premium anti-spam for WordPress, please look at the <a href="ht
 The setup is done! You can control anti-spam plugin by <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org or use <a href="https://play.google.com/store/apps/details?id=org.cleantalk.app">Adnroid</a>, <a href="https://itunes.apple.com/us/app/cleantalk/id825479913?mt=8">iPhone</a> anti-spam app. 
 
 == Frequently Asked Questions ==
-
-= How plugin stops spam? =
-Plugin uses several simple tests to stop spammers.
-
-* Spam bots signatures.
-* JavaScript antispam test.
-* Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
-* Comment submit time. Spam bots usually send post immediately after page load.
 
 = How plugin works with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
@@ -131,6 +123,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 2.44 2014-05-19 =
+  * Added: HTML notice about the need to enable JavaScript. 
+  * Fixed: Fixed pingbacks anti-spam test. 
+
 = 2.44 2014-05-12 =
   * Added: Anti-spam protection for S2Member framework. 
   * Improved: JavaScript anti-spam test. 
@@ -312,6 +308,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.44 2014-05-19 =
+  * Added: HTML notice about the need to enable JavaScript. 
+  * Fixed: Fixed pingbacks anti-spam test. 
+
 = 2.44 2014-05-12 =
   * Added: Anti-spam protection for S2Member framework. 
   * Improved: Plugin load time for backend and frontend. 
