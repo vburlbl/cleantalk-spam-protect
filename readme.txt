@@ -66,6 +66,14 @@ The setup is done! You can control anti-spam plugin by <a href="http://cleantalk
 = How plugin works with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
+= How plugin stops spam? =
+Plugin uses several simple tests to stop spammers.
+
+* Spam bots signatures.
+* JavaScript antispam test.
+* Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
+* Comment submit time. Spam bots usually send post immediately after page load.
+
 = Will anti spam protects my theme? =
 Plugin works with all WordPress themes, for example - Responsive, Twenty Eleven, Twenty Twelve, Twenty Ten, Twenty Thirteen, Sixteen, Radiate, Alexandria, Swift Basic, Ridizain, Customizr, Catch Box, Twenty Fourteen, Virtue, Tempera, Pinboard, hemingway, Vantage, Weaver II, Buzz, Omega, iFeature, Simple Catch and etc. With some themes may not works JavaScript anti-spam method, but it's not crucial to protect your blog from spam bots.
 
