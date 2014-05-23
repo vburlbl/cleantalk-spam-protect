@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, iphone, android, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, iphone, android, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cache
 Requires at least: 3.0
 Tested up to: 3.9.1
 Stable tag: 2.46
@@ -115,6 +115,9 @@ The plugin has several options to detect spam bots and humans. If you just post 
     "I want to sell something", "Buy something here.." and etc
 
 The comments will be passed, becuase the plugin detect sender as a human. So, use special email *stop_email@example.com* to test anti-spam or wait a few days to see how the plugin works. 
+
+= Can I use CleanTalk with cache plugins? =
+CleanTalk doesn't use static HTML code into templates, so all anit spam functions will works correctly with any WordPress cache plugins.
 
 == Other notes ==
 
