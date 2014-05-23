@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, спам, quiz, spammy, капча, s2member
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklists, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, iphone, android, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack
 Requires at least: 3.0
 Tested up to: 3.9.1
 Stable tag: 2.46
@@ -67,6 +67,14 @@ The setup is done! You can control anti-spam plugin by <a href="http://cleantalk
 
 = How plugin works with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+
+= How plugin stops spam? =
+Plugin uses several simple tests to stop spammers.
+
+* Spam bots signatures.
+* JavaScript antispam test.
+* Checks by Email, IP, web-sites domain at <a href="http://cleantalk.org/blacklists" target="_blank">spam activities list</a>.
+* Comment submit time. Spam bots usually send post immediately after page load.
 
 = How plugin stops spam? =
 Plugin uses several simple tests to stop spammers.
