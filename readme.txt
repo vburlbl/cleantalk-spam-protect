@@ -65,7 +65,7 @@ The setup is done! You can control anti-spam plugin by <a href="http://cleantalk
 
 == Frequently Asked Questions ==
 
-= How plugin works with spam comments? =
+= How does the plugin work with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
 = How does the plugin stop spam? =
@@ -82,11 +82,11 @@ Plugin works with all WordPress themes, for example - Responsive, Twenty Eleven,
 = How can I test anti-spam protection? =
 Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments processed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
-= How the plugin is effective against spam bots? =
+= Is the plugin effective against spam bots? =
 Plugin Anti-spam by CleanTalk stops up to 100% of spam comments, spam signups (registrations) and spam contact emails. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
 
 = What about pingback, trackback spam? = 
-Plugin by default pass not spam pingbacks/trackbacks (sender host clear at <a href="http://cleantalk.org/blacklists">blacklists IP</a> database) from third-party sites to the blog. If the pingback has more then 3 records in the blacklists and not relevant to the blog the pingback will be stopped by CleanTalk.
+Plugin by default pass pingbacks without any checks. All trackbacks will be blocked if the sender have spam activity.
 
 = Should I use another antispam plugins? =
 Use other antispam plugins not necessarily, because CleanTalk stops up to 100% of spam bots. In some cases several anti-spam plugins can conflict, so it will be better use just one plugin.  
