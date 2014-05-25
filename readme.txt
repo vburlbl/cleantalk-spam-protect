@@ -68,7 +68,7 @@ The setup is done! You can control anti-spam plugin by <a href="http://cleantalk
 = How plugin works with spam comments? =
 Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
 
-= How plugin stops spam? =
+= How does the plugin stop spam? =
 Plugin uses several simple tests to stop spammers.
 
 * Spam bots signatures.
