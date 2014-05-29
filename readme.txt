@@ -7,7 +7,7 @@ Stable tag: 2.46
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam contact emails in WordPress.
+No spam comments, no spam registrations, no spam contact emails in WordPress. Anti spam without annoying CAPTCHAs.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
@@ -43,6 +43,9 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
 * Simple and convenient form of commenting/registrations without captcha.
 * Always actual and regular updates.
 * Technical support.
+
+= CAPTCHA = 
+The annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots won’t discern these symbols, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource from visitors. Spam bots can automatically recognize Captcha. Spam bots can not pass through the anti-spam CleanTalk, complex invisible checks can immediately detect spam bots.
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
