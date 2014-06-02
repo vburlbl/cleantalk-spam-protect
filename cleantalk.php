@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk 
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.46
+  Version: 2.47
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-246';
+$ct_agent_version = 'wordpress-247';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -57,8 +57,11 @@ $ct_wplp_result_label = 'ct_wplp_result';
 // Flag indicates active JetPack comments 
 $ct_jp_comments = false;
 
-// S2member post data label
+// S2member PayPal post data label
 $ct_post_data_label = 's2member_pro_paypal_registration'; 
+
+// S2member Auth.Net post data label
+$ct_post_data_authnet_label = 's2member_pro_authnet_registration'; 
 
 // Form time load label  
 $ct_formtime_label = 'formtime'; 
@@ -125,7 +128,7 @@ if (is_admin()) {
  * @return 	mixed[] Array of options
  */
 function ct_init() {
-    global $ct_wplp_result_label, $ct_jp_comments, $ct_post_data_label;
+    global $ct_wplp_result_label, $ct_jp_comments, $ct_post_data_label, $ct_post_data_authnet_label;
 
     ct_init_session();
 
@@ -155,7 +158,7 @@ function ct_init() {
     }
     
     // intercept S2member POST
-    if (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION') && isset($_POST[$ct_post_data_label]['email'])){
+    if (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION') && (isset($_POST[$ct_post_data_label]['email']) || isset($_POST[$ct_post_data_authnet_label]['email']))){
         ct_s2member_registration_test(); 
     }
 }
@@ -1405,7 +1408,7 @@ function ct_check_wplp(){
  * @return array with errors 
  */
 function ct_s2member_registration_test() {
-    global $ct_agent_version, $ct_post_data_label;
+    global $ct_agent_version, $ct_post_data_label, $ct_post_data_authnet_label;
     
     $options = ct_get_options();
     if ($options['registrations_test'] == 0) {
@@ -1431,10 +1434,16 @@ function ct_s2member_registration_test() {
     $sender_email = null;
     if (isset($_POST[$ct_post_data_label]['email']))
         $sender_email = $_POST[$ct_post_data_label]['email'];
+    
+    if (isset($_POST[$ct_post_data_authnet_label]['email']))
+        $sender_email = $_POST[$ct_post_data_authnet_label]['email'];
 
     $sender_nickname = null;
     if (isset($_POST[$ct_post_data_label]['username']))
         $sender_nickname = $_POST[$ct_post_data_label]['username'];
+    
+    if (isset($_POST[$ct_post_data_authnet_label]['username']))
+        $sender_nickname = $_POST[$ct_post_data_authnet_label]['username'];
 
     $config = get_option('cleantalk_server');
 
