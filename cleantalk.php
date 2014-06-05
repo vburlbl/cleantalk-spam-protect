@@ -85,6 +85,10 @@ add_action('register_form','ct_register_form');
 add_filter('registration_errors', 'ct_registration_errors', 10, 3);
 add_action('user_register', 'ct_user_register');
 
+// Multisite registrations
+add_action('signup_extra_fields','ct_register_form');
+add_filter('wpmu_validate_user_signup', 'ct_registration_errors_wpmu', 10, 3);
+
 // BuddyPress
 add_action('bp_before_registration_submit_buttons','ct_register_form');
 add_filter('bp_signup_validate', 'ct_registration_errors');
@@ -962,6 +966,38 @@ function ct_login_message($message) {
     return $message;
 }
 
+/**
+ * Test users registration for multisite enviroment
+ * @return array with errors 
+ */
+function ct_registration_errors_wpmu($errors) {
+    //
+    // Multisite actions
+    //
+    $sanitized_user_login = null;
+    if (isset($errors['user_name'])) {
+        $sanitized_user_login = $errors['user_name']; 
+        $wpmu = true;
+    }
+    $user_email = null;
+    if (isset($errors['user_email'])) {
+        $user_email = $errors['user_email'];
+        $wpmu = true;
+    }
+    
+    if ($wpmu && isset($errors['errors']->errors) && count($errors['errors']->errors) > 0) {
+        return $errors;
+    }
+    $errors['errors'] = ct_registration_errors($errors['errors'], $sanitized_user_login, $user_email);
+    
+    // Show CleanTalk errors in user_name field
+    if (isset($errors['errors']->errors['ct_error'])) {
+       $errors['errors']->errors['user_name'] = $errors['errors']->errors['ct_error']; 
+       unset($errors['errors']->errors['ct_error']); 
+    }
+    
+    return $errors;
+}
 /**
  * Test users registration
  * @return array with errors 
