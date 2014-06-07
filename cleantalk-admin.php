@@ -30,7 +30,7 @@ function ct_admin_init() {
             $show_ct_notice_trial = true;
     } else {
         $options = ct_get_options();
-	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey'])) {
+	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey']) && 0) {
             $url = 'https://cleantalk.org/app_notice';
             $server_timeout = 1;
             $data['auth_key'] = $options['apikey']; 
