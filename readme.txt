@@ -7,7 +7,7 @@ Stable tag: 2.46
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam contact emails in WordPress.
+SPAM defender for WordPress - no spam comments, no spam registrations, no spam contact emails. It's robutst anti-spam without CAPTCHAs.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.

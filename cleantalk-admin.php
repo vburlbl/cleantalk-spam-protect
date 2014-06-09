@@ -22,17 +22,25 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout, $pagenow;
 
     $show_ct_notice_trial = false;
     if (isset($_COOKIE[$ct_notice_trial_label])) {
         if ($_COOKIE[$ct_notice_trial_label] == 1)
             $show_ct_notice_trial = true;
     } else {
+        // Run function only on special pages
+        $working_pages = array("plugins.php", "options-general.php");
+        $do_request = false;
+        if (in_array($pagenow, $working_pages)) {
+            $do_request = true; 
+        }
+
         $options = ct_get_options();
-	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey']) && 0) {
+        $result = false;
+	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey']) && $do_request) {
             $url = 'https://cleantalk.org/app_notice';
-            $server_timeout = 1;
+            $server_timeout = 2;
             $data['auth_key'] = $options['apikey']; 
             $data['param'] = 'notice_paid_till'; 
 
@@ -62,8 +70,10 @@ function ct_admin_init() {
                 }
             }
         }
-
-        setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"), '/');
+        
+        if ($result) {
+            setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"), '/');
+        }
     }
 
     $show_ct_notice_online = '';
@@ -229,15 +239,20 @@ input[type=submit] {padding: 10px; background: #3399FF; color: #fff; border:0 no
  * @return bool 
  */
 function admin_notice_message(){
-    global $show_ct_notice_trial, $show_ct_notice_online;
+    global $show_ct_notice_trial, $show_ct_notice_online, $ct_plugin_name;
 
     if (ct_active() === false)
 	    return false;
-
+   
     $options = ct_get_options();
     $show_notice = true;
     if ($show_notice && ct_valid_key($options['apikey']) === false) {
         echo '<div class="updated"><h3>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam!", 'cleantalk') . '</h3></div>';
+    }
+
+    if ($show_notice && $show_ct_notice_trial) {
+        echo '<div class="updated"><h3>' . __("<a href=\"options-general.php?page=cleantalk\">$ct_plugin_name</a> trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
+        $show_notice = false;
     }
 
     if ($show_notice && !empty($show_ct_notice_online)) {
@@ -248,11 +263,6 @@ function admin_notice_message(){
     	    echo __("Wrong </b><b style=\"color: #49C73B;\">Clean</b><b style=\"color: #349ebf;\">Talk</b><b> access key! Please check it or ask <a target=\"_blank\" href=\"https://cleantalk.org/forum/\">support</a>.", 'cleantalk');
 	}
         echo '</b></h3></div>';
-    }
-
-    if ($show_notice && $show_ct_notice_trial) {
-        echo '<div class="updated"><h3>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
-        $show_notice = false;
     }
 
     ct_send_feedback();
@@ -410,7 +420,7 @@ if (!function_exists ( 'ct_plugin_action_links')) {
  * @return array
 */
 function ct_update_option($option_name) {
-    global $show_ct_notice_online, $ct_notice_online_label;
+    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_check_timeout;
     if($option_name !== 'cleantalk_settings')
         return;
     $ct_base_call_result = ct_base_call(array(
@@ -428,7 +438,18 @@ function ct_update_option($option_name) {
         setcookie($ct_notice_online_label, 0, null, '/');
     }else{
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
+        setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_check_timeout minutes"), '/');
     }
+}
+
+
+/**
+ * Tests account status 
+ * @return array
+*/
+function ct_check_trial_notice() {
+     
+    return null;
 }
 
 ?>
