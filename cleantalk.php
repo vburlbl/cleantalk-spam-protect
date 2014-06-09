@@ -192,7 +192,7 @@ function ct_get_options() {
 function ct_def_options() {
     $lang = get_bloginfo('language');
     return array(
-        'server' => 'http://moderate.cleantalk.ru',
+        'server' => 'http://moderate.cleantalk.org',
         'apikey' => __('enter key', 'cleantalk'),
         'autoPubRevelantMess' => '1', 
         'registrations_test' => '1', 
@@ -263,6 +263,8 @@ function ct_feedback($hash, $message = null, $allow) {
  * @return bool
  */
 function ct_send_feedback($feedback_request = null) {
+
+    return false;
 
     if (empty($feedback_request) && isset($_SESSION['feedback_request']) && preg_match("/^[a-z0-9\;\:]+$/", $_SESSION['feedback_request'])) {
 	$feedback_request = $_SESSION['feedback_request'];
