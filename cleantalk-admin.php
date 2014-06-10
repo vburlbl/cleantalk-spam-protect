@@ -22,7 +22,7 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout, $pagenow;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout, $pagenow, $ct_plugin_name;
 
     $show_ct_notice_trial = false;
     if (isset($_COOKIE[$ct_notice_trial_label])) {
@@ -88,7 +88,7 @@ function ct_admin_init() {
     ct_init_session();
 
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
-    add_settings_section('cleantalk_settings_main', __('Anti-spam by CleanTalk', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
+    add_settings_section('cleantalk_settings_main', __($ct_plugin_name, 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
     add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
@@ -440,16 +440,6 @@ function ct_update_option($option_name) {
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
         setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_check_timeout minutes"), '/');
     }
-}
-
-
-/**
- * Tests account status 
- * @return array
-*/
-function ct_check_trial_notice() {
-     
-    return null;
 }
 
 ?>
