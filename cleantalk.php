@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.49
+  Version: 2.50
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-249';
+$ct_agent_version = 'wordpress-250';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -26,6 +26,9 @@ $ct_jpcf_fields = array('name', 'email');
 
 // Comment already proccessed
 $ct_comment_done = false;
+
+// Comment already proccessed
+$ct_signup_done = false;
 
 // Default value for JS test
 $ct_checkjs_def = 0;
@@ -107,7 +110,7 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
-
+        
 if (is_admin()) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
 
@@ -165,6 +168,15 @@ function ct_init() {
     if (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION') && (isset($_POST[$ct_post_data_label]['email']) || isset($_POST[$ct_post_data_authnet_label]['email']))){
         ct_s2member_registration_test(); 
     }
+    
+    //
+    // New user approve hack
+    // https://wordpress.org/plugins/new-user-approve/
+    //
+    if (ct_plugin_active('new-user-approve/new-user-approve.php')) {
+        add_action('register_post', 'ct_register_post', 1, 3);
+    }
+
 }
 
 /**
@@ -989,7 +1001,7 @@ function ct_registration_errors_wpmu($errors) {
         return $errors;
     }
     $errors['errors'] = ct_registration_errors($errors['errors'], $sanitized_user_login, $user_email);
-    
+
     // Show CleanTalk errors in user_name field
     if (isset($errors['errors']->errors['ct_error'])) {
        $errors['errors']->errors['user_name'] = $errors['errors']->errors['ct_error']; 
@@ -998,13 +1010,31 @@ function ct_registration_errors_wpmu($errors) {
     
     return $errors;
 }
+
+/**
+ *  Shell for action register_post 
+ * @return array with errors 
+ */
+function ct_register_post($sanitized_user_login = null, $user_email = null, $errors) {
+    return ct_registration_errors($errors, $sanitized_user_login, $user_email);
+}
+
 /**
  * Test users registration
  * @return array with errors 
  */
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
-    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp;
-
+    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done;
+    
+    // If there is an error already, let it do it's thing
+    if ($errors->get_error_code()) {
+        return $errors;
+    }
+    
+    // The function already executed
+    if ($ct_signup_done) {
+        return $errors;
+    }
     //
     // BuddyPress actions
     //
@@ -1070,6 +1100,8 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
                 )
         );
     }
+    
+    $ct_signup_done = true;
 
     if ($ct_result->errno != 0) {
         return $errors;
