@@ -10,6 +10,7 @@
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
+
 $ct_agent_version = 'wordpress-250';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
@@ -111,7 +112,7 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
         
-if (is_admin()) {
+if (is_admin() && !(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
 
     add_action('admin_init', 'ct_admin_init', 1);

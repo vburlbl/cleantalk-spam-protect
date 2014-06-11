@@ -140,7 +140,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
-= 2.48 2014-06-10 =
+= 2.49 2014-06-10 =
   * Added spam protection for S2Member Auth.net forms. 
   * Added spam protection for multisite signup form.
   * Optimized account status check function.
@@ -330,7 +330,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
-= 2.48 2014-06-10 =
+= 2.49 2014-06-10 =
   * Added spam protection for S2Member Auth.net forms. 
   * Added spam protection for multisite signup form.
   * Optimized account status check function.
