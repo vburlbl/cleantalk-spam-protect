@@ -216,7 +216,7 @@ function ct_def_options() {
         'contact_forms_test' => '1', 
         'remove_old_spam' => '0',
         'spam_store_days' => '31', // Days before delete comments from folder Spam 
-        'ssl_on' => 1 // Secure connection to servers 
+        'ssl_on' => 0 // Secure connection to servers 
     );
 }
 
