@@ -1,16 +1,16 @@
 <?php
 /*
-  Plugin Name: Anti-spam by CleanTalk 
+  Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.47
+  Version: 2.50
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-247';
+$ct_agent_version = 'wordpress-250';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -26,6 +26,9 @@ $ct_jpcf_fields = array('name', 'email');
 
 // Comment already proccessed
 $ct_comment_done = false;
+
+// Comment already proccessed
+$ct_signup_done = false;
 
 // Default value for JS test
 $ct_checkjs_def = 0;
@@ -64,7 +67,16 @@ $ct_post_data_label = 's2member_pro_paypal_registration';
 $ct_post_data_authnet_label = 's2member_pro_authnet_registration'; 
 
 // Form time load label  
-$ct_formtime_label = 'formtime'; 
+$ct_formtime_label = 'formtime';
+
+// Profiler proccess ID
+$ct_profiler_proccess_id = null;
+
+// Profiler last execution time 
+$ct_profiler_last_run = null;
+
+// Enable code profiler
+$ct_enable_profiler = true;
 
 // Init action.
 add_action('init', 'ct_init', 1);
@@ -107,8 +119,8 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
-
-if (is_admin()) {
+        
+if (is_admin() && !(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
 
     add_action('admin_init', 'ct_admin_init', 1);
@@ -165,6 +177,15 @@ function ct_init() {
     if (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION') && (isset($_POST[$ct_post_data_label]['email']) || isset($_POST[$ct_post_data_authnet_label]['email']))){
         ct_s2member_registration_test(); 
     }
+    
+    //
+    // New user approve hack
+    // https://wordpress.org/plugins/new-user-approve/
+    //
+    if (ct_plugin_active('new-user-approve/new-user-approve.php')) {
+        add_action('register_post', 'ct_register_post', 1, 3);
+    }
+
 }
 
 /**
@@ -192,7 +213,7 @@ function ct_get_options() {
 function ct_def_options() {
     $lang = get_bloginfo('language');
     return array(
-        'server' => 'http://moderate.cleantalk.ru',
+        'server' => 'http://moderate.cleantalk.org',
         'apikey' => __('enter key', 'cleantalk'),
         'autoPubRevelantMess' => '1', 
         'registrations_test' => '1', 
@@ -989,7 +1010,7 @@ function ct_registration_errors_wpmu($errors) {
         return $errors;
     }
     $errors['errors'] = ct_registration_errors($errors['errors'], $sanitized_user_login, $user_email);
-    
+
     // Show CleanTalk errors in user_name field
     if (isset($errors['errors']->errors['ct_error'])) {
        $errors['errors']->errors['user_name'] = $errors['errors']->errors['ct_error']; 
@@ -998,13 +1019,31 @@ function ct_registration_errors_wpmu($errors) {
     
     return $errors;
 }
+
+/**
+ *  Shell for action register_post 
+ * @return array with errors 
+ */
+function ct_register_post($sanitized_user_login = null, $user_email = null, $errors) {
+    return ct_registration_errors($errors, $sanitized_user_login, $user_email);
+}
+
 /**
  * Test users registration
  * @return array with errors 
  */
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
-    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp;
-
+    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done;
+    
+    // If there is an error already, let it do it's thing
+    if ($errors->get_error_code()) {
+        return $errors;
+    }
+    
+    // The function already executed
+    if ($ct_signup_done) {
+        return $errors;
+    }
     //
     // BuddyPress actions
     //
@@ -1070,6 +1109,8 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
                 )
         );
     }
+    
+    $ct_signup_done = true;
 
     if ($ct_result->errno != 0) {
         return $errors;
@@ -1519,6 +1560,56 @@ function ct_s2member_registration_test() {
     }
 
     return true;
+}
+
+/**
+ * Writes to log execution time CleanTalk's functions  
+ * @return null 
+ */
+function ct_profiler ($file, $line) {
+    global $ct_profiler_proccess_id, $ct_profiler_last_run, $ct_enable_profiler;
+    
+    if (!$ct_enable_profiler) {
+        return null;
+    }
+    
+    if ($ct_profiler_proccess_id === null) {
+        $ct_profiler_proccess_id = md5(time() . rand(0, 10000));
+    }
+    
+    $warning_label = '';
+    if ($ct_profiler_last_run === null) {
+        $ct_profiler_last_run = microtime();
+    } else {
+        $ct_profiler_last_run = microtime() - $ct_profiler_last_run;
+        
+        $max_execute_time = 1.0;
+        if ((float) $ct_profiler_last_run >= $max_execute_time) {
+            $warning_label = 'WARNING!!!';
+        }
+    }
+    
+    $file = preg_replace("/^.+\/(.+)$/", "$1", $file);
+
+    $log_file = CLEANTALK_PLUGIN_DIR . 'ct-profiler.php'; 
+    $fp = fopen($log_file, 'a+') or error_log('Could not open file:' . $file);
+    
+    //
+    // PROFILE_ID   FILE    LINE_NUM    CURRENT_TIME    MILLISECONDS_FROM_LAST_RUN
+    //
+    $to_file = sprintf("%s\t%s\t%d\t%s\t%.3f\t%s\n", 
+        $ct_profiler_proccess_id, 
+        $file, 
+        $line, 
+        date("Y-m-d H:i:s"), 
+        $ct_profiler_last_run,
+        $warning_label
+    );
+
+    fwrite($fp, $to_file);
+    fclose($fp);   
+    
+    return null;
 }
 
 ?>

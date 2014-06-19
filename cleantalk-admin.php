@@ -7,6 +7,7 @@ $ct_plugin_basename = 'cleantalk-spam-protect/cleantalk.php';
  * @param 	string $hook URL of hooked page
  */
 function ct_enqueue_scripts($hook) {
+    ct_profiler(__FILE__, __LINE__);
     if ($hook == 'edit-comments.php')
         wp_enqueue_script('ct_reload_script', plugins_url('/cleantalk-rel.js', __FILE__));
 }
@@ -15,6 +16,7 @@ function ct_enqueue_scripts($hook) {
  * Admin action 'admin_menu' - Add the admin options page
  */
 function ct_admin_add_page() {
+    ct_profiler(__FILE__, __LINE__);
     add_options_page(__('CleanTalk settings', 'cleantalk'), '<b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk</b>', 'manage_options', 'cleantalk', 'ct_settings_page');
 }
 
@@ -22,17 +24,26 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout;
-
+    ct_profiler(__FILE__, __LINE__);
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout, $pagenow, $ct_plugin_name;
+    
     $show_ct_notice_trial = false;
     if (isset($_COOKIE[$ct_notice_trial_label])) {
         if ($_COOKIE[$ct_notice_trial_label] == 1)
             $show_ct_notice_trial = true;
     } else {
+        // Run function only on special pages
+        $working_pages = array("plugins.php", "options-general.php");
+        $do_request = false;
+        if (in_array($pagenow, $working_pages)) {
+            $do_request = true; 
+        }
+
         $options = ct_get_options();
-	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey']) && 0) {
+        $result = false;
+	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey']) && $do_request) {
             $url = 'https://cleantalk.org/app_notice';
-            $server_timeout = 1;
+            $server_timeout = 2;
             $data['auth_key'] = $options['apikey']; 
             $data['param'] = 'notice_paid_till'; 
 
@@ -62,8 +73,10 @@ function ct_admin_init() {
                 }
             }
         }
-
-        setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"), '/');
+        
+        if ($result) {
+            setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"), '/');
+        }
     }
 
     $show_ct_notice_online = '';
@@ -74,17 +87,20 @@ function ct_admin_init() {
             $show_ct_notice_online = 'N';
 	}
     }
+    ct_profiler(__FILE__, __LINE__);
 
     ct_init_session();
 
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
-    add_settings_section('cleantalk_settings_main', __('Anti-spam by CleanTalk', 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
+    add_settings_section('cleantalk_settings_main', __($ct_plugin_name, 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
     add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_registrations_test', __('Registration forms', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_contact_forms_test', __('Contact forms', 'cleantalk'), 'ct_input_contact_forms_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+    
+    ct_profiler(__FILE__, __LINE__);
 }
 
 /**
@@ -108,6 +124,7 @@ function ct_section_settings_anti_spam() {
  * @return null
  */
 function ct_input_autoPubRevelantMess () {
+    ct_profiler(__FILE__, __LINE__);
     $options = ct_get_options();
     $value = $options['autoPubRevelantMess'];
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
@@ -122,6 +139,7 @@ function ct_input_autoPubRevelantMess () {
  * @return null
  */
 function ct_input_remove_old_spam() {
+    ct_profiler(__FILE__, __LINE__);
     $options = ct_get_options();
     $value = $options['remove_old_spam'];
     echo "<input type='radio' id='cleantalk_remove_old_spam1' name='cleantalk_settings[remove_old_spam]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam1'> " . __('Yes') . "</label>";
@@ -134,6 +152,7 @@ function ct_input_remove_old_spam() {
  * Admin callback function - Displays inputs of 'apikey' plugin parameter
  */
 function ct_input_apikey() {
+    ct_profiler(__FILE__, __LINE__);
     $options = ct_get_options();
     $value = $options['apikey'];
 
@@ -148,6 +167,7 @@ function ct_input_apikey() {
  * Admin callback function - Displays inputs of 'comments_test' plugin parameter
  */
 function ct_input_comments_test() {
+    ct_profiler(__FILE__, __LINE__);
     $options = ct_get_options();
     $value = $options['comments_test'];
     echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
@@ -160,6 +180,7 @@ function ct_input_comments_test() {
  * Admin callback function - Displays inputs of 'comments_test' plugin parameter
  */
 function ct_input_registrations_test() {
+    ct_profiler(__FILE__, __LINE__);
     $options = ct_get_options();
     $value = $options['registrations_test'];
     echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
@@ -172,6 +193,7 @@ function ct_input_registrations_test() {
  * Admin callback function - Displays inputs of 'contact_forms_test' plugin parameter
  */
 function ct_input_contact_forms_test() {
+    ct_profiler(__FILE__, __LINE__);
     $options = ct_get_options();
     $value = $options['contact_forms_test'];
     echo "<input type='radio' id='cleantalk_contact_forms_test1' name='cleantalk_settings[contact_forms_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test1'> " . __('Yes') . "</label>";
@@ -184,6 +206,7 @@ function ct_input_contact_forms_test() {
  * Admin callback function - Plugin parameters validator
  */
 function ct_settings_validate($input) {
+    ct_profiler(__FILE__, __LINE__);
     return $input;
 }
 
@@ -192,6 +215,7 @@ function ct_settings_validate($input) {
  * Admin callback function - Displays plugin options page
  */
 function ct_settings_page() {
+    ct_profiler(__FILE__, __LINE__);
     ?>
 <style type="text/css">
 input[type=submit] {padding: 10px; background: #3399FF; color: #fff; border:0 none;
@@ -229,15 +253,21 @@ input[type=submit] {padding: 10px; background: #3399FF; color: #fff; border:0 no
  * @return bool 
  */
 function admin_notice_message(){
-    global $show_ct_notice_trial, $show_ct_notice_online;
+    ct_profiler(__FILE__, __LINE__);
+    global $show_ct_notice_trial, $show_ct_notice_online, $ct_plugin_name;
 
     if (ct_active() === false)
 	    return false;
-
+   
     $options = ct_get_options();
     $show_notice = true;
     if ($show_notice && ct_valid_key($options['apikey']) === false) {
         echo '<div class="updated"><h3>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam!", 'cleantalk') . '</h3></div>';
+    }
+
+    if ($show_notice && $show_ct_notice_trial) {
+        echo '<div class="updated"><h3>' . __("<a href=\"options-general.php?page=cleantalk\">$ct_plugin_name</a> trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
+        $show_notice = false;
     }
 
     if ($show_notice && !empty($show_ct_notice_online)) {
@@ -248,11 +278,6 @@ function admin_notice_message(){
     	    echo __("Wrong </b><b style=\"color: #49C73B;\">Clean</b><b style=\"color: #349ebf;\">Talk</b><b> access key! Please check it or ask <a target=\"_blank\" href=\"https://cleantalk.org/forum/\">support</a>.", 'cleantalk');
 	}
         echo '</b></h3></div>';
-    }
-
-    if ($show_notice && $show_ct_notice_trial) {
-        echo '<div class="updated"><h3>' . __("CleanTalk anti-spam trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
-        $show_notice = false;
     }
 
     ct_send_feedback();
@@ -268,6 +293,7 @@ function admin_notice_message(){
  * Add descriptions for field
  */
 function admin_addDescriptionsFields($descr = '') {
+    ct_profiler(__FILE__, __LINE__);
     echo "<div style='color: #666 !important'>$descr</div>";
 }
 
@@ -275,6 +301,7 @@ function admin_addDescriptionsFields($descr = '') {
 * Test API key 
 */
 function ct_valid_key($apikey = null) {
+    ct_profiler(__FILE__, __LINE__);
     if ($apikey === null) {
         $options = ct_get_options();
         $apikey = $options['apikey'];
@@ -289,6 +316,7 @@ function ct_valid_key($apikey = null) {
  * @return	boolean TRUE
  */
 function ct_comment_approved($comment_object) {
+    ct_profiler(__FILE__, __LINE__);
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
     $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
     $comment['comment_content'] = ct_unmark_red($comment['comment_content']);
@@ -305,6 +333,7 @@ function ct_comment_approved($comment_object) {
  * @return	boolean TRUE
  */
 function ct_comment_unapproved($comment_object) {
+    ct_profiler(__FILE__, __LINE__);
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
     $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
     ct_feedback($hash, $comment['comment_content'], 0);
@@ -320,6 +349,7 @@ function ct_comment_unapproved($comment_object) {
  * @return	boolean TRUE
  */
 function ct_comment_spam($comment_object) {
+    ct_profiler(__FILE__, __LINE__);
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
     $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
     ct_feedback($hash, $comment['comment_content'], 0);
@@ -335,6 +365,7 @@ function ct_comment_spam($comment_object) {
  * @param type $comment_id
  */
 function ct_unspam_comment($comment_id) {
+    ct_profiler(__FILE__, __LINE__);
     update_comment_meta($comment_id, '_wp_trash_meta_status', 1);
     $comment = get_comment($comment_id, 'ARRAY_A');
     $hash = get_comment_meta($comment_id, 'ct_hash', true);
@@ -350,6 +381,7 @@ function ct_unspam_comment($comment_id) {
  * @return	string New comment text
  */
 function ct_get_comment_text($current_text) {
+    ct_profiler(__FILE__, __LINE__);
     global $comment;
     $new_text = $current_text;
     if (isset($comment) && is_object($comment)) {
@@ -366,6 +398,7 @@ function ct_get_comment_text($current_text) {
  * @return null 
  */
 function ct_delete_user($user_id) {
+    ct_profiler(__FILE__, __LINE__);
     $hash = get_user_meta($user_id, 'ct_hash', true);
     if ($hash !== '') {
         ct_feedback($hash, null, 0);
@@ -378,6 +411,7 @@ function ct_delete_user($user_id) {
 */
 if (!function_exists ( 'ct_register_plugin_links')) {
     function ct_register_plugin_links($links, $file) {
+        ct_profiler(__FILE__, __LINE__);
         global $ct_plugin_basename;
 	    
     	if ($file == $ct_plugin_basename) {
@@ -395,6 +429,7 @@ if (!function_exists ( 'ct_register_plugin_links')) {
 */
 if (!function_exists ( 'ct_plugin_action_links')) {
     function ct_plugin_action_links($links, $file) {
+        ct_profiler(__FILE__, __LINE__);
         global $ct_plugin_basename;
 
         if ($file == $ct_plugin_basename) {
@@ -410,7 +445,8 @@ if (!function_exists ( 'ct_plugin_action_links')) {
  * @return array
 */
 function ct_update_option($option_name) {
-    global $show_ct_notice_online, $ct_notice_online_label;
+    ct_profiler(__FILE__, __LINE__);
+    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_check_timeout;
     if($option_name !== 'cleantalk_settings')
         return;
     $ct_base_call_result = ct_base_call(array(
@@ -428,6 +464,7 @@ function ct_update_option($option_name) {
         setcookie($ct_notice_online_label, 0, null, '/');
     }else{
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
+        setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_check_timeout minutes"), '/');
     }
 }
 

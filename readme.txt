@@ -1,13 +1,13 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cache, question
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cache 
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 2.46
+Stable tag: 2.49
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam contact emails in WordPress.
+SPAM defender for WordPress - no spam comments, no spam registrations, no spam contact emails, no spam trackbacks.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
@@ -27,6 +27,8 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 * WordPress Landing Pages.
 
 = Anti spam plugin info = 
+Spam is one of the most irritating factors. Spam become every year more and conventional anti spam can no longer handle all the spam bots. CleanTalk prevents spam and automatically blocks it. You'll be surprised of effective protection against spam.
+
 CleanTalk is an antispam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate antispam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
 
 CleanTalk is a transparent antispam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see antispam statistics wherever whenever.
@@ -140,7 +142,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
-= 2.44 2014-05-19 =
+= 2.49 2014-06-10 =
+  * Added spam protection for S2Member Auth.net forms. 
+  * Added spam protection for multisite signup form.
+  * Optimized account status check function.
+
+= 2.46 2014-05-19 =
   * Added: HTML notice about the need to enable JavaScript. 
   * Fixed: Fixed pingbacks anti-spam test. 
 
@@ -325,7 +332,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
-= 2.44 2014-05-19 =
+= 2.49 2014-06-10 =
+  * Added spam protection for S2Member Auth.net forms. 
+  * Added spam protection for multisite signup form.
+  * Optimized account status check function.
+
+= 2.46 2014-05-19 =
   * Added: HTML notice about the need to enable JavaScript. 
   * Fixed: Fixed pingbacks anti-spam test. 
 
