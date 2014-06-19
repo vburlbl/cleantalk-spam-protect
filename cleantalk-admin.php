@@ -22,7 +22,9 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout, $pagenow, $ct_plugin_name;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout, $pagenow, $ct_plugin_name, $ct_options;
+
+    $ct_options = ct_get_options();
 
     $show_ct_notice_trial = false;
     if (isset($_COOKIE[$ct_notice_trial_label])) {
@@ -36,12 +38,11 @@ function ct_admin_init() {
             $do_request = true; 
         }
 
-        $options = ct_get_options();
         $result = false;
-	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($options['apikey']) && $do_request) {
+	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($ct_options['apikey']) && $do_request) {
             $url = 'https://cleantalk.org/app_notice';
             $server_timeout = 2;
-            $data['auth_key'] = $options['apikey']; 
+            $data['auth_key'] = $ct_options['apikey']; 
             $data['param'] = 'notice_paid_till'; 
 
             $ch = curl_init();
@@ -92,6 +93,7 @@ function ct_admin_init() {
     add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_ssl_on', __('Use secure (SSL) connection to CleanTalk cloud', 'cleantalk'), 'ct_radio_ssl_on', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_registrations_test', __('Registration forms', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_contact_forms_test', __('Contact forms', 'cleantalk'), 'ct_input_contact_forms_test', 'cleantalk', 'cleantalk_settings_anti_spam');
@@ -118,35 +120,35 @@ function ct_section_settings_anti_spam() {
  * @return null
  */
 function ct_input_autoPubRevelantMess () {
-    $options = ct_get_options();
-    $value = $options['autoPubRevelantMess'];
+    global $ct_options;
+   
+    $value = $ct_options['autoPubRevelantMess'];
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
     admin_addDescriptionsFields(__('Relevant (not spam) comments from new authors will be automatic published at the blog', 'cleantalk'));
 }
 /**
- * @author Artem Leontiev
- * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
+ * Admin callback function - Display secure connection options 
  *
  * @return null
  */
-function ct_input_remove_old_spam() {
-    $options = ct_get_options();
-    $value = $options['remove_old_spam'];
-    echo "<input type='radio' id='cleantalk_remove_old_spam1' name='cleantalk_settings[remove_old_spam]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam1'> " . __('Yes') . "</label>";
+function ct_radio_ssl_on() {
+    global $ct_options;
+    
+    $value = $ct_options['ssl_on'];
+    echo "<input type='radio' id='cleantalk_ssl_on1' name='cleantalk_settings[ssl_on]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_ssl_on1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_remove_old_spam0' name='cleantalk_settings[remove_old_spam]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(sprintf(__('Delete spam comments older than %d days.', 'cleantalk'),  $options['spam_store_days']));
+    echo "<input type='radio' id='cleantalk_ssl_on0' name='cleantalk_settings[ssl_on]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_ssl_on0'> " . __('No') . "</label>";
 }
 
 /**
  * Admin callback function - Displays inputs of 'apikey' plugin parameter
  */
 function ct_input_apikey() {
-    $options = ct_get_options();
-    $value = $options['apikey'];
-
+    global $ct_options;
+    
+    $value = $ct_options['apikey'];
     $def_value = ''; 
     echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='20' type='text' value='$value' style=\"font-size: 14pt;\"/>";
     if (ct_valid_key($value) === false) {
@@ -158,8 +160,9 @@ function ct_input_apikey() {
  * Admin callback function - Displays inputs of 'comments_test' plugin parameter
  */
 function ct_input_comments_test() {
-    $options = ct_get_options();
-    $value = $options['comments_test'];
+    global $ct_options;
+    
+    $value = $ct_options['comments_test'];
     echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_comments_test0' name='cleantalk_settings[comments_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_comments_test0'> " . __('No') . "</label>";
@@ -170,8 +173,9 @@ function ct_input_comments_test() {
  * Admin callback function - Displays inputs of 'comments_test' plugin parameter
  */
 function ct_input_registrations_test() {
-    $options = ct_get_options();
-    $value = $options['registrations_test'];
+    global $ct_options;
+    
+    $value = $ct_options['registrations_test'];
     echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_registrations_test0' name='cleantalk_settings[registrations_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_registrations_test0'> " . __('No') . "</label>";
@@ -182,8 +186,9 @@ function ct_input_registrations_test() {
  * Admin callback function - Displays inputs of 'contact_forms_test' plugin parameter
  */
 function ct_input_contact_forms_test() {
-    $options = ct_get_options();
-    $value = $options['contact_forms_test'];
+    global $ct_options;
+    
+    $value = $ct_options['contact_forms_test'];
     echo "<input type='radio' id='cleantalk_contact_forms_test1' name='cleantalk_settings[contact_forms_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_contact_forms_test0' name='cleantalk_settings[contact_forms_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test0'> " . __('No') . "</label>";

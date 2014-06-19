@@ -70,6 +70,9 @@ $ct_post_data_authnet_label = 's2member_pro_authnet_registration';
 // Form time load label  
 $ct_formtime_label = 'formtime'; 
 
+// Plugin's options 
+$ct_options = null; 
+
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -203,16 +206,17 @@ function ct_get_options() {
  * @return 	mixed[] Array of default options
  */
 function ct_def_options() {
-    $lang = get_bloginfo('language');
     return array(
         'server' => 'http://moderate.cleantalk.org',
+//        'server' => 'http://localhost',
         'apikey' => __('enter key', 'cleantalk'),
         'autoPubRevelantMess' => '1', 
         'registrations_test' => '1', 
         'comments_test' => '1', 
         'contact_forms_test' => '1', 
         'remove_old_spam' => '0',
-        'spam_store_days' => '31' // Days before delete comments from folder Spam 
+        'spam_store_days' => '31', // Days before delete comments from folder Spam 
+        'ssl_on' => 1 // Secure connection to servers 
     );
 }
 
@@ -367,6 +371,7 @@ function ct_base_call($params = array()) {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
+    $ct->ssl_on = $config['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 
@@ -1079,9 +1084,9 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
-
+    $ct->ssl_on = $options['ssl_on'];
+    
     $ct_request = new CleantalkRequest();
-
     $ct_request->auth_key = $options['apikey'];
     $ct_request->sender_email = $sender_email; 
     $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
@@ -1521,6 +1526,7 @@ function ct_s2member_registration_test() {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
+    $ct->ssl_on = $config['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 
