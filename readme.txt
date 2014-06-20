@@ -46,7 +46,7 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
 * Always actual and regular updates.
 * Technical support.
 
-Test: SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM
+Test: spam spam spam spam spam spam spam spam spam spam
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
@@ -130,6 +130,8 @@ If you're having trouble getting things to work after installing the plugin, her
 = CAPTCHA = 
 The annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots won’t discern these symbols, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource from visitors. Spam bots can automatically recognize Captcha. 
 Spam bots can not pass through the anti-spam CleanTalk, complex invisible checks can immediately detect spam bots.
+
+Test: spam spam spam spam spam spam spam spam spam spam
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
