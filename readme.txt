@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cache 
+Tags: anti spam, anti-spam, antispam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cache 
 Requires at least: 3.0
 Tested up to: 3.9.1
 Stable tag: 2.49
@@ -12,13 +12,13 @@ SPAM defender for WordPress - no spam comments, no spam registrations, no spam c
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
-= Anti-spam features =
+= Anti spam features =
 1. Stops spam bots comments.
 1. Stops spam bots signups.
 1. Stops spam bots contacts emails.
 1. Stops spam trackbacks.
 
-= Anti-spam protection =
+= Anti spam protection =
 * WordPress, JetPack comments.
 * WordPress, BuddyPress, bbPress, S2Member signups.
 * Formiadble forms, Contact form 7, JetPack Contact form.
@@ -29,9 +29,9 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 = Anti spam plugin info = 
 Spam is one of the most irritating factors. Spam become every year more and conventional anti spam can no longer handle all the spam bots. CleanTalk prevents spam and automatically blocks it. You'll be surprised of effective protection against spam.
 
-CleanTalk is an antispam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate antispam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
+CleanTalk is an anti spam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate anti spam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
 
-CleanTalk is a transparent antispam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see antispam statistics wherever whenever.
+CleanTalk is a transparent anti spam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see anti spam statistics wherever whenever.
 
 We have developed anti-spam for WordPress that would provide **maximum protection from spam bots** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
@@ -90,7 +90,7 @@ Plugin Anti-spam by CleanTalk stops up to 100% of spam comments, spam signups (r
 = What about pingback, trackback spam? = 
 Plugin by default pass pingbacks without any checks. All trackbacks will be blocked if the sender have spam activity.
 
-= Should I use another antispam plugins? =
+= Should I use another anti spam plugins? =
 CleanTalk stops up to 100% of spam bots, so you can disable other anti spam plugins (especially CAPTCHA like anti spam plugins). In some cases several anti-spam plugins can conflict, so it will be better use just one plugin.  
 
 = The plugin WordPress MultiUser (WPMU or WordPress network) compatible? =
@@ -127,7 +127,7 @@ If you're having trouble getting things to work after installing the plugin, her
 
 = CAPTCHA = 
 The annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots won’t discern these symbols, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource from visitors. Spam bots can automatically recognize Captcha. 
-Spam bots can not pass through the anti-spam CleanTalk, complex invisible checks can immediately detect spam bots.
+Spam bots can not pass through the anti spam CleanTalk, complex invisible checks can immediately detect spam bots.
 
 = Requirements =
 WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and enabled 'allow_url_fopen' setting. <a href="http://cleantalk.org/register?platform=wordpress">Sign up</a> to get an Access key.
@@ -194,11 +194,11 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 = 2.28 2013-12-19 =
   * New: Added protection against spam bots for WooCommerce review form. 
-  * Fixed: JavaScript antispam logic for WooCommerce review form.
+  * Fixed: JavaScript anti spam logic for WooCommerce review form.
 
 = 2.27 2013-12-06 =
   * New: Added protection against spam bots for JetPack Contact form. 
-  * Fixed: JavaScript antispam logic for registrations and Contact form 7.
+  * Fixed: JavaScript anti spam logic for registrations and Contact form 7.
 
 = 2.25 2013-11-27 =
   * New: Added protection against spam bots for BuddyPress registrations. 
@@ -208,10 +208,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 = 2.23 2013-11-20 =
   * New: Added automatic training blacklists on spam bot account deletion. 
   * New: Added URL to project homepage at plugin options. 
-  * Changed: Improved antispam logic. 
+  * Changed: Improved anti spam logic. 
 
 = 2.21 2013-11-13 =
-  * Changed: WordPress blacklists settings get priority over plugin's antispam settings 
+  * Changed: WordPress blacklists settings get priority over plugin's anti spam settings 
   * Changed: Disabled management approval comments for regular commentators of the blog. Automatically approved for publication only the comments of the new blog authors. 
   * Changed: Removed form submit time test. Imporved JavaScript spam test. 
   * Changed: PHP code optimizations 
@@ -244,7 +244,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 = 2.4.12 2013-08-12 =
   * Removed RPC::XML library from plugin. 
   * Switched plugin to HTTP+JSON connection with servers.
-  * Fixed bug with comments antispam tests with non UTF8 codepage.
+  * Fixed bug with comments anti spam tests with non UTF8 codepage.
 
 = 2.4.11 2013-08-02 =
   * Removed spam tests for self-made pingbacks 
@@ -380,7 +380,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 = 2.27 2013-12-06 =
   * New: Added protection against spam bots for JetPack Contact form. 
-  * Fixed: JavaScript antispam logic for registrations and Contact form 7.
+  * Fixed: JavaScript anti spam logic for registrations and Contact form 7.
 
 = 2.25 2013-11-27 =
   * New: Added protection against spam bots for BuddyPress registrations. 
@@ -390,10 +390,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 = 2.23 2013-11-20 =
   * New: Added automatic training blacklists on spam bot account deletion. 
   * New: Added URL to project homepage at plugin options. 
-  * Changed: Improved antispam logic. 
+  * Changed: Improved anti spam logic. 
 
 = 2.21 2013-11-13 =
-  * Changed: WordPress blacklists settings get priority over plugin's antispam settings 
+  * Changed: WordPress blacklists settings get priority over plugin's anti spam settings 
   * Changed: Disabled management approval comments for regular commentators of the blog. Automatically approved for publication only the comments of the new blog authors. 
   * Changed: PHP code optimizations
 
