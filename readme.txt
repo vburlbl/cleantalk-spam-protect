@@ -1,4 +1,4 @@
-=== Anti-spam by CleanTalk (No spam) ===
+=== Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, quiz, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cache 
 Requires at least: 3.0
@@ -45,8 +45,6 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
 * Simple and convenient form of commenting/registrations without captcha.
 * Always actual and regular updates.
 * Technical support.
-
-Test: spam spam spam spam spam spam spam spam spam spam
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
