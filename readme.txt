@@ -18,7 +18,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 1. Stops spam bots contacts emails.
 1. Stops spam trackbacks.
 
-= Anti spam protection =
+= Spam protection =
 * WordPress, JetPack comments.
 * WordPress, BuddyPress, bbPress, S2Member signups.
 * Formiadble forms, Contact form 7, JetPack Contact form.
@@ -26,9 +26,10 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 * Fast Secure Contact form.
 * WordPress Landing Pages.
 
-= Anti spam plugin info = 
+= SPAM defender for WordPress - no spam comments, no spam registrations, no spam contact emails, no spam trackbacks =
 Spam is one of the most irritating factors. Spam become every year more and conventional anti spam can no longer handle all the spam bots. CleanTalk prevents spam and automatically blocks it. You'll be surprised of effective protection against spam.
 
+= Anti spam plugin info = 
 CleanTalk is an anti spam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate anti spam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
 
 CleanTalk is a transparent anti spam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see anti spam statistics wherever whenever.
@@ -45,6 +46,8 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
 * Simple and convenient form of commenting/registrations without captcha.
 * Always actual and regular updates.
 * Technical support.
+
+Test: **spam** **spam** **spam** **spam** **spam** **spam** **spam** 
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
