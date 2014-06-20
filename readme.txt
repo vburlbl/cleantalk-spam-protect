@@ -47,8 +47,6 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
 * Always actual and regular updates.
 * Technical support.
 
-Test: **spam** **spam** **spam** **spam** **spam** **spam** **spam** 
-
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
 * Apps for iPhone, Android to control anti spam service, comments, signups, contacts. With traffic and spam statistics for last 7 days.
