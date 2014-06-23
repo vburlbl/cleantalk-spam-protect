@@ -265,7 +265,7 @@ function admin_notice_message(){
 	if($show_ct_notice_online === 'Y'){
     	    echo __("Please don’t forget to disable CAPTCHA if you have it!", 'cleantalk');
 	}else{
-    	    echo __("Wrong </b><b style=\"color: #49C73B;\">Clean</b><b style=\"color: #349ebf;\">Talk</b><b> access key! Please check it or ask <a target=\"_blank\" href=\"https://cleantalk.org/forum/\">support</a>.", 'cleantalk');
+    	    echo __("Wrong <a href=\"options-general.php?page=cleantalk\"><b style=\"color: #49C73B;\">Clean</b><b style=\"color: #349ebf;\">Talk</b> access key</a>! Please check it or ask <a target=\"_blank\" href=\"https://cleantalk.org/forum/\">support</a>.", 'cleantalk');
 	}
         echo '</b></h3></div>';
     }
