@@ -3,15 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.50
+  Version: 2.53
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-
-$ct_agent_version = 'wordpress-250';
+$ct_agent_version = 'wordpress-253';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -80,7 +79,7 @@ add_action('init', 'ct_init', 1);
 add_action( 'plugins_loaded', 'ct_plugin_loaded' );
 
 // Comments 
-add_filter('preprocess_comment', 'ct_preprocess_comment');     // param - comment data array
+add_filter('preprocess_comment', 'ct_preprocess_comment', 1, 1);     // param - comment data array
 add_filter('comment_text', 'ct_comment_text' );
 
 // Formidable
@@ -89,7 +88,7 @@ add_action('frm_entries_footer_scripts', 'ct_frm_entries_footer_scripts', 20, 2)
 
 // Registrations
 add_action('register_form','ct_register_form');
-add_filter('registration_errors', 'ct_registration_errors', 10, 3);
+add_filter('registration_errors', 'ct_registration_errors', 1, 3);
 add_action('user_register', 'ct_user_register');
 
 // Multisite registrations
@@ -208,7 +207,6 @@ function ct_get_options() {
 function ct_def_options() {
     return array(
         'server' => 'http://moderate.cleantalk.org',
-//        'server' => 'http://localhost',
         'apikey' => __('enter key', 'cleantalk'),
         'autoPubRevelantMess' => '1', 
         'registrations_test' => '1', 
@@ -1006,6 +1004,7 @@ function ct_registration_errors_wpmu($errors) {
     if ($wpmu && isset($errors['errors']->errors) && count($errors['errors']->errors) > 0) {
         return $errors;
     }
+    
     $errors['errors'] = ct_registration_errors($errors['errors'], $sanitized_user_login, $user_email);
 
     // Show CleanTalk errors in user_name field
@@ -1032,15 +1031,11 @@ function ct_register_post($sanitized_user_login = null, $user_email = null, $err
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
     global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done;
     
-    // If there is an error already, let it do it's thing
-    if ($errors->get_error_code()) {
-        return $errors;
-    }
-    
     // The function already executed
     if ($ct_signup_done) {
         return $errors;
     }
+    
     //
     // BuddyPress actions
     //
