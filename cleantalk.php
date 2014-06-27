@@ -1031,11 +1031,6 @@ function ct_register_post($sanitized_user_login = null, $user_email = null, $err
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
     global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done;
     
-    // If there is an error already, let it do it's thing
-    if (is_object($errors) && $errors->get_error_code()) {
-        return $errors;
-    }
-    
     // The function already executed
     if ($ct_signup_done) {
         return $errors;
