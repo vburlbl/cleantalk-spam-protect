@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: anti spam, anti-spam, antispam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cache 
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 2.52
+Stable tag: 2.53
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -143,6 +143,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 2.53 2014-06-27 =
+  * Fixed anit-spam protection bug for signups. 
+  * Changed anti-spam functions (comments and signups) priority. 
+
 = 2.52 2014-06-25 =
   * Fixed 'Fatal error: Call to a member function get_error_code()' issue with signups via BuddyPress. 
 
@@ -341,6 +345,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.53 2014-06-27 =
+  * Fixed anit-spam protection bug for signups. 
+  * Changed anti-spam functions (comments and signups) priority. 
+
 = 2.52 2014-06-25 =
   * Fixed 'Fatal error: Call to a member function get_error_code()' issue with signups via BuddyPress.
 
