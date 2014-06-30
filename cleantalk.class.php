@@ -2,7 +2,7 @@
 /**
  * Cleantalk base class
  *
- * @version 1.24
+ * @version 1.25
  * @package Cleantalk
  * @subpackage Base
  * @author Сleantalk team (welcome@cleantalk.ru)
@@ -873,19 +873,14 @@ class Cleantalk {
     }
 
     /*
-       Get user IP
+       Get user IP behind proxy server
     */
-    public function ct_session_ip( $data_ip )
-    {
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-        {
-            $forwarded_for = (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? htmlentities($_SERVER['HTTP_X_FORWARDED_FOR']) : '';
+    public function ct_session_ip( $data_ip ) {
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match("/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/", $_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $data_ip = $_SERVER['HTTP_X_FORWARDED_FOR']; 
         }
-
-        // 127.0.0.1 usually used at reverse proxy
-        $session_ip = ($data_ip == '127.0.0.1' && !empty($forwarded_for)) ? $forwarded_for : $data_ip;
-
-        return $session_ip;
+        
+        return $data_ip;
     }
     
     /**
