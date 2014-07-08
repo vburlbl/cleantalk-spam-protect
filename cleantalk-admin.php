@@ -22,24 +22,20 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_check_timeout, $pagenow, $ct_plugin_name, $ct_options;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_showtime, $pagenow, $ct_plugin_name, $ct_options, $trial_notice_check_timeout, $account_notice_check_timeout, $ct_user_token_label;
 
     $ct_options = ct_get_options();
 
     $show_ct_notice_trial = false;
     if (isset($_COOKIE[$ct_notice_trial_label])) {
-        if ($_COOKIE[$ct_notice_trial_label] == 1)
+        if ($_COOKIE[$ct_notice_trial_label] == 1) {
             $show_ct_notice_trial = true;
-    } else {
-        // Run function only on special pages
-        $working_pages = array("plugins.php", "options-general.php");
-        $do_request = false;
-        if (in_array($pagenow, $working_pages)) {
-            $do_request = true; 
         }
+    }
 
+    if (time() > $ct_options['next_account_status_check']) {
         $result = false;
-	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($ct_options['apikey']) && $do_request) {
+	    if (function_exists('curl_init') && function_exists('json_decode') && ct_valid_key($ct_options['apikey'])) {
             $url = 'https://cleantalk.org/app_notice';
             $server_timeout = 2;
             $data['auth_key'] = $ct_options['apikey']; 
@@ -61,19 +57,32 @@ function ct_admin_init() {
 
             $result = curl_exec($ch);
             curl_close($ch);
-
+            
+            $notice_check_timeout = $trial_notice_check_timeout; 
             if ($result) {
                 $result = json_decode($result, true);
-                if (isset($result['show_notice']) && $result['show_notice'] == 1) {
-                    if (isset($result['trial']) && $result['trial'] == 1) {
-                        $show_ct_notice_trial = true;
+                if (isset($result['trial']) && $result['trial'] == 1) {
+                    $show_ct_notice_trial = true;
+                }
+                    
+                if (isset($result['show_notice'])) {
+                   if ($result['show_notice'] == 0 && !$show_ct_notice_trial) {
+                        $notice_check_timeout = $account_notice_check_timeout; 
                     }
                 }
+                
+                if (isset($result['user_token'])) {
+                    $ct_options['user_token'] = $result['user_token']; 
+                }
             }
+
+            // Save next status request time
+            $ct_options['next_account_status_check'] = strtotime("+ $notice_check_timeout hours", $ct_options['next_account_status_check']);
+            update_option('cleantalk_settings', $ct_options);
         }
         
         if ($result) {
-            setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_check_timeout minutes"), '/');
+            setcookie($ct_notice_trial_label, (int) $show_ct_notice_trial, strtotime("+$trial_notice_showtime minutes"), '/');
         }
     }
 
@@ -250,13 +259,18 @@ function admin_notice_message(){
 	    return false;
    
     $options = ct_get_options();
+    $user_token = '';
+    if (isset($options['user_token']) && $options['user_token'] != '') {
+        $user_token = '&user_token=' . $options['user_token'];
+    }
+
     $show_notice = true;
     if ($show_notice && ct_valid_key($options['apikey']) === false) {
         echo '<div class="updated"><h3>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam!", 'cleantalk') . '</h3></div>';
     }
 
     if ($show_notice && $show_ct_notice_trial) {
-        echo '<div class="updated"><h3>' . __("<a href=\"options-general.php?page=cleantalk\">$ct_plugin_name</a> trial period will end soon, please upgrade to <a href=\"http://cleantalk.org/my\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
+        echo '<div class="updated"><h3>' . __("<a href=\"options-general.php?page=cleantalk\">$ct_plugin_name</a> trial period ends, please upgrade to <a href=\"http://cleantalk.org/my/bill/recharge?utm_source=wp-backend&utm_medium=cpc&utm_campaign=WP%20backend%20trial$user_token\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
         $show_notice = false;
     }
 
@@ -425,7 +439,7 @@ if (!function_exists ( 'ct_plugin_action_links')) {
  * @return array
 */
 function ct_update_option($option_name) {
-    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_check_timeout;
+    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime;
     if($option_name !== 'cleantalk_settings')
         return;
     $ct_base_call_result = ct_base_call(array(
@@ -443,7 +457,7 @@ function ct_update_option($option_name) {
         setcookie($ct_notice_online_label, 0, null, '/');
     }else{
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
-        setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_check_timeout minutes"), '/');
+        setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_showtime minutes"), '/');
     }
 }
 

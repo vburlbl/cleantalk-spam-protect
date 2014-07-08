@@ -3,7 +3,7 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.53
+  Version: 2.54
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
@@ -51,8 +51,14 @@ $ct_notice_online_label = 'ct_notice_online';
 // Flag to show online notice - 'Y' or 'N'
 $show_ct_notice_online = '';
 
-// Timeout before new check for trial notice in minutes
-$trial_notice_check_timeout = 10;
+// Timeout before new check for trial notice in hours
+$trial_notice_check_timeout = 1;
+
+// Timeout before new check account notice in hours
+$account_notice_check_timeout = 24;
+
+// Trial notice show time in minutes
+$trial_notice_showtime = 10;
 
 // COOKIE label for WP Landing Page proccessing result
 $ct_wplp_result_label = 'ct_wplp_result';
@@ -214,7 +220,9 @@ function ct_def_options() {
         'contact_forms_test' => '1', 
         'remove_old_spam' => '0',
         'spam_store_days' => '31', // Days before delete comments from folder Spam 
-        'ssl_on' => 0 // Secure connection to servers 
+        'ssl_on' => 0, // Secure connection to servers 
+        'next_account_status_check' => 0, // Time label when the plugin should check account status 
+        'user_token' => '' // User token 
     );
 }
 
