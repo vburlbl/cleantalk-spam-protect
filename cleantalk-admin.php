@@ -61,12 +61,12 @@ function ct_admin_init() {
             $notice_check_timeout = $trial_notice_check_timeout; 
             if ($result) {
                 $result = json_decode($result, true);
-                if (isset($result['trial']) && $result['trial'] == 1) {
-                    $show_ct_notice_trial = true;
-                }
-                    
                 if (isset($result['show_notice'])) {
-                   if ($result['show_notice'] == 0 && !$show_ct_notice_trial) {
+                    if ($result['show_notice'] == 1 && isset($result['trial']) && $result['trial'] == 1) {
+                        $show_ct_notice_trial = true;
+                    }
+                    
+                    if ($result['show_notice'] == 0) {
                         $notice_check_timeout = $account_notice_check_timeout; 
                     }
                 }
