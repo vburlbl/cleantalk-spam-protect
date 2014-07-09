@@ -1039,8 +1039,11 @@ function ct_register_post($sanitized_user_login = null, $user_email = null, $err
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
     global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done;
     
+    //
     // The function already executed
-    if ($ct_signup_done) {
+    // It happens when used ct_register_post(); 
+    //
+    if ($ct_signup_done && is_object($errors) && count($errors->errors) > 0) {
         return $errors;
     }
     
