@@ -1204,7 +1204,8 @@ function ct_contact_form_is_spam($form) {
         if (preg_match("/^.+$ct_checkjs_jpcf$/", $k))
            $js_field_name = $k; 
     }
-    $checkjs = js_test($js_field_name, $_COOKIE);
+    
+    $checkjs = js_test($js_field_name, $_POST);
 
     $sender_info = array(
 	'sender_url' => @$form['comment_author_url']
