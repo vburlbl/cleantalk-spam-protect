@@ -77,7 +77,7 @@ function ct_admin_init() {
             }
 
             // Save next status request time
-            $ct_options['next_account_status_check'] = strtotime("+ $notice_check_timeout hours", $ct_options['next_account_status_check']);
+            $ct_options['next_account_status_check'] = strtotime("+$notice_check_timeout hours", time());
             update_option('cleantalk_settings', $ct_options);
         }
         
@@ -440,7 +440,7 @@ if (!function_exists ( 'ct_plugin_action_links')) {
 */
 function ct_update_option($option_name) {
     global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime;
-    
+
     if($option_name !== 'cleantalk_settings')
         return;
 
@@ -461,15 +461,6 @@ function ct_update_option($option_name) {
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
         setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_showtime minutes"), '/');
     }
-    
-    //
-    // Force account status check
-    //
-    $ct_options = ct_get_options();
-    $ct_options['next_account_status_check'] = 0;
-    update_option('cleantalk_settings', $ct_options);
-
-    return null;
 }
 
 ?>
