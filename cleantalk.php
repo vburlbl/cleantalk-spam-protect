@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.53
+  Version: 2.54
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-253';
+$ct_agent_version = 'wordpress-254';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -51,8 +51,14 @@ $ct_notice_online_label = 'ct_notice_online';
 // Flag to show online notice - 'Y' or 'N'
 $show_ct_notice_online = '';
 
-// Timeout before new check for trial notice in minutes
-$trial_notice_check_timeout = 10;
+// Timeout before new check for trial notice in hours
+$trial_notice_check_timeout = 1;
+
+// Timeout before new check account notice in hours
+$account_notice_check_timeout = 24;
+
+// Trial notice show time in minutes
+$trial_notice_showtime = 10;
 
 // COOKIE label for WP Landing Page proccessing result
 $ct_wplp_result_label = 'ct_wplp_result';
@@ -214,7 +220,9 @@ function ct_def_options() {
         'contact_forms_test' => '1', 
         'remove_old_spam' => '0',
         'spam_store_days' => '31', // Days before delete comments from folder Spam 
-        'ssl_on' => 0 // Secure connection to servers 
+        'ssl_on' => 0, // Secure connection to servers 
+        'next_account_status_check' => 0, // Time label when the plugin should check account status 
+        'user_token' => '' // User token 
     );
 }
 
@@ -1031,8 +1039,11 @@ function ct_register_post($sanitized_user_login = null, $user_email = null, $err
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
     global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done;
     
+    //
     // The function already executed
-    if ($ct_signup_done) {
+    // It happens when used ct_register_post(); 
+    //
+    if ($ct_signup_done && is_object($errors) && count($errors->errors) > 0) {
         return $errors;
     }
     
@@ -1193,7 +1204,8 @@ function ct_contact_form_is_spam($form) {
         if (preg_match("/^.+$ct_checkjs_jpcf$/", $k))
            $js_field_name = $k; 
     }
-    $checkjs = js_test($js_field_name, $_COOKIE);
+    
+    $checkjs = js_test($js_field_name, $_POST);
 
     $sender_info = array(
 	'sender_url' => @$form['comment_author_url']
