@@ -144,7 +144,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 == Changelog ==
 = 2.55 2014-07-11 =
-  * Fixed bug with account status function. 
+  * Fixed bug with account status function. In backend the plugin showed notice 'Please don’t forget to disable CAPTCHA if you have it!' on every page. 
 
 = 2.54 2014-07-11 =
   * Fixed signup anti spam protection logic for BuddyPress registrations. 
@@ -354,7 +354,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 == Upgrade Notice ==
 = 2.55 2014-07-11 =
-  * Fixed bug with account status function. 
+  * Fixed bug with account status function. In backend the plugin showed notice 'Please don’t forget to disable CAPTCHA if you have it!' on every page. 
 
 = 2.54 2014-07-11 =
   * Fixed signup anti spam protection logic for BuddyPress registrations. 
