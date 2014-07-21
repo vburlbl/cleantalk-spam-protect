@@ -22,7 +22,7 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_showtime, $pagenow, $ct_plugin_name, $ct_options, $trial_notice_check_timeout, $account_notice_check_timeout, $ct_user_token_label;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_showtime, $pagenow, $ct_plugin_name, $ct_options, $trial_notice_check_timeout, $account_notice_check_timeout, $ct_user_token_label, $ct_account_status_check;
 
     $ct_options = ct_get_options();
 
@@ -75,9 +75,10 @@ function ct_admin_init() {
                     $ct_options['user_token'] = $result['user_token']; 
                 }
             }
-
+            
             // Save next status request time
             $ct_options['next_account_status_check'] = strtotime("+$notice_check_timeout hours", time());
+            $ct_account_status_check = time(); 
             update_option('cleantalk_settings', $ct_options);
         }
         
@@ -439,10 +440,16 @@ if (!function_exists ( 'ct_plugin_action_links')) {
  * @return array
 */
 function ct_update_option($option_name) {
-    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime;
+    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime, $ct_account_status_check;
 
-    if($option_name !== 'cleantalk_settings')
+    if($option_name !== 'cleantalk_settings') {
         return;
+    }
+
+    // Skip test call if the function executet during account status check
+    if ($ct_account_status_check > 0 && time() - $ct_account_status_check < 5) {
+        return;
+    }
 
     $ct_base_call_result = ct_base_call(array(
         'message' => 'CleanTalk setup comment',
