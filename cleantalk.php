@@ -123,13 +123,17 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
         
-if (is_admin() && !(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+if (is_admin()) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
+    
+    if (!(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+        add_action('admin_init', 'ct_admin_init', 1);
+        add_action('admin_menu', 'ct_admin_add_page');
+        add_action('admin_notices', 'admin_notice_message');
+    }
 
-    add_action('admin_init', 'ct_admin_init', 1);
-    add_action('admin_menu', 'ct_admin_add_page');
     add_action('admin_enqueue_scripts', 'ct_enqueue_scripts');
-    add_action('admin_notices', 'admin_notice_message');
+    add_action('comment_unapproved_to_approvecomment', 'ct_comment_approved'); // param - comment object
     add_action('comment_unapproved_to_approved', 'ct_comment_approved'); // param - comment object
     add_action('comment_approved_to_unapproved', 'ct_comment_unapproved'); // param - comment object
     add_action('comment_unapproved_to_spam', 'ct_comment_spam');  // param - comment object
@@ -267,8 +271,9 @@ function ct_feedback($hash, $message = null, $allow) {
     $ct->server_changed = $config['ct_server_changed'];
 
     if (empty($hash)) {
-	$hash = $ct->getCleantalkCommentHash($message);
+	    $hash = $ct->getCleantalkCommentHash($message);
     }
+
     if ($message !== null) {
         $resultMessage = $ct->delCleantalkComment($message);
     }
@@ -380,7 +385,7 @@ function ct_base_call($params = array()) {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
-    $ct->ssl_on = $config['ssl_on'];
+    $ct->ssl_on = $options['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 
@@ -1541,7 +1546,7 @@ function ct_s2member_registration_test() {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
-    $ct->ssl_on = $config['ssl_on'];
+    $ct->ssl_on = $options['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 

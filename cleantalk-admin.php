@@ -321,6 +321,7 @@ function ct_valid_key($apikey = null) {
 function ct_comment_approved($comment_object) {
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
     $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
+
     $comment['comment_content'] = ct_unmark_red($comment['comment_content']);
     $comment['comment_content'] = ct_feedback($hash, $comment['comment_content'], 1);
     $comment['comment_approved'] = 1;
