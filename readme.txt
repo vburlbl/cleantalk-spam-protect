@@ -145,7 +145,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 == Changelog ==
 = 2.57 2014-07-29 =
   * Improved anti spam protection for comments. The plugin now proccessing website url in the comments form.
-  * Fixed signup remove logic for approved comments. Previous version doesn't cut sign for comments approved via AJAX call in WordPress backend.
+  * Fixed sign remove logic for approved comments. Previous version doesn't cut sign for comments approved via AJAX call in WordPress backend.
   * Fixed switching to SSL for comments. Previous version doesn't use secured connection for comments.
 
 = 2.56 2014-07-21 =
@@ -363,7 +363,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 == Upgrade Notice ==
 = 2.57 2014-07-29 =
   * Improved anti spam protection for comments. The plugin now proccessing website url in the comments form.
-  * Fixed signup remove logic for approved comments. Previous version doesn't cut sign for comments approved via AJAX call in WordPress backend.
+  * Fixed sign remove logic for approved comments. Previous version doesn't cut sign for comments approved via AJAX call in WordPress backend.
   * Fixed switching to SSL for comments. Previous version doesn't use secured connection for comments.
 
 = 2.56 2014-07-21 =
