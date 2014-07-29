@@ -2,8 +2,8 @@
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack 
 Requires at least: 3.0
-Tested up to: 3.9.1
-Stable tag: 2.53
+Tested up to: 4.0 
+Stable tag: 2.57
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -143,6 +143,22 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 2.57 2014-07-29 =
+  * Improved anti spam protection for comments. The plugin now proccessing website url in the comments form.
+  * Fixed signup remove logic for approved comments. Previous version doesn't cut sign for comments approved via AJAX call in WordPress backend.
+  * Fixed switching to SSL for comments. Previous version doesn't use secured connection for comments.
+
+= 2.56 2014-07-21 =
+  * Fixed account status check logic. Previous version makes unnecessary test API calls when the plugin asks account status check.
+
+= 2.55 2014-07-11 =
+  * Fixed bug with account status function. In backend the plugin showed notice 'Please don’t forget to disable CAPTCHA if you have it!' on every page. 
+
+= 2.54 2014-07-11 =
+  * Fixed signup anti spam protection logic for BuddyPress registrations. 
+  * Fixed anti spam protection for JetPack contact form.
+  * Changed account status check logic.
+
 = 2.53 2014-06-27 =
   * Fixed anit-spam protection bug for signups. 
   * Changed anti-spam functions (comments and signups) priority. 
@@ -345,6 +361,22 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.57 2014-07-29 =
+  * Improved anti spam protection for comments. The plugin now proccessing website url in the comments form.
+  * Fixed signup remove logic for approved comments. Previous version doesn't cut sign for comments approved via AJAX call in WordPress backend.
+  * Fixed switching to SSL for comments. Previous version doesn't use secured connection for comments.
+
+= 2.56 2014-07-21 =
+  * Fixed account status check logic. Previous version makes unnecessary test API calls when the plugin asks account status check.
+
+= 2.55 2014-07-11 =
+  * Fixed bug with account status function. In backend the plugin showed notice 'Please don’t forget to disable CAPTCHA if you have it!' on every page. 
+
+= 2.54 2014-07-11 =
+  * Fixed signup anti spam protection logic for BuddyPress registrations. 
+  * Fixed anti spam protection for JetPack contact form.
+  * Changed account status check logic.
+
 = 2.53 2014-06-27 =
   * Fixed anit-spam protection bug for signups. 
   * Changed anti-spam functions (comments and signups) priority. 

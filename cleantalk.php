@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.54
+  Version: 2.57
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-254';
+$ct_agent_version = 'wordpress-257';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -78,6 +78,9 @@ $ct_formtime_label = 'formtime';
 // Plugin's options 
 $ct_options = null; 
 
+// Account status check last time
+$ct_account_status_check = 0;
+
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -120,13 +123,17 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
         
-if (is_admin() && !(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+if (is_admin()) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
+    
+    if (!(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+        add_action('admin_init', 'ct_admin_init', 1);
+        add_action('admin_menu', 'ct_admin_add_page');
+        add_action('admin_notices', 'admin_notice_message');
+    }
 
-    add_action('admin_init', 'ct_admin_init', 1);
-    add_action('admin_menu', 'ct_admin_add_page');
     add_action('admin_enqueue_scripts', 'ct_enqueue_scripts');
-    add_action('admin_notices', 'admin_notice_message');
+    add_action('comment_unapproved_to_approvecomment', 'ct_comment_approved'); // param - comment object
     add_action('comment_unapproved_to_approved', 'ct_comment_approved'); // param - comment object
     add_action('comment_approved_to_unapproved', 'ct_comment_unapproved'); // param - comment object
     add_action('comment_unapproved_to_spam', 'ct_comment_spam');  // param - comment object
@@ -264,8 +271,9 @@ function ct_feedback($hash, $message = null, $allow) {
     $ct->server_changed = $config['ct_server_changed'];
 
     if (empty($hash)) {
-	$hash = $ct->getCleantalkCommentHash($message);
+	    $hash = $ct->getCleantalkCommentHash($message);
     }
+
     if ($message !== null) {
         $resultMessage = $ct->delCleantalkComment($message);
     }
@@ -377,7 +385,7 @@ function ct_base_call($params = array()) {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
-    $ct->ssl_on = $config['ssl_on'];
+    $ct->ssl_on = $options['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 
@@ -641,6 +649,10 @@ function ct_preprocess_comment($comment) {
     $checkjs = js_test('ct_checkjs', $_POST);
 
     $example = null;
+    
+    $sender_info = array(
+	    'sender_url' => @$comment['comment_author_url']
+    );
 
     $post_info['comment_type'] = $comment['comment_type'];
     $post_info['post_url'] = ct_post_url(null, $comment_post_id); 
@@ -674,7 +686,8 @@ function ct_preprocess_comment($comment) {
         'sender_email' => $comment['comment_author_email'],
         'sender_nickname' => $comment['comment_author'],
         'post_info' => $post_info,
-        'checkjs' => $checkjs
+        'checkjs' => $checkjs,
+        'sender_info' => $sender_info
     ));
     $ct = $ct_base_call_result['ct'];
     $ct_result = $ct_base_call_result['ct_result'];
@@ -1533,7 +1546,7 @@ function ct_s2member_registration_test() {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
-    $ct->ssl_on = $config['ssl_on'];
+    $ct->ssl_on = $options['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 
