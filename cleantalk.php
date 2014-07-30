@@ -1082,6 +1082,13 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
 
     $checkjs = js_test($ct_checkjs_register_form, $_POST);
 
+    //
+    // This hack can be helpfull when plugin uses with untested themes&signups plugins.
+    //
+    if ($checkjs === null) {
+        $checkjs = js_test($ct_checkjs_register_form, $_COOKIE);
+    }
+
     require_once('cleantalk.class.php');
 
     $blog_lang = substr(get_locale(), 0, 2);
