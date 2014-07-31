@@ -163,7 +163,7 @@ function ct_init() {
 	(defined('LANDINGPAGES_CURRENT_VERSION'))
 	|| (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION'))
     ) {
-	    add_action('wp_footer', 'ct_footer_add_cookie');
+	    add_action('wp_footer', 'ct_footer_add_cookie', 1);
     }
     if (
 	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules))
@@ -443,10 +443,6 @@ function ct_footer_add_cookie() {
         return false;
     }
 
-    $options = ct_get_options();
-    if ($options['comments_test'] == 0) {
-        return false;
-    }
     ct_add_hidden_fields(null, 'ct_checkjs', false, true);
 
     return null;
