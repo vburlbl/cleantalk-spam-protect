@@ -1447,19 +1447,16 @@ function ct_check_wplp(){
     global $ct_wplp_result_label;
     if (!isset($_COOKIE[$ct_wplp_result_label])) {
         // First AJAX submit of WPLP form
-	$options = ct_get_options();
-	if ($options['contact_forms_test'] == 0)
-    	    return;
+        $options = ct_get_options();
+        if ($options['contact_forms_test'] == 0)
+                return;
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE);
 
-    if (null === $checkjs)
-        $checkjs = 0;
-
-	$post_info['comment_type'] = 'feedback';
-	$post_info = json_encode($post_info);
-	if ($post_info === false)
-    	    $post_info = '';
+        $post_info['comment_type'] = 'feedback';
+        $post_info = json_encode($post_info);
+        if ($post_info === false)
+            $post_info = '';
 
         $sender_email = '';
         foreach ($_POST as $v) {
@@ -1474,28 +1471,28 @@ function ct_check_wplp(){
             $form_input_values = json_decode(stripslashes($_POST['form_input_values']), true);
             if (is_array($form_input_values) && array_key_exists('null', $form_input_values))
                 $message = $form_input_values['null'];
-        }else if(array_key_exists('null', $_POST)){
+        } else if (array_key_exists('null', $_POST)) {
             $message = $_POST['null'];
         }
 
-	$ct_base_call_result = ct_base_call(array(
-    	    'message' => $message,
-    	    'example' => null,
-    	    'sender_email' => $sender_email,
-    	    'sender_nickname' => null,
-    	    'post_info' => $post_info,
-    	    'checkjs' => $checkjs
-	));
-	$ct = $ct_base_call_result['ct'];
-	$ct_result = $ct_base_call_result['ct_result'];
+        $ct_base_call_result = ct_base_call(array(
+                'message' => $message,
+                'example' => null,
+                'sender_email' => $sender_email,
+                'sender_nickname' => null,
+                'post_info' => $post_info,
+                'checkjs' => $checkjs
+        ));
+        $ct = $ct_base_call_result['ct'];
+        $ct_result = $ct_base_call_result['ct_result'];
 
-	if ($ct_result->spam == 1) {
+        if ($ct_result->spam == 1) {
             $cleantalk_comment = $ct_result->comment;
-	} else {
+        } else {
             $cleantalk_comment = 'OK';
         }
 
-	setcookie($ct_wplp_result_label, $cleantalk_comment, strtotime("+5 seconds"), '/');
+        setcookie($ct_wplp_result_label, $cleantalk_comment, strtotime("+5 seconds"), '/');
     } else {
         // Next POST/AJAX submit(s) of same WPLP form
         $cleantalk_comment = $_COOKIE[$ct_wplp_result_label];
