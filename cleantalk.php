@@ -122,6 +122,9 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
+
+// WooCoomerse signups
+add_filter('woocommerce_register_post', 'ct_register_post', 1, 3);
         
 if (is_admin()) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
@@ -162,6 +165,7 @@ function ct_init() {
 	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
 	(defined('LANDINGPAGES_CURRENT_VERSION'))
 	|| (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION'))
+    || (defined('WOOCOMMERCE_VERSION'))
     ) {
 	    add_action('wp_footer', 'ct_footer_add_cookie', 1);
     }
@@ -273,7 +277,8 @@ function ct_feedback($hash, $message = null, $allow) {
     if (empty($hash)) {
 	    $hash = $ct->getCleantalkCommentHash($message);
     }
-
+    
+    $resultMessage = null;
     if ($message !== null) {
         $resultMessage = $ct->delCleantalkComment($message);
     }
@@ -1082,7 +1087,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     // This hack can be helpfull when plugin uses with untested themes&signups plugins.
     //
     if ($checkjs === null) {
-        $checkjs = js_test($ct_checkjs_register_form, $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE);
     }
 
     require_once('cleantalk.class.php');
@@ -1579,5 +1584,10 @@ function ct_s2member_registration_test() {
 
     return true;
 }
+
+function ct_woocommerce_register_post ($username, $email, $validation_errors) {
+    var_dump($username, $email); exit;
+    return $validation_errors; 
+};
 
 ?>
