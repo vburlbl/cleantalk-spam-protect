@@ -26,7 +26,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 * Fast Secure Contact form.
 * WordPress Landing Pages.
 
-= Cloun antispam for WordPress. no spam comments, no spam registrations, no spam contact emails, no spam trackbacks =
+= Cloud antispam for WordPress. no spam comments, no spam registrations, no spam contact emails, no spam trackbacks =
 Spam is one of the most irritating factors. Spam become every year more and conventional anti spam can no longer handle all the spam bots. CleanTalk prevents spam and automatically blocks it. You'll be surprised of effective protection against spam.
 
 = Anti spam plugin info = 
