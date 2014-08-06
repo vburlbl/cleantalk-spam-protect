@@ -22,7 +22,7 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_showtime, $pagenow, $ct_plugin_name, $ct_options, $trial_notice_check_timeout, $account_notice_check_timeout, $ct_user_token_label;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_showtime, $pagenow, $ct_plugin_name, $ct_options, $trial_notice_check_timeout, $account_notice_check_timeout, $ct_user_token_label, $ct_account_status_check;
 
     $ct_options = ct_get_options();
 
@@ -75,9 +75,10 @@ function ct_admin_init() {
                     $ct_options['user_token'] = $result['user_token']; 
                 }
             }
-
+            
             // Save next status request time
-            $ct_options['next_account_status_check'] = strtotime("+ $notice_check_timeout hours", $ct_options['next_account_status_check']);
+            $ct_options['next_account_status_check'] = strtotime("+$notice_check_timeout hours", time());
+            $ct_account_status_check = time(); 
             update_option('cleantalk_settings', $ct_options);
         }
         
@@ -175,7 +176,7 @@ function ct_input_comments_test() {
     echo "<input type='radio' id='cleantalk_comments_test1' name='cleantalk_settings[comments_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_comments_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_comments_test0' name='cleantalk_settings[comments_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_comments_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('WordPress, JetPack', 'cleantalk'));
+    admin_addDescriptionsFields(__('WordPress, JetPack, WooCommerce', 'cleantalk'));
 }
 
 /**
@@ -188,7 +189,7 @@ function ct_input_registrations_test() {
     echo "<input type='radio' id='cleantalk_registrations_test1' name='cleantalk_settings[registrations_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_registrations_test1'> " . __('Yes') . "</label>";
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_registrations_test0' name='cleantalk_settings[registrations_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_registrations_test0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('WordPress, BuddyPress, bbPress, S2Member', 'cleantalk'));
+    admin_addDescriptionsFields(__('WordPress, BuddyPress, bbPress, S2Member, WooCommerce', 'cleantalk'));
 }
 
 /**
@@ -320,6 +321,7 @@ function ct_valid_key($apikey = null) {
 function ct_comment_approved($comment_object) {
     $comment = get_comment($comment_object->comment_ID, 'ARRAY_A');
     $hash = get_comment_meta($comment_object->comment_ID, 'ct_hash', true);
+
     $comment['comment_content'] = ct_unmark_red($comment['comment_content']);
     $comment['comment_content'] = ct_feedback($hash, $comment['comment_content'], 1);
     $comment['comment_approved'] = 1;
@@ -439,10 +441,16 @@ if (!function_exists ( 'ct_plugin_action_links')) {
  * @return array
 */
 function ct_update_option($option_name) {
-    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime;
-    
-    if($option_name !== 'cleantalk_settings')
+    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime, $ct_account_status_check;
+
+    if($option_name !== 'cleantalk_settings') {
         return;
+    }
+
+    // Skip test call if the function executet during account status check
+    if ($ct_account_status_check > 0 && time() - $ct_account_status_check < 5) {
+        return;
+    }
 
     $ct_base_call_result = ct_base_call(array(
         'message' => 'CleanTalk setup comment',
@@ -461,15 +469,6 @@ function ct_update_option($option_name) {
         setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
         setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_showtime minutes"), '/');
     }
-    
-    //
-    // Force account status check
-    //
-    $ct_options = ct_get_options();
-    $ct_options['next_account_status_check'] = 0;
-    update_option('cleantalk_settings', $ct_options);
-
-    return null;
 }
 
 ?>

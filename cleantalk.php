@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.54
+  Version: 2.58
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-254';
+$ct_agent_version = 'wordpress-258';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -78,6 +78,9 @@ $ct_formtime_label = 'formtime';
 // Plugin's options 
 $ct_options = null; 
 
+// Account status check last time
+$ct_account_status_check = 0;
+
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -119,14 +122,21 @@ add_filter('si_contact_form_validate', 'ct_si_contact_form_validate');
 
 // Login form - for notifications only
 add_filter('login_message', 'ct_login_message');
-        
-if (is_admin() && !(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
-	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
 
-    add_action('admin_init', 'ct_admin_init', 1);
-    add_action('admin_menu', 'ct_admin_add_page');
+// WooCoomerse signups
+add_filter('woocommerce_register_post', 'ct_register_post', 1, 3);
+        
+if (is_admin()) {
+	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
+    
+    if (!(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+        add_action('admin_init', 'ct_admin_init', 1);
+        add_action('admin_menu', 'ct_admin_add_page');
+        add_action('admin_notices', 'admin_notice_message');
+    }
+
     add_action('admin_enqueue_scripts', 'ct_enqueue_scripts');
-    add_action('admin_notices', 'admin_notice_message');
+    add_action('comment_unapproved_to_approvecomment', 'ct_comment_approved'); // param - comment object
     add_action('comment_unapproved_to_approved', 'ct_comment_approved'); // param - comment object
     add_action('comment_approved_to_unapproved', 'ct_comment_unapproved'); // param - comment object
     add_action('comment_unapproved_to_spam', 'ct_comment_spam');  // param - comment object
@@ -155,8 +165,9 @@ function ct_init() {
 	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
 	(defined('LANDINGPAGES_CURRENT_VERSION'))
 	|| (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION'))
+    || (defined('WOOCOMMERCE_VERSION'))
     ) {
-	    add_action('wp_footer', 'ct_footer_add_cookie');
+	    add_action('wp_footer', 'ct_footer_add_cookie', 1);
     }
     if (
 	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules))
@@ -264,8 +275,10 @@ function ct_feedback($hash, $message = null, $allow) {
     $ct->server_changed = $config['ct_server_changed'];
 
     if (empty($hash)) {
-	$hash = $ct->getCleantalkCommentHash($message);
+	    $hash = $ct->getCleantalkCommentHash($message);
     }
+    
+    $resultMessage = null;
     if ($message !== null) {
         $resultMessage = $ct->delCleantalkComment($message);
     }
@@ -377,7 +390,7 @@ function ct_base_call($params = array()) {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
-    $ct->ssl_on = $config['ssl_on'];
+    $ct->ssl_on = $options['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 
@@ -435,10 +448,6 @@ function ct_footer_add_cookie() {
         return false;
     }
 
-    $options = ct_get_options();
-    if ($options['comments_test'] == 0) {
-        return false;
-    }
     ct_add_hidden_fields(null, 'ct_checkjs', false, true);
 
     return null;
@@ -641,6 +650,10 @@ function ct_preprocess_comment($comment) {
     $checkjs = js_test('ct_checkjs', $_POST);
 
     $example = null;
+    
+    $sender_info = array(
+	    'sender_url' => @$comment['comment_author_url']
+    );
 
     $post_info['comment_type'] = $comment['comment_type'];
     $post_info['post_url'] = ct_post_url(null, $comment_post_id); 
@@ -674,7 +687,8 @@ function ct_preprocess_comment($comment) {
         'sender_email' => $comment['comment_author_email'],
         'sender_nickname' => $comment['comment_author'],
         'post_info' => $post_info,
-        'checkjs' => $checkjs
+        'checkjs' => $checkjs,
+        'sender_info' => $sender_info
     ));
     $ct = $ct_base_call_result['ct'];
     $ct_result = $ct_base_call_result['ct_result'];
@@ -1069,6 +1083,13 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
 
     $checkjs = js_test($ct_checkjs_register_form, $_POST);
 
+    //
+    // This hack can be helpfull when plugin uses with untested themes&signups plugins.
+    //
+    if ($checkjs === null) {
+        $checkjs = js_test('ct_checkjs', $_COOKIE);
+    }
+
     require_once('cleantalk.class.php');
 
     $blog_lang = substr(get_locale(), 0, 2);
@@ -1296,14 +1317,14 @@ function ct_wpcf7_spam($spam) {
         if ($sender_email === null && preg_match("/^\S+@\S+\.\S+$/", $v)) {
             $sender_email = $v;
         }
-        if ($message === '' && preg_match("/-message$/", $k)) {
+        if ($message === '' && preg_match("/(\-message|\w*message\w*)$/", $k)) {
             $message = $v;
         }
         if ($sender_nickname === null && preg_match("/-name$/", $k)) {
             $sender_nickname = $v;
         }
     }
-
+    
     $ct_base_call_result = ct_base_call(array(
         'message' => $message,
         'example' => null,
@@ -1427,19 +1448,16 @@ function ct_check_wplp(){
     global $ct_wplp_result_label;
     if (!isset($_COOKIE[$ct_wplp_result_label])) {
         // First AJAX submit of WPLP form
-	$options = ct_get_options();
-	if ($options['contact_forms_test'] == 0)
-    	    return;
+        $options = ct_get_options();
+        if ($options['contact_forms_test'] == 0)
+                return;
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE);
 
-    if (null === $checkjs)
-        $checkjs = 0;
-
-	$post_info['comment_type'] = 'feedback';
-	$post_info = json_encode($post_info);
-	if ($post_info === false)
-    	    $post_info = '';
+        $post_info['comment_type'] = 'feedback';
+        $post_info = json_encode($post_info);
+        if ($post_info === false)
+            $post_info = '';
 
         $sender_email = '';
         foreach ($_POST as $v) {
@@ -1454,28 +1472,28 @@ function ct_check_wplp(){
             $form_input_values = json_decode(stripslashes($_POST['form_input_values']), true);
             if (is_array($form_input_values) && array_key_exists('null', $form_input_values))
                 $message = $form_input_values['null'];
-        }else if(array_key_exists('null', $_POST)){
+        } else if (array_key_exists('null', $_POST)) {
             $message = $_POST['null'];
         }
 
-	$ct_base_call_result = ct_base_call(array(
-    	    'message' => $message,
-    	    'example' => null,
-    	    'sender_email' => $sender_email,
-    	    'sender_nickname' => null,
-    	    'post_info' => $post_info,
-    	    'checkjs' => $checkjs
-	));
-	$ct = $ct_base_call_result['ct'];
-	$ct_result = $ct_base_call_result['ct_result'];
+        $ct_base_call_result = ct_base_call(array(
+                'message' => $message,
+                'example' => null,
+                'sender_email' => $sender_email,
+                'sender_nickname' => null,
+                'post_info' => $post_info,
+                'checkjs' => $checkjs
+        ));
+        $ct = $ct_base_call_result['ct'];
+        $ct_result = $ct_base_call_result['ct_result'];
 
-	if ($ct_result->spam == 1) {
+        if ($ct_result->spam == 1) {
             $cleantalk_comment = $ct_result->comment;
-	} else {
+        } else {
             $cleantalk_comment = 'OK';
         }
 
-	setcookie($ct_wplp_result_label, $cleantalk_comment, strtotime("+5 seconds"), '/');
+        setcookie($ct_wplp_result_label, $cleantalk_comment, strtotime("+5 seconds"), '/');
     } else {
         // Next POST/AJAX submit(s) of same WPLP form
         $cleantalk_comment = $_COOKIE[$ct_wplp_result_label];
@@ -1533,7 +1551,7 @@ function ct_s2member_registration_test() {
     $ct->server_url = $options['server'];
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
-    $ct->ssl_on = $config['ssl_on'];
+    $ct->ssl_on = $options['ssl_on'];
 
     $ct_request = new CleantalkRequest();
 
@@ -1566,5 +1584,10 @@ function ct_s2member_registration_test() {
 
     return true;
 }
+
+function ct_woocommerce_register_post ($username, $email, $validation_errors) {
+    var_dump($username, $email); exit;
+    return $validation_errors; 
+};
 
 ?>
