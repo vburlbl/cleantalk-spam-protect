@@ -7,7 +7,7 @@ Stable tag: 2.58
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud antispam for WordPress. No spam comments, no spam registrations, no spam contact emails, no spam trackbacks.
+Cloud, premium antispam for WordPress. No spam comments, no spam registrations, no spam contact emails, no spam trackbacks.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
