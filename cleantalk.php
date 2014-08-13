@@ -430,8 +430,6 @@ function ct_base_call($params = array()) {
  * Adds hidden filed to comment form 
  */
 function ct_comment_form($post_id) {
-    global $ct_jp_comments;
-    
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -701,15 +699,23 @@ function ct_preprocess_comment($comment) {
 
     $post = get_post($comment_post_id);
 
-    $checkjs = js_test('ct_checkjs', $_POST);
-
     $example = null;
     
     $sender_info = array(
 	    'sender_url' => @$comment['comment_author_url']
     );
+    
+    //
+    // JetPack comments logic
+    //
+    if ($ct_jp_comments) {
+        $post_info['comment_type'] = 'jetpack_comment'; 
+        $checkjs = js_test('ct_checkjs', $_COOKIE);
+    } else {
+        $post_info['comment_type'] = $comment['comment_type'];
+        $checkjs = js_test('ct_checkjs', $_POST);
+    }
 
-    $post_info['comment_type'] = $comment['comment_type'];
     $post_info['post_url'] = ct_post_url(null, $comment_post_id); 
 
     $post_info = json_encode($post_info);
