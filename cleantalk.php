@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.59
+  Version: 3.1
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-259';
+$ct_agent_version = 'wordpress-31';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -163,6 +163,8 @@ function ct_init() {
     global $ct_wplp_result_label, $ct_jp_comments, $ct_post_data_label, $ct_post_data_authnet_label;
 
     ct_init_session();
+    
+    ct_cookies_test();
 
     add_action('comment_form', 'ct_comment_form');
 
@@ -358,6 +360,27 @@ function ct_init_session() {
 }
 
 /**
+ * Cookies test for sender 
+ * @return null|0|1;
+ */
+function ct_cookies_test ($test = false) {
+    $cookie_label = 'ct_cookies_test';
+    $secret_hash = ct_get_checkjs_value();
+
+    $result = null;
+    if ($test) {
+        $result = 0;
+        if (isset($_COOKIE[$cookie_label]) && $_COOKIE[$cookie_label] == $secret_hash) {
+            $result = 1;
+        }
+    } else {
+        setcookie($cookie_label, $secret_hash, 0, '/');
+    }
+
+    return $result;
+}
+
+/**
  * Inner function - Common part of request sending
  * @param array Array of parameters:
  *  'message' - string
@@ -376,12 +399,8 @@ function ct_base_call($params = array()) {
         
     $submit_time = submit_time_test();
 
-    $sender_info = array(
-        'cms_lang' => substr(get_locale(), 0, 2),
-        'REFFERRER' => @$_SERVER['HTTP_REFERER'],
-        'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
-    );
-    if(array_key_exists('sender_info', $params)){
+    $sender_info = get_sender_info();
+    if (array_key_exists('sender_info', $params)) {
 	    $sender_info = array_merge($sender_info, (array) $params['sender_info']);
     }
     $sender_info = json_encode($sender_info);
@@ -1152,15 +1171,11 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
 
     require_once('cleantalk.class.php');
 
-    $blog_lang = substr(get_locale(), 0, 2);
-    $user_info = array(
-        'cms_lang' => $blog_lang,
-        'REFFERRER' => @$_SERVER['HTTP_REFERER'],
-        'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
-    );
-    $user_info = json_encode($user_info);
-    if ($user_info === false)
-        $user_info = '';
+    $sender_info = get_sender_info();
+    $sender_info = json_encode($sender_info);
+    if ($sender_info === false) {
+        $sender_info= '';
+    }
 
     $sender_email = $user_email;
 
@@ -1179,7 +1194,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
     $ct_request->sender_nickname = $sanitized_user_login; 
     $ct_request->agent = $ct_agent_version; 
-    $ct_request->sender_info = $user_info;
+    $ct_request->sender_info = $sender_info;
     $ct_request->js_on = $checkjs;
     $ct_request->submit_time = $submit_time; 
 
@@ -1581,16 +1596,12 @@ function ct_s2member_registration_test() {
     $checkjs = js_test('ct_checkjs', $_COOKIE);
 
     require_once('cleantalk.class.php');
-
-    $blog_lang = substr(get_locale(), 0, 2);
-    $user_info = array(
-        'cms_lang' => $blog_lang,
-        'REFFERRER' => @$_SERVER['HTTP_REFERER'],
-        'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
-    );
-    $user_info = json_encode($user_info);
-    if ($user_info === false)
-        $user_info = '';
+    
+    $sender_info = get_sender_info();
+    $sender_info = json_encode($sender_info);
+    if ($sender_info === false) {
+        $sender_info= '';
+    }
     
     $sender_email = null;
     if (isset($_POST[$ct_post_data_label]['email']))
@@ -1622,7 +1633,7 @@ function ct_s2member_registration_test() {
     $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
     $ct_request->sender_nickname = $sender_nickname; 
     $ct_request->agent = $ct_agent_version; 
-    $ct_request->sender_info = $user_info;
+    $ct_request->sender_info = $sender_info;
     $ct_request->js_on = $checkjs;
     $ct_request->submit_time = $submit_time; 
 
@@ -1647,9 +1658,18 @@ function ct_s2member_registration_test() {
     return true;
 }
 
-function ct_woocommerce_register_post ($username, $email, $validation_errors) {
-    var_dump($username, $email); exit;
-    return $validation_errors; 
-};
+/**
+ * Inner function - Default data array for senders 
+ * @return array 
+ */
+function get_sender_info() {
+     return $sender_info = array(
+        'cms_lang' => substr(get_locale(), 0, 2),
+        'REFFERRER' => @$_SERVER['HTTP_REFERER'],
+        'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
+        'php_session' => session_id() != '' ? 1 : 0, 
+        'cookies_enabled' => ct_cookies_test(true), 
+    );
+}
 
 ?>
