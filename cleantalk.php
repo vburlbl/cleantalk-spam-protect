@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 2.58
+  Version: 2.59
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-258';
+$ct_agent_version = 'wordpress-259';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -18,7 +18,7 @@ $ct_session_request_id_label = 'request_id';
 $ct_session_register_ok_label = 'register_ok';
 
 $ct_checkjs_cf7 = 'ct_checkjs_cf7';
-$ct_cf7_comment = 'This is a spam!';
+$ct_cf7_comment = '';
 
 $ct_checkjs_jpcf = 'ct_checkjs_jpcf';
 $ct_jpcf_patched = false; 
@@ -125,6 +125,12 @@ add_filter('login_message', 'ct_login_message');
 
 // WooCoomerse signups
 add_filter('woocommerce_register_post', 'ct_register_post', 1, 3);
+
+// bbPress
+add_filter('bbp_new_topic_pre_content', 'ct_bbp_new_pre_content', 1);
+add_filter('bbp_new_reply_pre_content', 'ct_bbp_new_pre_content', 1);
+add_action('bbp_theme_before_topic_form_content', 'ct_comment_form');
+add_action('bbp_theme_before_reply_form_content', 'ct_comment_form');
         
 if (is_admin()) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
@@ -424,8 +430,6 @@ function ct_base_call($params = array()) {
  * Adds hidden filed to comment form 
  */
 function ct_comment_form($post_id) {
-    global $ct_jp_comments;
-    
     if (ct_is_user_enable() === false) {
         return false;
     }
@@ -607,6 +611,54 @@ function ct_frm_validate_entry ($errors, $values) {
 }
 
 /**
+ * Public filter 'bbp_*' - Checks topics, replies by cleantalk
+ * @param 	mixed[] $comment Comment string 
+ * @return  mixed[] $comment Comment string 
+ */
+function ct_bbp_new_pre_content ($comment) {
+//    wp_die('123', 'Blacklisted', array('back_link' => true));
+//    bbp_add_error('bbp_reply_content', __('Sorry, but you have been detected as spam', 'cleantalk' ));
+    $options = ct_get_options();
+    if (ct_is_user_enable() === false || $options['comments_test'] == 0 || is_user_logged_in()) {
+        return $comment;
+    }
+    
+    $checkjs = js_test('ct_checkjs', $_POST);
+
+    $example = null;
+    
+    $sender_info = array(
+	    'sender_url' => isset($_POST['bbp_anonymous_website']) ? $_POST['bbp_anonymous_website'] : null 
+    );
+
+    $post_info['comment_type'] = 'bbpress_comment'; 
+    $post_info['post_url'] = bbp_get_topic_permalink(); 
+
+    $post_info = json_encode($post_info);
+    if ($post_info === false) {
+	    $post_info = '';
+    }
+
+    $ct_base_call_result = ct_base_call(array(
+        'message' => $comment,
+        'example' => $example,
+        'sender_email' => isset($_POST['bbp_anonymous_email']) ? $_POST['bbp_anonymous_email'] : null, 
+        'sender_nickname' => isset($_POST['bbp_anonymous_name']) ? $_POST['bbp_anonymous_name'] : null, 
+        'post_info' => $post_info,
+        'checkjs' => $checkjs,
+        'sender_info' => $sender_info
+    ));
+    $ct = $ct_base_call_result['ct'];
+    $ct_result = $ct_base_call_result['ct_result'];
+
+    if ($ct_result->stop_queue == 1 || $ct_result->spam == 1) {
+        bbp_add_error('bbp_reply_content', $ct_result->comment);
+    }
+
+    return $comment;
+}
+
+/**
  * Public filter 'preprocess_comment' - Checks comment by cleantalk server
  * @param 	mixed[] $comment Comment data array
  * @return 	mixed[] New data array of comment
@@ -647,15 +699,23 @@ function ct_preprocess_comment($comment) {
 
     $post = get_post($comment_post_id);
 
-    $checkjs = js_test('ct_checkjs', $_POST);
-
     $example = null;
     
     $sender_info = array(
 	    'sender_url' => @$comment['comment_author_url']
     );
+    
+    //
+    // JetPack comments logic
+    //
+    if ($ct_jp_comments) {
+        $post_info['comment_type'] = 'jetpack_comment'; 
+        $checkjs = js_test('ct_checkjs', $_COOKIE);
+    } else {
+        $post_info['comment_type'] = $comment['comment_type'];
+        $checkjs = js_test('ct_checkjs', $_POST);
+    }
 
-    $post_info['comment_type'] = $comment['comment_type'];
     $post_info['post_url'] = ct_post_url(null, $comment_post_id); 
 
     $post_info = json_encode($post_info);
@@ -1340,10 +1400,12 @@ function ct_wpcf7_spam($spam) {
         $spam = true;
         $ct_cf7_comment = $ct_result->comment;
 	    add_filter('wpcf7_display_message', 'ct_wpcf7_display_message', 10, 2);
+        
     }
 
     return $spam;
 }
+
 /**
  * Changes CF7 status message 
  * @param 	string $hook URL of hooked page
