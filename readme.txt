@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form 
 Requires at least: 3.0
 Tested up to: 4.0 
-Stable tag: 2.58
+Stable tag: 2.59
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -143,12 +143,16 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 2.59 2014-08-14 =
+  * Added antispam protection for bbPress guests toptics/replies.
+  * Improved antispam protection for JComments comment form. 
+  * Updated PHP API. Now the plugin can resolve senders IP via proxies chain. The plugin uses first IP address from chain. 
+
 = 2.58 2014-08-06 =
   * Added anti spam protection for signups posted via WooCommerce order form. 
   * Improved anti spam protection for Contact Form 7.  
   * Improved anti spam protection for registrations. Now the plugin looking for JavaScript antispam test results not only in POST array, but in COOKIES array too. This improvement allows protect signup forms for any untested signups plugins and themes.
-  * Updated PHP API. No the plugin can resolve sender IP for websites behind proxy servers. If the proxy servers uses private IP address.  
-
+  * Updated PHP API. Now the plugin can resolve sender IP for websites behind proxy servers. If the proxy servers uses private IP address.  
 
 = 2.57 2014-07-29 =
   * Improved anti spam protection for comments. The plugin now proccessing website url in the comments form.
@@ -368,6 +372,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 2.59 2014-08-14 =
+Antispam protection for bbPress guests posts. Improvement for JetPack comments and PHP API update.
+
 = 2.58 2014-08-06 =
   * Added anti spam protection for signups posted via WooCommerce order form. 
   * Improved anti spam protection for Contact Form 7.  
