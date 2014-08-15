@@ -21,9 +21,8 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 = Spam protection =
 * WordPress, JetPack comments.
 * WordPress, BuddyPress, bbPress, S2Member signups.
-* Formiadble forms, Contact form 7, JetPack Contact form.
+* Formidable forms, Contact form 7, JetPack Contact form, Fast Secure Contact form.
 * WooCommerce review form.
-* Fast Secure Contact form.
 * WordPress Landing Pages.
 
 = Cloud antispam for WordPress. no spam comments, no spam registrations, no spam contact emails, no spam trackbacks =
