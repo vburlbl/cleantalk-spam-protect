@@ -7,7 +7,7 @@ Stable tag: 2.59
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud, premium antispam for WordPress. No spam comments, no spam registrations, no spam contact emails, no spam trackbacks.
+Cloud, premium antispam for WordPress. No captcha, no spam comments, no spam registrations, no spam contact emails, no spam trackbacks.
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
@@ -38,14 +38,21 @@ We have developed anti-spam for WordPress that would provide **maximum protectio
 
 The anti spam method offered by CleanTalk allows to switch from the methods that trouble the communication (CAPTCHA, question-answer etc.) to a more convenient one.
 
-The plugin developers had a long time experience in front-end, backend and server-side PHP programming, client side JavaScript and HTML programming. We were looking for an anti spam tool which is strong for spam bots and invisible to visitors, but nothing matched their criteria. So, we are started an anti-spam project called CleanTalk.
-
 The CleanTalk is premium anti spam for WordPress, please look at the <a href="http://cleantalk.org/price">pricing</a>. We try to provide the service at the highest level and we can not afford to offer a free version of our service, as this will immediately affect the quality of providing anti spam protection. Paying for a year of service, you save a lot more and get: 
+ 
+ * 100% protection against spambots
+ * Time and resources saving
+ * More registrations/comments/visitors
+ * Protect several websites at once at different CMS
+ * Easy to install and use
+ * Traffic acquisition and user loyalty
+ * 24/7 technical support
+ * Clear statistics
+ * No captcha, puzzles, etc.
+ * Free mobile app
 
-* Up to 100% protection from spam bots.
-* Simple and convenient form of commenting/registrations without captcha.
-* Always actual and regular updates.
-* Technical support.
+= How to Protect Sites from Bots? =
+The most popular method is CAPTCHA -- the annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots won’t discern these CAPTCHA, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource both from bots and visitors. CAPTCHA is not a panacea from spam. Doubts Concerning the Need for CAPTCHA?
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
