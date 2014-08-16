@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.1
+  Version: 3.0
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-31';
+$ct_agent_version = 'wordpress-30';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -241,7 +241,8 @@ function ct_def_options() {
         'spam_store_days' => '31', // Days before delete comments from folder Spam 
         'ssl_on' => 0, // Secure connection to servers 
         'next_account_status_check' => 0, // Time label when the plugin should check account status 
-        'user_token' => '' // User token 
+        'user_token' => '', // User token 
+        'relevance_test' => 0 // Test comment for relevance 
     );
 }
 
@@ -716,10 +717,6 @@ function ct_preprocess_comment($comment) {
 
     $comment_post_id = $comment['comment_post_ID'];
 
-    $post = get_post($comment_post_id);
-
-    $example = null;
-    
     $sender_info = array(
 	    'sender_url' => @$comment['comment_author_url']
     );
@@ -736,28 +733,32 @@ function ct_preprocess_comment($comment) {
     }
 
     $post_info['post_url'] = ct_post_url(null, $comment_post_id); 
-
     $post_info = json_encode($post_info);
-    if ($post_info === false)
-	$post_info = '';
-
-    if ($post !== null){
-	$example['title'] = $post->post_title;
-	$example['body'] = $post->post_content;
-	$example['comments'] = null;
-
-	$last_comments = get_comments(array('status' => 'approve', 'number' => 10, 'post_id' => $comment_post_id));
-	foreach ($last_comments as $post_comment){
-		$example['comments'] .= "\n\n" . $post_comment->comment_content;
-	}
-
-	$example = json_encode($example);
+    if ($post_info === false) {
+	    $post_info = '';
     }
+    
+    $example = null;
+    if ($options['relevance_test']) {
+        $post = get_post($comment_post_id);
+        if ($post !== null){
+            $example['title'] = $post->post_title;
+            $example['body'] = $post->post_content;
+            $example['comments'] = null;
 
-    // Use plain string format if've failed with JSON
-    if ($example === false || $example === null){
-	$example = ($post->post_title !== null) ? $post->post_title : '';
-	$example .= ($post->post_content !== null) ? "\n\n" . $post->post_content : '';
+            $last_comments = get_comments(array('status' => 'approve', 'number' => 10, 'post_id' => $comment_post_id));
+            foreach ($last_comments as $post_comment){
+                $example['comments'] .= "\n\n" . $post_comment->comment_content;
+            }
+
+            $example = json_encode($example);
+        }
+
+        // Use plain string format if've failed with JSON
+        if ($example === false || $example === null){
+            $example = ($post->post_title !== null) ? $post->post_title : '';
+            $example .= ($post->post_content !== null) ? "\n\n" . $post->post_content : '';
+        }
     }
 
     $ct_base_call_result = ct_base_call(array(
