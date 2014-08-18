@@ -81,6 +81,9 @@ $ct_options = null;
 // Account status check last time
 $ct_account_status_check = 0;
 
+// Post without page load
+$ct_direct_post = 0;
+
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -160,9 +163,17 @@ if (is_admin()) {
  * @return 	mixed[] Array of options
  */
 function ct_init() {
-    global $ct_wplp_result_label, $ct_jp_comments, $ct_post_data_label, $ct_post_data_authnet_label;
+    global $ct_wplp_result_label, $ct_jp_comments, $ct_post_data_label, $ct_post_data_authnet_label, $ct_formtime_label, $ct_direct_post;
 
     ct_init_session();
+    
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (!array_key_exists($ct_formtime_label, $_SESSION) && session_id() != '') {
+            $ct_direct_post = 1;
+        }
+    } else {
+        $_SESSION[$ct_formtime_label] = time();
+    }
     
     ct_cookies_test();
 
@@ -170,7 +181,7 @@ function ct_init() {
 
     $jetpack_active_modules = get_option('jetpack_active_modules');
     if (
-	(class_exists( 'Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
+	(class_exists('Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
 	(defined('LANDINGPAGES_CURRENT_VERSION'))
 	|| (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION'))
     || (defined('WOOCOMMERCE_VERSION'))
@@ -369,15 +380,20 @@ function ct_cookies_test ($test = false) {
     $secret_hash = ct_get_checkjs_value();
 
     $result = null;
-    if ($test) {
-        $result = 0;
-        if (isset($_COOKIE[$cookie_label]) && $_COOKIE[$cookie_label] == $secret_hash) {
+    if (isset($_COOKIE[$cookie_label])) {
+        if ($_COOKIE[$cookie_label] == $secret_hash) {
             $result = 1;
+        } else {
+            $result = 0;
         }
     } else {
         setcookie($cookie_label, $secret_hash, 0, '/');
-    }
 
+        if ($test) {
+            $result = 0;
+        }
+    }
+    
     return $result;
 }
 
@@ -482,11 +498,10 @@ function ct_footer_add_cookie() {
  * @param 	int $post_id Post ID, not used
  */
 function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
-    global $ct_checkjs_def, $ct_formtime_label, $ct_plugin_name;
+    global $ct_checkjs_def, $ct_plugin_name;
 
     $ct_checkjs_key = ct_get_checkjs_value(); 
     
-    $_SESSION[$ct_formtime_label] = time();
 
     if ($cookie_check) { 
 			$html = '
@@ -560,15 +575,13 @@ function ct_is_user_enable() {
 * return null;
 */
 function ct_frm_entries_footer_scripts($fields, $form) {
-    global $current_user, $ct_checkjs_frm, $ct_formtime_label;
+    global $current_user, $ct_checkjs_frm;
 
     $options = ct_get_options();
     if ($options['contact_forms_test'] == 0) {
         return false;
     }
     
-    $_SESSION[$ct_formtime_label] = time();
-
     $ct_checkjs_key = ct_get_checkjs_value();
     $ct_frm_name = 'form_' . $form->form_key;
 
@@ -1185,6 +1198,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     $ct = new Cleantalk();
     $ct->work_url = $config['ct_work_url'];
     $ct->server_url = $options['server'];
+
     $ct->server_ttl = $config['ct_server_ttl'];
     $ct->server_changed = $config['ct_server_changed'];
     $ct->ssl_on = $options['ssl_on'];
@@ -1507,7 +1521,7 @@ function ct_si_contact_form_validate($form_errors = array(), $form_id_num = 0) {
 function ct_comment_text($comment_text) {
     global $comment, $ct_approved_request_id_label;
 
-    if (isset($_COOKIE[$ct_approved_request_id_label])) {
+    if (isset($_COOKIE[$ct_approved_request_id_label]) && isset($comment->comment_ID)) {
         $ct_hash = get_comment_meta($comment->comment_ID, 'ct_hash', true);
 
         if ($ct_hash !== '' && $_COOKIE[$ct_approved_request_id_label] == $ct_hash) {
@@ -1664,12 +1678,17 @@ function ct_s2member_registration_test() {
  * @return array 
  */
 function get_sender_info() {
-     return $sender_info = array(
+    global $ct_direct_post;
+
+    $php_session = session_id() != '' ? 1 : 0;
+    
+    return $sender_info = array(
         'cms_lang' => substr(get_locale(), 0, 2),
         'REFFERRER' => @$_SERVER['HTTP_REFERER'],
         'USER_AGENT' => @$_SERVER['HTTP_USER_AGENT'],
-        'php_session' => session_id() != '' ? 1 : 0, 
+        'php_session' => $php_session, 
         'cookies_enabled' => ct_cookies_test(true), 
+        'direct_post' => $ct_direct_post,
     );
 }
 
