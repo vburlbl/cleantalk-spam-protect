@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form 
 Requires at least: 3.0
 Tested up to: 4.0 
-Stable tag: 2.59
+Stable tag: 3.1
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -149,10 +149,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
-= 2.59 2014-08-14 =
-  * Added antispam protection for bbPress guests toptics/replies.
-  * Improved antispam protection for JComments comment form. 
-  * Updated PHP API. Now the plugin can resolve senders IP via proxies chain. The plugin uses first IP address from chain. 
+= 3.1 2014-08-19 =
+  * Added anti spam test over senders Cookies.
+  * Improved form fill anti spam test.
+  * Improved speed selection of the nearest server to website.
+  * Improved anti spam speed for comments.
+  * Relevance anti spam test disabled by default. To enable test should be used option 'relevance_test'.
 
 = 2.58 2014-08-06 =
   * Added anti spam protection for signups posted via WooCommerce order form. 
@@ -378,8 +380,11 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 3.1 2014-08-19 =
+  Major changes for comments antispam logic. Improved plugin speed.
+
 = 2.59 2014-08-14 =
-Antispam protection for bbPress guests posts. Improvement for JetPack comments and PHP API update.
+  Antispam protection for bbPress guests posts. Improvement for JetPack comments and PHP API update.
 
 = 2.58 2014-08-06 =
   * Added anti spam protection for signups posted via WooCommerce order form. 
