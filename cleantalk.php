@@ -73,7 +73,7 @@ $ct_post_data_label = 's2member_pro_paypal_registration';
 $ct_post_data_authnet_label = 's2member_pro_authnet_registration'; 
 
 // Form time load label  
-$ct_formtime_label = 'formtime'; 
+$ct_formtime_label = 'ct_formtime'; 
 
 // Plugin's options 
 $ct_options = null; 
@@ -364,7 +364,6 @@ function ct_send_feedback($feedback_request = null) {
  */
 function ct_init_session() {
     if(session_id() === '') {
-        session_name('cleantalksession');
         @session_start();
     }
 
