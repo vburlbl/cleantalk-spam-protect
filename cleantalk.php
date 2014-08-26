@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.1
+  Version: 3.2
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-31';
+$ct_agent_version = 'wordpress-32';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -409,7 +409,7 @@ function ct_cookies_test ($test = false) {
  * @return array array('ct'=> Cleantalk, 'ct_result' => CleantalkResponse)
  */
 function ct_base_call($params = array()) {
-    global $wpdb, $ct_agent_version;
+    global $wpdb, $ct_agent_version, $ct_formtime_label;
 
     require_once('cleantalk.class.php');
         
@@ -456,6 +456,11 @@ function ct_base_call($params = array()) {
                 'ct_server_changed' => time()
                 )
         );
+    }
+     
+    // Restart submit form counter for failed requests
+    if ($ct_result->allow == 0) {
+        $_SESSION[$ct_formtime_label] = time();
     }
 
     return array('ct' => $ct, 'ct_result' => $ct_result);
@@ -1143,7 +1148,7 @@ function ct_register_post($sanitized_user_login = null, $user_email = null, $err
  * @return array with errors 
  */
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
-    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done;
+    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done, $ct_formtime_label;
     
     //
     // The function already executed
@@ -1227,6 +1232,11 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
 
     if ($ct_result->errno != 0) {
         return $errors;
+    }
+    
+    // Restart submit form counter for failed requests
+    if ($ct_result->allow == 0) {
+        $_SESSION[$ct_formtime_label] = time();
     }
     
     if ($ct_result->inactive != 0) {
@@ -1598,7 +1608,7 @@ function ct_check_wplp(){
  * @return array with errors 
  */
 function ct_s2member_registration_test() {
-    global $ct_agent_version, $ct_post_data_label, $ct_post_data_authnet_label;
+    global $ct_agent_version, $ct_post_data_label, $ct_post_data_authnet_label, $ct_formtime_label;
     
     $options = ct_get_options();
     if ($options['registrations_test'] == 0) {
@@ -1665,6 +1675,12 @@ function ct_s2member_registration_test() {
     if ($ct_result->errno != 0) {
         return false;
     }
+    
+    // Restart submit form counter for failed requests
+    if ($ct_result->allow == 0) {
+        $_SESSION[$ct_formtime_label] = time();
+    }
+
     if ($ct_result->allow == 0) {
         ct_die_extended($ct_result->comment);
     }
