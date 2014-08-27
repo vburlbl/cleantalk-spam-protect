@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form 
 Requires at least: 3.0
 Tested up to: 4.0 
-Stable tag: 3.1
+Stable tag: 3.2
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -149,6 +149,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the registration form. 
 
 == Changelog ==
+= 3.2 2014-08-27 =
+  * Fixed submit_time() logic for failed submits (comments/registrations). Now form fill time resets after every failed submit. 
+
 = 3.1 2014-08-19 =
   * Added anti spam test over senders Cookies.
   * Improved form fill anti spam test.
@@ -380,6 +383,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 3.2 2014-08-27 =
+Minor changes in spam filtration logic.
+
 = 3.1 2014-08-19 =
   Major changes for comments antispam logic. Improved plugin speed.
 
