@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.2
+  Version: 3.3
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-32';
+$ct_agent_version = 'wordpress-33';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -215,7 +215,17 @@ function ct_init() {
     if (ct_plugin_active('new-user-approve/new-user-approve.php')) {
         add_action('register_post', 'ct_register_post', 1, 3);
     }
-
+    
+    //
+    // Load JS code to website footer for contact forms
+    //
+    if (!is_admin() && !(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+        $options = get_option('cleantalk_settings');
+        if (isset($options['general_contact_forms_test']) && $options['general_contact_forms_test'] == 1) {
+            add_action('wp_footer', 'ct_footer_add_cookie', 1);
+            ct_contact_form_validate();
+        }
+    }
 }
 
 /**
@@ -248,6 +258,7 @@ function ct_def_options() {
         'registrations_test' => '1', 
         'comments_test' => '1', 
         'contact_forms_test' => '1', 
+        'general_contact_forms_test' => '0', // Antispam test for unsupported and untested contact forms 
         'remove_old_spam' => '0',
         'spam_store_days' => '31', // Days before delete comments from folder Spam 
         'ssl_on' => 0, // Secure connection to servers 
@@ -653,8 +664,7 @@ function ct_frm_validate_entry ($errors, $values) {
  * @return  mixed[] $comment Comment string 
  */
 function ct_bbp_new_pre_content ($comment) {
-//    wp_die('123', 'Blacklisted', array('back_link' => true));
-//    bbp_add_error('bbp_reply_content', __('Sorry, but you have been detected as spam', 'cleantalk' ));
+
     $options = ct_get_options();
     if (ct_is_user_enable() === false || $options['comments_test'] == 0 || is_user_logged_in()) {
         return $comment;
@@ -737,7 +747,7 @@ function ct_preprocess_comment($comment) {
     $sender_info = array(
 	    'sender_url' => @$comment['comment_author_url']
     );
-    
+
     //
     // JetPack comments logic
     //
@@ -1687,6 +1697,95 @@ function ct_s2member_registration_test() {
 
     return true;
 }
+
+/**
+ * General test for any contact form
+ */
+function ct_contact_form_validate () {
+    if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        return null;
+    }
+
+    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    
+    $sender_info = get_sender_info();
+    $sender_info = json_encode($sender_info);
+    if ($sender_info === false) {
+        $sender_info= '';
+    }
+
+    $post_info['comment_type'] = 'feedback_general_contact_form';
+    $post_info = json_encode($post_info);
+    if ($post_info === false) {
+        $post_info = '';
+    }
+
+    $sender_email = null;
+    $sender_nickname = null;
+    $subject = '';
+    $message = '';
+    $contact_form = false;
+    foreach ($_POST as $k => $v) {
+        if ($sender_email === null && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+            $sender_email = $v;
+        }
+        if ($sender_nickname === null && ct_get_data_from_submit($k, 'name')) {
+            $sender_nickname = $v;
+        }
+        if ($message === '' && ct_get_data_from_submit($k, 'message')) {
+            $message = $v;
+        }
+        if ($subject === '' && ct_get_data_from_submit($k, 'subject')) {
+            $subject = $v;
+        }
+
+        if (!$contact_form && preg_match("/(contact|form|feedback)/", $k) && !preg_match("/^ct_checkjs/", $k)) {
+            $contact_form = true;
+        }
+    }
+
+    // Skip submision if no data found
+    if ((!$sender_email && $message == '' && $subject == '') || !$contact_form) {
+        return false;
+    }
+
+    $ct_base_call_result = ct_base_call(array(
+        'message' => $subject . "\n\n" . $message,
+        'example' => null,
+        'sender_email' => $sender_email,
+        'sender_nickname' => $sender_nickname,
+        'post_info' => $post_info,
+	    'sender_info' => $sender_info,
+        'checkjs' => $checkjs
+    ));
+    
+    $ct = $ct_base_call_result['ct'];
+    $ct_result = $ct_base_call_result['ct_result'];
+
+    if ($ct_result->allow == 0) {
+        global $ct_comment;
+        $ct_comment = $ct_result->comment;
+        ct_die(null, null);
+        exit;
+    }
+
+    return null;
+}
+
+
+/**
+ * Inner function - Finds and returns pattern in string
+ * @return null|bool
+ */
+function ct_get_data_from_submit($value = null, $field_name = null) {
+    if (!$value || !$field_name) {
+        return false;
+    }
+    if (preg_match("/[a-z0-9_\-]*" . $field_name. "[a-z0-9_\-]*$/", $value)) {
+        return true;
+    }
+}
+
 
 /**
  * Inner function - Default data array for senders 
