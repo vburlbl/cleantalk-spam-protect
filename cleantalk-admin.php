@@ -174,7 +174,7 @@ function ct_input_apikey() {
         echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
     } else{
         if (isset($_COOKIE[$ct_notice_online_label]) && $_COOKIE[$ct_notice_online_label] > 0) {
-            echo '&nbsp;&nbsp;<span style="text-decoration: underline;">The key accepted!</span>&nbsp;<img src="' . plugin_dir_url(__FILE__) . 'inc/images/Yes.png" alt=""  height="" />'; 
+            echo '&nbsp;&nbsp;<span style="text-decoration: underline;">The key accepted!</span>&nbsp;<img src="' . plugin_dir_url(__FILE__) . 'inc/images/yes.png" alt=""  height="" />'; 
         }
     }
 }
