@@ -260,7 +260,7 @@ function ct_def_options() {
         'contact_forms_test' => '1', 
         'general_contact_forms_test' => '0', // Antispam test for unsupported and untested contact forms 
         'remove_old_spam' => '0',
-        'spam_store_days' => '31', // Days before delete comments from folder Spam 
+        'spam_store_days' => '15', // Days before delete comments from folder Spam 
         'ssl_on' => 0, // Secure connection to servers 
         'next_account_status_check' => 0, // Time label when the plugin should check account status 
         'user_token' => '', // User token 
@@ -1053,26 +1053,6 @@ function ct_get_checkjs_value() {
     return md5($salt); 
 }
 
-/**
- * Delete old spam comments 
- * @return null 
- */
-function delete_spam_comments() {
-    $options = ct_get_options();
-
-    if ($options['remove_old_spam'] == 1) {
-        $last_comments = get_comments(array('status' => 'spam', 'number' => 1000, 'order' => 'ASC'));
-        foreach ($last_comments as $c) {
-            if (time() - strtotime($c->comment_date_gmt) > 86400 * $options['spam_store_days']) {
-                // Force deletion old spam comments
-                wp_delete_comment($c->comment_ID, true);
-            } 
-        }
-    }
-
-    return null; 
-}
-
 
 /**
  * Insert a hidden field to registration form
@@ -1180,7 +1160,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         $user_email = $_POST['signup_email'];
         $buddypress = true;
     }
-    
+
     $submit_time = submit_time_test();
 
     $options = ct_get_options();
