@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.3
+  Version: 3.4
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-33';
+$ct_agent_version = 'wordpress-34';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -134,7 +134,28 @@ add_filter('bbp_new_topic_pre_content', 'ct_bbp_new_pre_content', 1);
 add_filter('bbp_new_reply_pre_content', 'ct_bbp_new_pre_content', 1);
 add_action('bbp_theme_before_topic_form_content', 'ct_comment_form');
 add_action('bbp_theme_before_reply_form_content', 'ct_comment_form');
-        
+
+register_activation_hook( __FILE__, 'ct_activation' );
+
+/**
+ * On activation, set a time, frequency and name of an action hook to be scheduled.
+ */
+function ct_activation() {
+	wp_schedule_event(time(), 'hourly', 'ct_hourly_event_hook' );
+}
+
+// Hourly run hook
+add_action('ct_hourly_event_hook', 'ct_do_this_hourly');
+
+/**
+ * On the scheduled action hook, run the function.
+ */
+function ct_do_this_hourly() {
+	// do something every hour
+    delete_spam_comments();
+    error_log('ct_do_this_hourly');
+}
+
 if (is_admin()) {
 	require_once(CLEANTALK_PLUGIN_DIR . 'cleantalk-admin.php');
     
@@ -1785,5 +1806,27 @@ function get_sender_info() {
         'direct_post' => $ct_direct_post,
     );
 }
+
+/**
+ * Delete old spam comments 
+ * @return null 
+ */
+function delete_spam_comments() {
+    global $pagenow;
+    
+    $options = ct_get_options();
+    if ($options['remove_old_spam'] == 1) {
+        $last_comments = get_comments(array('status' => 'spam', 'number' => 1000, 'order' => 'ASC'));
+        foreach ($last_comments as $c) {
+            if (time() - strtotime($c->comment_date_gmt) > 86400 * $options['spam_store_days']) {
+                // Force deletion old spam comments
+                wp_delete_comment($c->comment_ID, true);
+            } 
+        }
+    }
+
+    return null; 
+}
+
 
 ?>

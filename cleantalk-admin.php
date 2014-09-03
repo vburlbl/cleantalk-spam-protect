@@ -102,8 +102,6 @@ function ct_admin_init() {
 
     ct_init_session();
     
-    delete_spam_comments();
-
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
     add_settings_section('cleantalk_settings_main', __($ct_plugin_name, 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
     add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
@@ -510,32 +508,5 @@ function ct_update_option($option_name) {
         setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_showtime minutes"), '/');
     }
 }
-
-/**
- * Delete old spam comments 
- * @return null 
- */
-function delete_spam_comments() {
-    global $pagenow;
-    
-    // Go out if the page not comments page
-    if ($pagenow != 'edit-comments.php') {
-        return null;
-    }
-
-    $options = ct_get_options();
-    if ($options['remove_old_spam'] == 1) {
-        $last_comments = get_comments(array('status' => 'spam', 'number' => 1000, 'order' => 'ASC'));
-        foreach ($last_comments as $c) {
-            if (time() - strtotime($c->comment_date_gmt) > 86400 * $options['spam_store_days']) {
-                // Force deletion old spam comments
-                wp_delete_comment($c->comment_ID, true);
-            } 
-        }
-    }
-
-    return null; 
-}
-
 
 ?>
