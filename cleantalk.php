@@ -153,7 +153,6 @@ add_action('ct_hourly_event_hook', 'ct_do_this_hourly');
 function ct_do_this_hourly() {
 	// do something every hour
     delete_spam_comments();
-    error_log('ct_do_this_hourly');
 }
 
 if (is_admin()) {
