@@ -1,4 +1,4 @@
-=== Anti-spam by CleanTalk (No CAPTCHA) ===
+=== Anti-spam by CleanTalk (CAPTCHA less anti spam) ===
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, forms 
 Requires at least: 3.0
