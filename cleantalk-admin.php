@@ -22,7 +22,7 @@ function ct_admin_add_page() {
  * Admin action 'admin_init' - Add the admin settings and such
  */
 function ct_admin_init() {
-    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_showtime, $pagenow, $ct_plugin_name, $ct_options, $trial_notice_check_timeout, $account_notice_check_timeout, $ct_user_token_label, $ct_account_status_check;
+    global $show_ct_notice_trial, $ct_notice_trial_label, $show_ct_notice_online, $ct_notice_online_label, $trial_notice_showtime, $ct_plugin_name, $ct_options, $trial_notice_check_timeout, $account_notice_check_timeout, $ct_user_token_label, $ct_account_status_check;
 
     $ct_options = ct_get_options();
 
@@ -89,24 +89,31 @@ function ct_admin_init() {
 
     $show_ct_notice_online = '';
     if (isset($_COOKIE[$ct_notice_online_label])) {
-        if ($_COOKIE[$ct_notice_online_label] == 1) {
+        if ($_COOKIE[$ct_notice_online_label] != 0 && time() - $_COOKIE[$ct_notice_online_label] <= 5) {
             $show_ct_notice_online = 'Y';
-	}else{
+	    } else {
+            $show_ct_notice_online = '';
+        }
+
+        if ($_COOKIE[$ct_notice_online_label] == 0) {
             $show_ct_notice_online = 'N';
-	}
+	    }
     }
 
     ct_init_session();
-
+    
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
     add_settings_section('cleantalk_settings_main', __($ct_plugin_name, 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
     add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_ssl_on', __('Use secure (SSL) connection to CleanTalk cloud', 'cleantalk'), 'ct_radio_ssl_on', 'cleantalk', 'cleantalk_settings_main');
+    add_settings_field('cleantalk_remove_old_spam', __('Automatically delete spam comments', 'cleantalk'), 'ct_input_remove_old_spam', 'cleantalk', 'cleantalk_settings_main');
+    
     add_settings_field('cleantalk_registrations_test', __('Registration forms', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_comments_test', __('Comments form', 'cleantalk'), 'ct_input_comments_test', 'cleantalk', 'cleantalk_settings_anti_spam');
     add_settings_field('cleantalk_contact_forms_test', __('Contact forms', 'cleantalk'), 'ct_input_contact_forms_test', 'cleantalk', 'cleantalk_settings_anti_spam');
+    add_settings_field('cleantalk_general_contact_forms_test', __('Custom contact forms', 'cleantalk'), 'ct_input_general_contact_forms_test', 'cleantalk', 'cleantalk_settings_anti_spam');
 }
 
 /**
@@ -156,13 +163,17 @@ function ct_radio_ssl_on() {
  * Admin callback function - Displays inputs of 'apikey' plugin parameter
  */
 function ct_input_apikey() {
-    global $ct_options;
+    global $ct_options, $ct_notice_online_label;
     
     $value = $ct_options['apikey'];
     $def_value = ''; 
     echo "<input id='cleantalk_apikey' name='cleantalk_settings[apikey]' size='20' type='text' value='$value' style=\"font-size: 14pt;\"/>";
     if (ct_valid_key($value) === false) {
         echo "<a target='__blank' style='margin-left: 10px' href='http://cleantalk.org/install/wordpress?step=2'>".__('Click here to get access key', 'cleantalk')."</a>";
+    } else{
+        if (isset($_COOKIE[$ct_notice_online_label]) && $_COOKIE[$ct_notice_online_label] > 0) {
+            echo '&nbsp;&nbsp;<span style="text-decoration: underline;">The key accepted!</span>&nbsp;<img src="' . plugin_dir_url(__FILE__) . 'inc/images/yes.png" alt=""  height="" />'; 
+        }
     }
 }
 
@@ -203,6 +214,34 @@ function ct_input_contact_forms_test() {
     echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     echo "<input type='radio' id='cleantalk_contact_forms_test0' name='cleantalk_settings[contact_forms_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_contact_forms_test0'> " . __('No') . "</label>";
     admin_addDescriptionsFields(__('Contact Form 7, Formiadble forms, JetPack, Fast Secure Contact Form, WordPress Landing Pages', 'cleantalk'));
+}
+
+/**
+ * Admin callback function - Displays inputs of 'general_contact_forms_test' plugin parameter
+ */
+function ct_input_general_contact_forms_test() {
+    global $ct_options;
+    
+    $value = $ct_options['general_contact_forms_test'];
+    echo "<input type='radio' id='cleantalk_general_contact_forms_test1' name='cleantalk_settings[general_contact_forms_test]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_general_contact_forms_test1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_general_contact_forms_test0' name='cleantalk_settings[general_contact_forms_test]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_general_contact_forms_test0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(__('Anti spam test for any WordPress or themes contacts forms', 'cleantalk'));
+}
+
+/**
+ * @author Artem Leontiev
+ * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
+ *
+ * @return null
+ */
+function ct_input_remove_old_spam() {
+    $options = ct_get_options();
+    $value = $options['remove_old_spam'];
+    echo "<input type='radio' id='cleantalk_remove_old_spam1' name='cleantalk_settings[remove_old_spam]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam1'> " . __('Yes') . "</label>";
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<input type='radio' id='cleantalk_remove_old_spam0' name='cleantalk_settings[remove_old_spam]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_remove_old_spam0'> " . __('No') . "</label>";
+    admin_addDescriptionsFields(sprintf(__('Delete spam comments older than %d days.', 'cleantalk'),  $options['spam_store_days']));
 }
 
 /**
@@ -268,6 +307,7 @@ function admin_notice_message(){
     $show_notice = true;
     if ($show_notice && ct_valid_key($options['apikey']) === false) {
         echo '<div class="updated"><h3>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam!", 'cleantalk') . '</h3></div>';
+        $show_notice = false;
     }
 
     if ($show_notice && $show_ct_notice_trial) {
@@ -287,8 +327,6 @@ function admin_notice_message(){
 
     ct_send_feedback();
 
-    delete_spam_comments();
-
     return true;
 }
 
@@ -298,7 +336,7 @@ function admin_notice_message(){
  * Add descriptions for field
  */
 function admin_addDescriptionsFields($descr = '') {
-    echo "<div style='color: #666 !important'>$descr</div>";
+    echo "<div style='font-size: 10pt; color: #666 !important'>$descr</div>";
 }
 
 /**
@@ -465,8 +503,8 @@ function ct_update_option($option_name) {
 
     if ($ct_result->inactive == 1) {
         setcookie($ct_notice_online_label, 0, null, '/');
-    }else{
-        setcookie($ct_notice_online_label, 1, strtotime("+5 seconds"), '/');
+    } else {
+        setcookie($ct_notice_online_label, time(), strtotime("+14 days"), '/');
         setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_showtime minutes"), '/');
     }
 }
