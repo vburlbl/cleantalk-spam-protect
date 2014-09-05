@@ -25,7 +25,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 * WooCommerce review form.
 * WordPress Landing Pages.
 
-= Cloud antispam for WordPress. no spam comments, no spam registrations, no spam contact emails, no spam trackbacks =
+= Cloud antispam for WordPress. CAPTCHA less, no spam comments, no spam registrations, no spam contact emails, no spam trackbacks =
 Spam is one of the most irritating factors. Spam become every year more and conventional anti spam can no longer handle all the spam bots. CleanTalk prevents spam and automatically blocks it. You'll be surprised of effective protection against spam.
 
 = Anti spam plugin info = 
@@ -50,7 +50,7 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
  * No captcha, puzzles, etc.
  * Free mobile app
 
-= How to Protect Sites from Bots? =
+= How to protect sites from spam bots without CAPTCHA? =
 The most popular method is CAPTCHA -- the annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots won’t discern these CAPTCHA, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource both from bots and visitors. CAPTCHA is not a panacea from spam. Doubts Concerning the Need for CAPTCHA?
 
 = Additional features =
