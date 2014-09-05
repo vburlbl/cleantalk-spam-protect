@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.4
+  Version: 3.5
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-34';
+$ct_agent_version = 'wordpress-35';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -239,10 +239,14 @@ function ct_init() {
     //
     // Load JS code to website footer for contact forms
     //
-    if (!is_admin() && !(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+    if (ct_is_user_enable()) {
         $options = get_option('cleantalk_settings');
         if (isset($options['general_contact_forms_test']) && $options['general_contact_forms_test'] == 1) {
-            add_action('wp_footer', 'ct_footer_add_cookie', 1);
+            
+            if (!(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+                add_action('wp_footer', 'ct_footer_add_cookie', 1);
+            }
+
             ct_contact_form_validate();
         }
     }
@@ -1761,11 +1765,16 @@ function ct_contact_form_validate () {
     
     $ct = $ct_base_call_result['ct'];
     $ct_result = $ct_base_call_result['ct_result'];
-
+       
     if ($ct_result->allow == 0) {
-        global $ct_comment;
-        $ct_comment = $ct_result->comment;
-        ct_die(null, null);
+        
+        if (!(defined( 'DOING_AJAX' ) && DOING_AJAX)) {
+            global $ct_comment;
+            $ct_comment = $ct_result->comment;
+            ct_die(null, null);
+        } else {
+            echo $ct_result->comment; 
+        }
         exit;
     }
 
