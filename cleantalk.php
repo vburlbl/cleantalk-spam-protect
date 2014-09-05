@@ -1744,8 +1744,8 @@ function ct_contact_form_validate () {
         }
     }
 
-    // Skip submision if no data found
-    if ((!$sender_email && $message == '' && $subject == '') || !$contact_form) {
+    // Skip submission if no data found
+    if (!$sender_email || !$contact_form) {
         return false;
     }
 
