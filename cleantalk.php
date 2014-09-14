@@ -657,7 +657,7 @@ function ct_frm_validate_entry ($errors, $values) {
     $sender_email = null;
     $message = '';
     foreach ($values['item_meta'] as $v) {
-        if (preg_match("/^\S+@\S+\.\S+$/", $v)) {
+        if (isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) { 
             $sender_email = $v;
             continue;
         }
