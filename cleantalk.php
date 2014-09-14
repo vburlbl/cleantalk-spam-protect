@@ -657,7 +657,7 @@ function ct_frm_validate_entry ($errors, $values) {
     $sender_email = null;
     $message = '';
     foreach ($values['item_meta'] as $v) {
-        if (isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+        if (preg_match("/^\S+@\S+\.\S+$/", $v)) {
             $sender_email = $v;
             continue;
         }
@@ -1730,7 +1730,7 @@ function ct_contact_form_validate () {
     $message = '';
     $contact_form = false;
     foreach ($_POST as $k => $v) {
-        if ($sender_email === null && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+        if ($sender_email === null && isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
             $sender_email = $v;
         }
         if ($sender_nickname === null && ct_get_data_from_submit($k, 'name')) {
@@ -1787,7 +1787,7 @@ function ct_contact_form_validate () {
  * @return null|bool
  */
 function ct_get_data_from_submit($value = null, $field_name = null) {
-    if (!$value || !$field_name) {
+    if (!$value || !$field_name || !is_string($value)) {
         return false;
     }
     if (preg_match("/[a-z0-9_\-]*" . $field_name. "[a-z0-9_\-]*$/", $value)) {
