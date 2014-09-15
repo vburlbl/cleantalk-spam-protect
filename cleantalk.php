@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.5
+  Version: 3.6
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-35';
+$ct_agent_version = 'wordpress-36';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -657,7 +657,7 @@ function ct_frm_validate_entry ($errors, $values) {
     $sender_email = null;
     $message = '';
     foreach ($values['item_meta'] as $v) {
-        if (isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+        if (isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) { 
             $sender_email = $v;
             continue;
         }
@@ -1730,7 +1730,7 @@ function ct_contact_form_validate () {
     $message = '';
     $contact_form = false;
     foreach ($_POST as $k => $v) {
-        if ($sender_email === null && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+        if ($sender_email === null && isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
             $sender_email = $v;
         }
         if ($sender_nickname === null && ct_get_data_from_submit($k, 'name')) {
@@ -1787,7 +1787,7 @@ function ct_contact_form_validate () {
  * @return null|bool
  */
 function ct_get_data_from_submit($value = null, $field_name = null) {
-    if (!$value || !$field_name) {
+    if (!$value || !$field_name || !is_string($value)) {
         return false;
     }
     if (preg_match("/[a-z0-9_\-]*" . $field_name. "[a-z0-9_\-]*$/", $value)) {
