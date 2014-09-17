@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.6
+  Version: 3.7
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-36';
+$ct_agent_version = 'wordpress-37';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -545,12 +545,10 @@ function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $retu
     if ($cookie_check) { 
 			$html = '
 <script type="text/javascript">
-// <![CDATA[
 function ctSetCookie(c_name, value) {
     document.cookie = c_name + "=" + escape(value) + "; path=/";
 }
 ctSetCookie("%s", "%s");
-// ]]>
 </script>
 ';
 		$html = sprintf($html, $field_name, $ct_checkjs_key);
@@ -559,28 +557,26 @@ ctSetCookie("%s", "%s");
 			$html = '
 <input type="hidden" id="%s" name="%s" value="%s" />
 <script type="text/javascript">
-// <![CDATA[
 var ct_input_name = \'%s\';
 var ct_input_value = document.getElementById(ct_input_name).value;
-var ct_input_challenge = \'%s\'; 
-
+var ct_input_challenge = \'%s\';
 document.getElementById(ct_input_name).value = document.getElementById(ct_input_name).value.replace(ct_input_value, ct_input_challenge);
-
 if (document.getElementById(ct_input_name).value == ct_input_value) {
     document.getElementById(ct_input_name).value = ct_set_challenge(ct_input_challenge); 
 }
-
 function ct_set_challenge(val) {
     return val; 
-}; 
-
-// ]]>
+};
 </script>
 ';
 		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_checkjs_key);
     };
     
     $html .= '<noscript><p><b>Please enable JavaScript to pass anti-spam protection!</b><br />Here are the instructions how to enable JavaScript in your web browser <a href="http://www.enable-javascript.com" rel="nofollow" target="_blank">http://www.enable-javascript.com</a>.<br />' . $ct_plugin_name . '.</p></noscript>';
+
+    // Simplify JS code
+    // and fixing issue with wpautop()
+    $html = str_replace(array("\n","\r"),'', $html);
 
     if ($return_string === true) {
         return $html;
