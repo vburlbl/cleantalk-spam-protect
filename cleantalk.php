@@ -1241,29 +1241,20 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     $ct_signup_done = true;
 
     if ($ct_result->errno != 0) {
+        ct_send_error_notice($ct_result->comment);
         return $errors;
-    }
-    
-    // Restart submit form counter for failed requests
-    if ($ct_result->allow == 0) {
-        $_SESSION[$ct_formtime_label] = time();
     }
     
     if ($ct_result->inactive != 0) {
-	$timelabel_reg = intval( get_option('cleantalk_timelabel_reg') );
-	if(time() - 900 > $timelabel_reg){
-	    update_option('cleantalk_timelabel_reg', time());
-
-	    $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
-	    $message  = __('Attention, please!', 'cleantalk') . "\r\n\r\n";
-	    $message .= sprintf(__('"Anti-spam by CleanTalk" plugin error on your site %s:', 'cleantalk'), $blogname) . "\r\n\r\n";
-	    $message .= $ct_result->comment . "\r\n\r\n";
-	    @wp_mail(get_option('admin_email'), sprintf(__('[%s] Anti-spam by CleanTalk error!', 'cleantalk'), $blogname), $message);
-	}
+        ct_send_error_notice($ct_result->comment);
         return $errors;
     }
 
     if ($ct_result->allow == 0) {
+        
+        // Restart submit form counter for failed requests
+        $_SESSION[$ct_formtime_label] = time();
+        
         if ($buddypress === true) {
             $bp->signup->errors['signup_username'] =  $ct_result->comment;
         } else {
@@ -1832,5 +1823,25 @@ function delete_spam_comments() {
     return null; 
 }
 
+/**
+ * Sends error notice to admin
+ * @return null
+ */
+function ct_send_error_notice ($comment = '') {
+    global $ct_plugin_name;
+
+    $timelabel_reg = intval( get_option('cleantalk_timelabel_reg') );
+    if(time() - 900 > $timelabel_reg){
+        update_option('cleantalk_timelabel_reg', time());
+
+        $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+        $message  = __('Attention, please!', 'cleantalk') . "\r\n\r\n";
+        $message .= sprintf(__('"%s" plugin error on your site %s:', 'cleantalk'), $ct_plugin_name, $blogname) . "\r\n\r\n";
+        $message .= $comment . "\r\n\r\n";
+        @wp_mail(get_option('admin_email'), sprintf(__('[%s] %s error!', 'cleantalk'), $ct_plugin_name, $blogname), $message);
+    }
+
+    return null;
+}
 
 ?>
