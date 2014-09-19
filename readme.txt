@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form 
 Requires at least: 3.0
 Tested up to: 4.0 
-Stable tag: 3.6
+Stable tag: 3.8
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -151,6 +151,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. 
 
 == Changelog ==
+= 3.8 2014-09-19 =
+  * Fixed json_encode() + malformed characters.
+  * Fixed JavaScript issue with wpautop(). 
+
 = 3.6 2014-09-15 =
   * Fixed preg_match() issue for Formidable forms and Custom contact forms.
   * Improved anti spam protection for Custom contact forms.
@@ -393,6 +397,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 3.8 2014-09-19 =
+Bug fix release. Minor fixes in API class and JavaScript anti spam test.
+
 = 3.6 2014-09-15 =
 Minor fixes in anti spam protection for Formidable and custom contact forms.
 
