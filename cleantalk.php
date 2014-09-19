@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.7
+  Version: 3.8
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-37';
+$ct_agent_version = 'wordpress-38';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -83,6 +83,9 @@ $ct_account_status_check = 0;
 
 // Post without page load
 $ct_direct_post = 0;
+
+// WP admin email notice interval in seconds
+$ct_admin_notoice_period = 10800;
 
 // Init action.
 add_action('init', 'ct_init', 1);
@@ -288,7 +291,8 @@ function ct_def_options() {
         'ssl_on' => 0, // Secure connection to servers 
         'next_account_status_check' => 0, // Time label when the plugin should check account status 
         'user_token' => '', // User token 
-        'relevance_test' => 0 // Test comment for relevance 
+        'relevance_test' => 0, // Test comment for relevance 
+        'notice_api_errors' => 0 // Send API error notices to WP admin 
     );
 }
 
@@ -1240,7 +1244,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     
     $ct_signup_done = true;
 
-    if ($ct_result->errno != 0) {
+    if ($ct_result->errno != 0 && $options['notice_api_errors']) {
         ct_send_error_notice($ct_result->comment);
         return $errors;
     }
@@ -1828,10 +1832,10 @@ function delete_spam_comments() {
  * @return null
  */
 function ct_send_error_notice ($comment = '') {
-    global $ct_plugin_name;
+    global $ct_plugin_name, $ct_admin_notoice_period;
 
     $timelabel_reg = intval( get_option('cleantalk_timelabel_reg') );
-    if(time() - 900 > $timelabel_reg){
+    if(time() - $ct_admin_notoice_period > $timelabel_reg){
         update_option('cleantalk_timelabel_reg', time());
 
         $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
