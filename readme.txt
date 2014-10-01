@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form 
 Requires at least: 3.0
 Tested up to: 4.0 
-Stable tag: 3.8
+Stable tag: 3.9
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,7 +33,7 @@ CleanTalk is an anti spam protection **4 in 1 for WordPress** that protects logi
 
 CleanTalk is a transparent anti spam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see anti spam statistics wherever whenever.
 
-We have developed anti-spam for WordPress that would provide **maximum protection from spam bots** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
+We have developed antispam for WordPress that would provide **maximum protection from spam bots** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
 The anti spam method offered by CleanTalk allows to switch from the methods that trouble the communication (CAPTCHA, question-answer etc.) to a more convenient one.
 
@@ -72,7 +72,7 @@ At the sight of CAPTCHA and after input errors, many visitors leave the resource
 
     *** Forbidden. Sender blacklisted. Request number . Antispam service cleantalk.org. ***
 
-The setup is done! You can control anti-spam plugin by <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org or use <a href="https://play.google.com/store/apps/details?id=org.cleantalk.app">Adnroid</a>, <a href="https://itunes.apple.com/us/app/cleantalk/id825479913?mt=8">iPhone</a> anti-spam app. 
+The setup is done! You can control anti spam plugin by <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org or use <a href="https://play.google.com/store/apps/details?id=org.cleantalk.app">Adnroid</a>, <a href="https://itunes.apple.com/us/app/cleantalk/id825479913?mt=8">iPhone</a> anti spam app. 
 
 == Frequently Asked Questions ==
 
@@ -90,7 +90,7 @@ Plugin uses several simple tests to stop spammers.
 = Will anti spam protects my theme? =
 Yes, it will. The plugin compatible with any WordPress themes.
 
-= How can I test anti-spam protection? =
+= How can I test anti spam protection? =
 Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments processed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = Is the plugin effective against spam bots? =
@@ -151,6 +151,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. 
 
 == Changelog ==
+= 3.9 2014-10-01 =
+  * Did exception to do not break to create new user in WordPress backend. 
+
 = 3.8 2014-09-19 =
   * Fixed json_encode() + malformed characters.
   * Fixed JavaScript issue with wpautop(). 
@@ -397,6 +400,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 3.9 2014-10-01 =
+Did exception to do not break to create new user in WordPress backend. 
+
 = 3.8 2014-09-19 =
 Bug fix release. Minor fixes in API class and JavaScript anti spam test.
 
