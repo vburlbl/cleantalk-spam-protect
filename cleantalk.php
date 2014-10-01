@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.9
+  Version: 4.0
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-39';
+$ct_agent_version = 'wordpress-40';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -86,6 +86,8 @@ $ct_direct_post = 0;
 
 // WP admin email notice interval in seconds
 $ct_admin_notoice_period = 10800;
+
+$ct_random_key_field_name = 'ct_random_key';
 
 // Init action.
 add_action('init', 'ct_init', 1);
@@ -538,14 +540,15 @@ function ct_footer_add_cookie() {
 
 /**
  * Adds hidden filed to define avaialbility of client's JavaScript
- * @param 	int $post_id Post ID, not used
+ * @param 	bool $random_key switch on generation random key for every page load 
  */
-function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
-    global $ct_checkjs_def, $ct_plugin_name;
+function ct_add_hidden_fields($random_key = false, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
+    global $ct_checkjs_def, $ct_plugin_name, $ct_random_key_field_name;
 
     $ct_checkjs_key = ct_get_checkjs_value(); 
+    $field_id_hash = md5(rand(0, 1000));
+    $random_key_hash = md5($ct_checkjs_key . ':'. $field_id_hash);
     
-
     if ($cookie_check) { 
 			$html = '
 <script type="text/javascript">
@@ -554,16 +557,33 @@ function ctSetCookie(c_name, value) {
 }
 ctSetCookie("%s", "%s");
 </script>
-';
+';      
+        $ct_input_challenge = $ct_checkjs_key;
+        if ($random_key) {
+            $ct_input_challenge = $random_key_hash;
+            setcookie($ct_random_key_field_name, $random_key_hash);
+        }
+
 		$html = sprintf($html, $field_name, $ct_checkjs_key);
     } else {
-    		$field_id = $field_name . '_' . md5(rand(0, 1000));
-			$html = '
+        
+
+        $html = '';
+        $ct_input_challenge = sprintf("'%s'", $ct_checkjs_key);
+        if ($random_key) {
+    	    $field_id = $ct_random_key_field_name . '_' . $field_id_hash;
+		    $html = '<input type="hidden" id="%s" name="%s" value="%s" />';
+            $html = sprintf($html, $field_id, $ct_random_key_field_name, $random_key_hash);
+            $ct_input_challenge = sprintf('document.getElementById(\'%s\').value', $field_id);
+        }
+
+    	$field_id = $field_name . '_' . $field_id_hash;
+		$html .= '
 <input type="hidden" id="%s" name="%s" value="%s" />
 <script type="text/javascript">
 var ct_input_name = \'%s\';
 var ct_input_value = document.getElementById(ct_input_name).value;
-var ct_input_challenge = \'%s\';
+var ct_input_challenge = %s;
 document.getElementById(ct_input_name).value = document.getElementById(ct_input_name).value.replace(ct_input_value, ct_input_challenge);
 if (document.getElementById(ct_input_name).value == ct_input_value) {
     document.getElementById(ct_input_name).value = ct_set_challenge(ct_input_challenge); 
@@ -573,7 +593,7 @@ function ct_set_challenge(val) {
 };
 </script>
 ';
-		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_checkjs_key);
+		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_input_challenge);
     };
     
     $html .= '<noscript><p><b>Please enable JavaScript to pass anti-spam protection!</b><br />Here are the instructions how to enable JavaScript in your web browser <a href="http://www.enable-javascript.com" rel="nofollow" target="_blank">http://www.enable-javascript.com</a>.<br />' . $ct_plugin_name . '.</p></noscript>';
@@ -901,7 +921,9 @@ function ct_die_extended($comment_body) {
  * Validates JavaScript anti-spam test
  *
  */
-function js_test($field_name = 'ct_checkjs', $data = null) {
+function js_test($field_name = 'ct_checkjs', $data = null, $random_key = false) {
+    global $ct_random_key_field_name;
+
     $checkjs = null;
     $js_post_value = null;
     
@@ -910,7 +932,21 @@ function js_test($field_name = 'ct_checkjs', $data = null) {
 
     if (isset($data[$field_name])) {
 	    $js_post_value = $data[$field_name];
-        $ct_challenge = ct_get_checkjs_value();
+        
+        //
+        // Random key check
+        //
+        if ($random_key) {
+            if (isset($data[$ct_random_key_field_name])) {
+                $ct_challenge = $data[$ct_random_key_field_name]; 
+            } else {
+                return $checkjs;
+            }
+        } else {
+            $ct_challenge = ct_get_checkjs_value();
+        }
+        
+
         if(preg_match("/$ct_challenge/", $js_post_value)) {
             $checkjs = 1;
         } else {
@@ -1090,7 +1126,7 @@ function ct_register_form() {
         return false;
     }
 
-    ct_add_hidden_fields(null, $ct_checkjs_register_form, false);
+    ct_add_hidden_fields(true, $ct_checkjs_register_form, false);
 
     return null;
 }
@@ -1190,34 +1226,33 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         $buddypress = true;
     }
 
-    $submit_time = submit_time_test();
-
     $options = ct_get_options();
     if ($options['registrations_test'] == 0) {
         return $errors;
     }
+    
+    $submit_time = submit_time_test();
+    
+    $sender_info = get_sender_info();
 
-    $checkjs = js_test($ct_checkjs_register_form, $_POST);
-
+    $checkjs = js_test($ct_checkjs_register_form, $_POST, true);
+    $sender_info['post_checkjs_passed'] = $checkjs;
+   
     //
     // This hack can be helpfull when plugin uses with untested themes&signups plugins.
     //
     if ($checkjs === null) {
         $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $sender_info['cookie_checkjs_passed'] = $checkjs;
     }
 
-    require_once('cleantalk.class.php');
-
-    $sender_info = get_sender_info();
     $sender_info = json_encode($sender_info);
     if ($sender_info === false) {
         $sender_info= '';
     }
-
-    $sender_email = $user_email;
-
+ 
+    require_once('cleantalk.class.php');
     $config = get_option('cleantalk_server');
-
     $ct = new Cleantalk();
     $ct->work_url = $config['ct_work_url'];
     $ct->server_url = $options['server'];
@@ -1228,7 +1263,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     
     $ct_request = new CleantalkRequest();
     $ct_request->auth_key = $options['apikey'];
-    $ct_request->sender_email = $sender_email; 
+    $ct_request->sender_email = $user_email; 
     $ct_request->sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
     $ct_request->sender_nickname = $sanitized_user_login; 
     $ct_request->agent = $ct_agent_version; 
