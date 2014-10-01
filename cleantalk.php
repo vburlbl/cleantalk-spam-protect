@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 3.5
+  Version: 3.9
   Author: СleanTalk <welcome@cleantalk.ru>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-35';
+$ct_agent_version = 'wordpress-39';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -83,6 +83,9 @@ $ct_account_status_check = 0;
 
 // Post without page load
 $ct_direct_post = 0;
+
+// WP admin email notice interval in seconds
+$ct_admin_notoice_period = 10800;
 
 // Init action.
 add_action('init', 'ct_init', 1);
@@ -288,7 +291,8 @@ function ct_def_options() {
         'ssl_on' => 0, // Secure connection to servers 
         'next_account_status_check' => 0, // Time label when the plugin should check account status 
         'user_token' => '', // User token 
-        'relevance_test' => 0 // Test comment for relevance 
+        'relevance_test' => 0, // Test comment for relevance 
+        'notice_api_errors' => 0 // Send API error notices to WP admin 
     );
 }
 
@@ -545,12 +549,10 @@ function ct_add_hidden_fields($post_id = null, $field_name = 'ct_checkjs', $retu
     if ($cookie_check) { 
 			$html = '
 <script type="text/javascript">
-// <![CDATA[
 function ctSetCookie(c_name, value) {
     document.cookie = c_name + "=" + escape(value) + "; path=/";
 }
 ctSetCookie("%s", "%s");
-// ]]>
 </script>
 ';
 		$html = sprintf($html, $field_name, $ct_checkjs_key);
@@ -559,28 +561,26 @@ ctSetCookie("%s", "%s");
 			$html = '
 <input type="hidden" id="%s" name="%s" value="%s" />
 <script type="text/javascript">
-// <![CDATA[
 var ct_input_name = \'%s\';
 var ct_input_value = document.getElementById(ct_input_name).value;
-var ct_input_challenge = \'%s\'; 
-
+var ct_input_challenge = \'%s\';
 document.getElementById(ct_input_name).value = document.getElementById(ct_input_name).value.replace(ct_input_value, ct_input_challenge);
-
 if (document.getElementById(ct_input_name).value == ct_input_value) {
     document.getElementById(ct_input_name).value = ct_set_challenge(ct_input_challenge); 
 }
-
 function ct_set_challenge(val) {
     return val; 
-}; 
-
-// ]]>
+};
 </script>
 ';
 		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_checkjs_key);
     };
     
     $html .= '<noscript><p><b>Please enable JavaScript to pass anti-spam protection!</b><br />Here are the instructions how to enable JavaScript in your web browser <a href="http://www.enable-javascript.com" rel="nofollow" target="_blank">http://www.enable-javascript.com</a>.<br />' . $ct_plugin_name . '.</p></noscript>';
+
+    // Simplify JS code
+    // and fixing issue with wpautop()
+    $html = str_replace(array("\n","\r"),'', $html);
 
     if ($return_string === true) {
         return $html;
@@ -657,7 +657,7 @@ function ct_frm_validate_entry ($errors, $values) {
     $sender_email = null;
     $message = '';
     foreach ($values['item_meta'] as $v) {
-        if (isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+        if (isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) { 
             $sender_email = $v;
             continue;
         }
@@ -1163,7 +1163,12 @@ function ct_register_post($sanitized_user_login = null, $user_email = null, $err
  */
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
     global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done, $ct_formtime_label;
-    
+
+    // Go out if a registrered user action
+    if (ct_is_user_enable() === false) {
+        return $errors;
+    }
+
     //
     // The function already executed
     // It happens when used ct_register_post(); 
@@ -1244,30 +1249,21 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     
     $ct_signup_done = true;
 
-    if ($ct_result->errno != 0) {
+    if ($ct_result->errno != 0 && $options['notice_api_errors']) {
+        ct_send_error_notice($ct_result->comment);
         return $errors;
-    }
-    
-    // Restart submit form counter for failed requests
-    if ($ct_result->allow == 0) {
-        $_SESSION[$ct_formtime_label] = time();
     }
     
     if ($ct_result->inactive != 0) {
-	$timelabel_reg = intval( get_option('cleantalk_timelabel_reg') );
-	if(time() - 900 > $timelabel_reg){
-	    update_option('cleantalk_timelabel_reg', time());
-
-	    $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
-	    $message  = __('Attention, please!', 'cleantalk') . "\r\n\r\n";
-	    $message .= sprintf(__('"Anti-spam by CleanTalk" plugin error on your site %s:', 'cleantalk'), $blogname) . "\r\n\r\n";
-	    $message .= $ct_result->comment . "\r\n\r\n";
-	    @wp_mail(get_option('admin_email'), sprintf(__('[%s] Anti-spam by CleanTalk error!', 'cleantalk'), $blogname), $message);
-	}
+        ct_send_error_notice($ct_result->comment);
         return $errors;
     }
 
     if ($ct_result->allow == 0) {
+        
+        // Restart submit form counter for failed requests
+        $_SESSION[$ct_formtime_label] = time();
+        
         if ($buddypress === true) {
             $bp->signup->errors['signup_username'] =  $ct_result->comment;
         } else {
@@ -1730,7 +1726,7 @@ function ct_contact_form_validate () {
     $message = '';
     $contact_form = false;
     foreach ($_POST as $k => $v) {
-        if ($sender_email === null && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+        if ($sender_email === null && isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
             $sender_email = $v;
         }
         if ($sender_nickname === null && ct_get_data_from_submit($k, 'name')) {
@@ -1787,7 +1783,7 @@ function ct_contact_form_validate () {
  * @return null|bool
  */
 function ct_get_data_from_submit($value = null, $field_name = null) {
-    if (!$value || !$field_name) {
+    if (!$value || !$field_name || !is_string($value)) {
         return false;
     }
     if (preg_match("/[a-z0-9_\-]*" . $field_name. "[a-z0-9_\-]*$/", $value)) {
@@ -1836,5 +1832,25 @@ function delete_spam_comments() {
     return null; 
 }
 
+/**
+ * Sends error notice to admin
+ * @return null
+ */
+function ct_send_error_notice ($comment = '') {
+    global $ct_plugin_name, $ct_admin_notoice_period;
+
+    $timelabel_reg = intval( get_option('cleantalk_timelabel_reg') );
+    if(time() - $ct_admin_notoice_period > $timelabel_reg){
+        update_option('cleantalk_timelabel_reg', time());
+
+        $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+        $message  = __('Attention, please!', 'cleantalk') . "\r\n\r\n";
+        $message .= sprintf(__('"%s" plugin error on your site %s:', 'cleantalk'), $ct_plugin_name, $blogname) . "\r\n\r\n";
+        $message .= $comment . "\r\n\r\n";
+        @wp_mail(get_option('admin_email'), sprintf(__('[%s] %s error!', 'cleantalk'), $ct_plugin_name, $blogname), $message);
+    }
+
+    return null;
+}
 
 ?>
