@@ -87,8 +87,6 @@ $ct_direct_post = 0;
 // WP admin email notice interval in seconds
 $ct_admin_notoice_period = 10800;
 
-$ct_random_key_field_name = 'ct_random_key';
-
 // Init action.
 add_action('init', 'ct_init', 1);
 
@@ -200,7 +198,6 @@ function ct_init() {
         $_SESSION[$ct_formtime_label] = time();
     }
     
-    ct_cookies_test();
 
     add_action('comment_form', 'ct_comment_form');
 
@@ -245,6 +242,8 @@ function ct_init() {
     // Load JS code to website footer for contact forms
     //
     if (ct_is_user_enable()) {
+        ct_cookies_test();
+
         $options = get_option('cleantalk_settings');
         if (isset($options['general_contact_forms_test']) && $options['general_contact_forms_test'] == 1) {
             
@@ -294,7 +293,10 @@ function ct_def_options() {
         'next_account_status_check' => 0, // Time label when the plugin should check account status 
         'user_token' => '', // User token 
         'relevance_test' => 0, // Test comment for relevance 
-        'notice_api_errors' => 0 // Send API error notices to WP admin 
+        'notice_api_errors' => 0, // Send API error notices to WP admin 
+        'js_keys' => array(), // Keys to do JavaScript antispam test 
+        'js_keys_store_days' => 1, // JavaScript keys store days 
+        'js_key_lifetime' => 3600, // JavaScript key life time in seconds 
     );
 }
 
@@ -433,7 +435,7 @@ function ct_cookies_test ($test = false) {
             $result = 0;
         }
     }
-    
+
     return $result;
 }
 
@@ -543,11 +545,10 @@ function ct_footer_add_cookie() {
  * @param 	bool $random_key switch on generation random key for every page load 
  */
 function ct_add_hidden_fields($random_key = false, $field_name = 'ct_checkjs', $return_string = false, $cookie_check = false) {
-    global $ct_checkjs_def, $ct_plugin_name, $ct_random_key_field_name;
+    global $ct_checkjs_def, $ct_plugin_name;
 
-    $ct_checkjs_key = ct_get_checkjs_value(); 
+    $ct_checkjs_key = ct_get_checkjs_value($random_key); 
     $field_id_hash = md5(rand(0, 1000));
-    $random_key_hash = md5($ct_checkjs_key . ':'. $field_id_hash);
     
     if ($cookie_check) { 
 			$html = '
@@ -558,27 +559,12 @@ function ctSetCookie(c_name, value) {
 ctSetCookie("%s", "%s");
 </script>
 ';      
-        $ct_input_challenge = $ct_checkjs_key;
-        if ($random_key) {
-            $ct_input_challenge = $random_key_hash;
-            setcookie($ct_random_key_field_name, $random_key_hash);
-        }
-
 		$html = sprintf($html, $field_name, $ct_checkjs_key);
     } else {
-        
-
-        $html = '';
         $ct_input_challenge = sprintf("'%s'", $ct_checkjs_key);
-        if ($random_key) {
-    	    $field_id = $ct_random_key_field_name . '_' . $field_id_hash;
-		    $html = '<input type="hidden" id="%s" name="%s" value="%s" />';
-            $html = sprintf($html, $field_id, $ct_random_key_field_name, $random_key_hash);
-            $ct_input_challenge = sprintf('document.getElementById(\'%s\').value', $field_id);
-        }
 
     	$field_id = $field_name . '_' . $field_id_hash;
-		$html .= '
+		$html = '
 <input type="hidden" id="%s" name="%s" value="%s" />
 <script type="text/javascript">
 var ct_input_name = \'%s\';
@@ -922,7 +908,6 @@ function ct_die_extended($comment_body) {
  *
  */
 function js_test($field_name = 'ct_checkjs', $data = null, $random_key = false) {
-    global $ct_random_key_field_name;
 
     $checkjs = null;
     $js_post_value = null;
@@ -937,21 +922,25 @@ function js_test($field_name = 'ct_checkjs', $data = null, $random_key = false) 
         // Random key check
         //
         if ($random_key) {
-            if (isset($data[$ct_random_key_field_name])) {
-                $ct_challenge = $data[$ct_random_key_field_name]; 
+            $options = ct_get_options();
+            
+            $keys = $options['js_keys'];
+            if (isset($keys[$js_post_value])) {
+                $checkjs = 1;
             } else {
-                return $checkjs;
+                $checkjs = 0; 
             }
         } else {
             $ct_challenge = ct_get_checkjs_value();
+            
+            if(preg_match("/$ct_challenge/", $js_post_value)) {
+                $checkjs = 1;
+            } else {
+                $checkjs = 0; 
+            }
         }
         
 
-        if(preg_match("/$ct_challenge/", $js_post_value)) {
-            $checkjs = 1;
-        } else {
-            $checkjs = 0; 
-        }
     }
 
     return $checkjs;
@@ -1105,12 +1094,45 @@ function ct_plugin_active($plugin_name){
  * Get ct_get_checkjs_value 
  * @return string
  */
-function ct_get_checkjs_value() {
+function ct_get_checkjs_value($random_key = false) {
     $options = ct_get_options();
 
-    $salt = $options['apikey'] . '+' . get_option('admin_email');
+    if ($random_key) {
+        $keys = $options['js_keys'];
+        $keys_checksum = md5(json_encode($keys));
+        
+        $key = null;
+        $latest_key_time = 0;
+        foreach ($keys as $k => $t) {
 
-    return md5($salt); 
+            // Removing key if it's to old
+            if (time() - $t > $options['js_keys_store_days'] * 86400) {
+                unset($keys[$k]);
+                continue;
+            }
+
+            if ($t > $latest_key_time) {
+                $latest_key_time = $t;
+                $key = $k;
+            }
+        }
+        
+        // Get new key if the latest key is too old
+        if (time() - $latest_key_time > $options['js_key_lifetime']) {
+            $key = rand();
+            $keys[$key] = time();
+        }
+        
+        if (md5(json_encode($keys)) != $keys_checksum) {
+            $options['js_keys'] = $keys;
+            update_option('cleantalk_settings', $options);
+        }
+    } else {
+        $key = md5($options['apikey'] . '+' . get_option('admin_email'));
+    }
+
+
+    return $key; 
 }
 
 
@@ -1760,9 +1782,25 @@ function ct_contact_form_validate () {
     $subject = '';
     $message = '';
     $contact_form = false;
+
     foreach ($_POST as $k => $v) {
-        if ($sender_email === null && isset($v) && is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
-            $sender_email = $v;
+        if ($sender_email === null && isset($v)) {
+            if (is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
+                $sender_email = $v;
+            }
+
+            // Looing email address in arrays
+            if (is_array($v)) {
+                foreach ($v as $v2) {
+                    if ($sender_email) {
+                        continue;
+                    }
+                    
+                    if (is_string($v2) && preg_match("/^\S+@\S+\.\S+$/", $v2)) {
+                        $sender_email = $v2;
+                    }
+                }
+            }
         }
         if ($sender_nickname === null && ct_get_data_from_submit($k, 'name')) {
             $sender_nickname = $v;
