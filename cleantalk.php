@@ -1764,13 +1764,7 @@ function ct_contact_form_validate () {
     }
 
     $checkjs = js_test('ct_checkjs', $_COOKIE);
-    
-    $sender_info = get_sender_info();
-    $sender_info = json_encode($sender_info);
-    if ($sender_info === false) {
-        $sender_info= '';
-    }
-
+  
     $post_info['comment_type'] = 'feedback_general_contact_form';
     $post_info = json_encode($post_info);
     if ($post_info === false) {
