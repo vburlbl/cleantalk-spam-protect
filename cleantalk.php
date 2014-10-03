@@ -4,7 +4,7 @@
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
   Version: 4.0
-  Author: СleanTalk <welcome@cleantalk.ru>
+  Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
