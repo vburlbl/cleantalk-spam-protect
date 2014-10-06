@@ -3,7 +3,7 @@ Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form 
 Requires at least: 3.0
 Tested up to: 4.0 
-Stable tag: 3.9
+Stable tag: 4.0
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -153,6 +153,10 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 == Changelog ==
 = 3.9 2014-10-01 =
   * Did exception to do not break to create new user in WordPress backend. 
+
+= 4.0 2014-10-06 =
+  * Improved anti spam protection for custom contact forms.
+  * Improved anti spam protection for registration forms.
 
 = 3.8 2014-09-19 =
   * Fixed json_encode() + malformed characters.
@@ -400,6 +404,9 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 4.0 2014-10-06 =
+Major anti spam improvements for registration and contact forms.
+
 = 3.9 2014-10-01 =
 Did exception to do not break to create new user in WordPress backend. 
 
