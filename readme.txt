@@ -20,7 +20,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 
 = Spam protection =
 * WordPress, JetPack comments.
-* WordPress, BuddyPress, bbPress, S2Member signups.
+* WordPress, BuddyPress, bbPress, S2Member, WooCommerce registrations.
 * Formidable forms, Contact form 7, JetPack Contact form, Fast Secure Contact form any themes/custom contact form.
 * WooCommerce review form.
 * WordPress Landing Pages.
