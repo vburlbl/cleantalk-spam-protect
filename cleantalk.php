@@ -569,14 +569,7 @@ ctSetCookie("%s", "%s");
 <script type="text/javascript">
 var ct_input_name = \'%s\';
 var ct_input_value = document.getElementById(ct_input_name).value;
-var ct_input_challenge = %s;
-document.getElementById(ct_input_name).value = document.getElementById(ct_input_name).value.replace(ct_input_value, ct_input_challenge);
-if (document.getElementById(ct_input_name).value == ct_input_value) {
-    document.getElementById(ct_input_name).value = ct_set_challenge(ct_input_challenge); 
-}
-function ct_set_challenge(val) {
-    return val; 
-};
+document.getElementById(ct_input_name).value = document.getElementById(ct_input_name).value.replace(ct_input_value, %s);
 </script>
 ';
 		$html = sprintf($html, $field_id, $field_name, $ct_checkjs_def, $field_id, $ct_input_challenge);
@@ -917,7 +910,7 @@ function js_test($field_name = 'ct_checkjs', $data = null, $random_key = false) 
 
     if (isset($data[$field_name])) {
 	    $js_post_value = $data[$field_name];
-        
+       
         //
         // Random key check
         //
@@ -1513,7 +1506,7 @@ function ct_wpcf7_spam($spam) {
     ));
     $ct = $ct_base_call_result['ct'];
     $ct_result = $ct_base_call_result['ct_result'];
-
+   
     if ($ct_result->spam == 1) {
         $spam = true;
         $ct_cf7_comment = $ct_result->comment;
