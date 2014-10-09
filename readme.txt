@@ -151,12 +151,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. 
 
 == Changelog ==
-= 3.9 2014-10-01 =
-  * Did exception to do not break to create new user in WordPress backend. 
-
 = 4.0 2014-10-06 =
   * Improved anti spam protection for custom contact forms.
   * Improved anti spam protection for registration forms.
+
+= 3.9 2014-10-01 =
+  * Did exception to do not break to create new user in WordPress backend. 
 
 = 3.8 2014-09-19 =
   * Fixed json_encode() + malformed characters.
