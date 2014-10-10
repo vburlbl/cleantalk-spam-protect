@@ -327,7 +327,7 @@ function admin_notice_message(){
         echo '</b></h3></div>';
     }
 
-    ct_send_feedback();
+    //ct_send_feedback(); -- removed to ct_do_this_hourly()
 
     return true;
 }

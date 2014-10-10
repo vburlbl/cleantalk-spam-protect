@@ -156,6 +156,7 @@ add_action('ct_hourly_event_hook', 'ct_do_this_hourly');
 function ct_do_this_hourly() {
 	// do something every hour
     delete_spam_comments();
+    ct_send_feedback();
 }
 
 if (is_admin()) {
