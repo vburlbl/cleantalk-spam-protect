@@ -72,7 +72,7 @@ At the sight of CAPTCHA and after input errors, many visitors leave the resource
 
     *** Forbidden. Sender blacklisted. Request number . Antispam service cleantalk.org. ***
 
-The setup is done! You can control anti spam plugin by <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org or use <a href="https://play.google.com/store/apps/details?id=org.cleantalk.app">Adnroid</a>, <a href="https://itunes.apple.com/us/app/cleantalk/id825479913?mt=8">iPhone</a> anti spam app. 
+The setup is done! You can control anti spam plugin by <a href="http://cleantalk.org/my" target="_blank">Control panel</a> at the cleantalk.org or use <a href="https://play.google.com/store/apps/details?id=org.cleantalk.app">Android</a>, <a href="https://itunes.apple.com/us/app/cleantalk/id825479913?mt=8">iPhone</a> anti spam app. 
 
 == Frequently Asked Questions ==
 
