@@ -39,7 +39,7 @@ The anti spam method offered by CleanTalk allows to switch from the methods that
 
 The CleanTalk is premium anti spam for WordPress, please look at the <a href="http://cleantalk.org/price">pricing</a>. We try to provide the service at the highest level and we can not afford to offer a free version of our service, as this will immediately affect the quality of providing anti spam protection. Paying for a year of service, you save a lot more and get: 
  
- * 100% protection against spambots
+ * 100% protection against spam bots
  * Time and resources saving
  * More registrations/comments/visitors
  * Protect several websites at once at different CMS
@@ -110,7 +110,7 @@ There are a few reasons for this:
 
 * With the indexing of your web-site by the search systems, appearance of external links and better search results position, your web-site attracts more and more spambots.
 * Non-transparent protection systems like CAPTCHA or question/answer, that don't have spam attacks statistics, don't let you see the whole picture, or the picture is incomplete.
-* Counting methods for spam attacks and spambots are different for different systems, which explains the diversity. We seek to provide detailed statistics.
+* Counting methods for spam attacks and spam bots are different for different systems, which explains the diversity. We seek to provide detailed statistics.
 
 = Why my dummy "spam" comment passed to the WordPress? =
 The plugin has several options to detect spam bots and humans. If you just post spammy text like this,
@@ -153,7 +153,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 == Changelog ==
 = 4.1 2014-10-12 =
   * Optimized code for manual moderation feedback sending.
-  * Optimized antispam algorithms for comments, contacts and signups. 
+  * Optimized anti spam algorithms for comments, contacts and signups. 
 
 = 4.0 2014-10-06 =
   * Improved anti spam protection for custom contact forms.
