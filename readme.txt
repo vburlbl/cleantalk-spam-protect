@@ -151,7 +151,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. 
 
 == Changelog ==
-= 4.1 2014-10-12 =
+= 4.1 2014-10-13 =
   * Optimized code for manual moderation feedback sending.
   * Optimized anti spam algorithms for comments, contacts and signups. 
 
@@ -408,7 +408,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
-= 4.1 2014-10-12 =
+= 4.1 2014-10-13 =
 Minor anti spam improvements for contacts, registration and contact forms.
 
 = 4.0 2014-10-06 =
