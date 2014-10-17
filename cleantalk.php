@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 4.1
+  Version: 4.2
   Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-41';
+$ct_agent_version = 'wordpress-42';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -86,6 +86,10 @@ $ct_direct_post = 0;
 
 // WP admin email notice interval in seconds
 $ct_admin_notoice_period = 10800;
+
+// Sevice negative comment to visitor.
+// It uses for BuddyPress registrations to avoid double checks
+$ct_negative_comment = null;
 
 // Init action.
 add_action('init', 'ct_init', 1);
@@ -1172,6 +1176,8 @@ function ct_login_message($message) {
  * @return array with errors 
  */
 function ct_registration_errors_wpmu($errors) {
+    global $ct_signup_done;
+    
     //
     // Multisite actions
     //
@@ -1194,9 +1200,9 @@ function ct_registration_errors_wpmu($errors) {
 
     // Show CleanTalk errors in user_name field
     if (isset($errors['errors']->errors['ct_error'])) {
-       $errors['errors']->errors['user_name'] = $errors['errors']->errors['ct_error']; 
-       unset($errors['errors']->errors['ct_error']); 
-    }
+        $errors['errors']->errors['user_name'] = $errors['errors']->errors['ct_error']; 
+        unset($errors['errors']->errors['ct_error']);
+     }
     
     return $errors;
 }
@@ -1214,13 +1220,18 @@ function ct_register_post($sanitized_user_login = null, $user_email = null, $err
  * @return array with errors 
  */
 function ct_registration_errors($errors, $sanitized_user_login = null, $user_email = null) {
-    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done, $ct_formtime_label;
+    global $ct_agent_version, $ct_checkjs_register_form, $ct_session_request_id_label, $ct_session_register_ok_label, $bp, $ct_signup_done, $ct_formtime_label, $ct_negative_comment;
 
     // Go out if a registrered user action
     if (ct_is_user_enable() === false) {
         return $errors;
     }
-
+    
+    $options = ct_get_options();
+    if ($options['registrations_test'] == 0) {
+        return $errors;
+    }
+    
     //
     // The function already executed
     // It happens when used ct_register_post(); 
@@ -1241,12 +1252,17 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         $user_email = $_POST['signup_email'];
         $buddypress = true;
     }
-
-    $options = ct_get_options();
-    if ($options['registrations_test'] == 0) {
+    
+    //
+    // Break tests because we already have servers response
+    //
+    if ($buddypress && $ct_signup_done) {
+        if ($ct_negative_comment) {
+            $bp->signup->errors['signup_username'] = $ct_negative_comment;
+        }
         return $errors;
     }
-    
+
     $submit_time = submit_time_test();
     
     $sender_info = get_sender_info();
@@ -1286,7 +1302,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     $ct_request->sender_info = $sender_info;
     $ct_request->js_on = $checkjs;
     $ct_request->submit_time = $submit_time; 
-
+    
     $ct_result = $ct->isAllowUser($ct_request);
     if ($ct->server_change) {
         update_option(
@@ -1316,9 +1332,10 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
         $_SESSION[$ct_formtime_label] = time();
         
         if ($buddypress === true) {
-            $bp->signup->errors['signup_username'] =  $ct_result->comment;
+            $bp->signup->errors['signup_username'] = $ct_result->comment;
         } else {
             $errors->add('ct_error', $ct_result->comment);
+            $ct_negative_comment = $ct_result->comment;
         }
     } else {
         if ($ct_result->id !== null) {
