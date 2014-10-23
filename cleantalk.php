@@ -527,7 +527,7 @@ function ct_comment_form($post_id) {
         return false;
     }
     
-    ct_add_hidden_fields(null, 'ct_checkjs', false, false);
+    ct_add_hidden_fields(true, 'ct_checkjs', false, false);
     
     return null;
 }
@@ -784,7 +784,7 @@ function ct_preprocess_comment($comment) {
         $checkjs = js_test('ct_checkjs', $_COOKIE);
     } else {
         $post_info['comment_type'] = $comment['comment_type'];
-        $checkjs = js_test('ct_checkjs', $_POST);
+        $checkjs = js_test('ct_checkjs', $_POST, true);
     }
 
     $post_info['post_url'] = ct_post_url(null, $comment_post_id); 
@@ -1128,7 +1128,6 @@ function ct_get_checkjs_value($random_key = false) {
     } else {
         $key = md5($options['apikey'] . '+' . get_option('admin_email'));
     }
-
 
     return $key; 
 }

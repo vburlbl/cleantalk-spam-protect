@@ -403,7 +403,7 @@ class Cleantalk {
      * Minimal server response in miliseconds to catch the server
      *
      */
-    public $min_server_timeout = 150;
+    public $min_server_timeout = 100;
 
     /**
      * Function checks whether it is possible to publish the message
