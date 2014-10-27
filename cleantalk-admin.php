@@ -295,9 +295,6 @@ input[type=submit] {padding: 10px; background: #3399FF; color: #fff; border:0 no
 function admin_notice_message(){
     global $show_ct_notice_trial, $show_ct_notice_online, $ct_plugin_name;
 
-    if (ct_active() === false)
-	    return false;
-   
     $options = ct_get_options();
     $user_token = '';
     if (isset($options['user_token']) && $options['user_token'] != '') {

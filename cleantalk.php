@@ -17,7 +17,6 @@ $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
 $ct_session_register_ok_label = 'register_ok';
 
-$ct_checkjs_cf7 = 'ct_checkjs_cf7';
 $ct_cf7_comment = '';
 
 $ct_checkjs_jpcf = 'ct_checkjs_jpcf';
@@ -119,7 +118,6 @@ add_action('bp_before_registration_submit_buttons','ct_register_form');
 add_filter('bp_signup_validate', 'ct_registration_errors');
 
 // Contact Form7 
-add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements');
 add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 
 // JetPack Contact form
@@ -208,10 +206,11 @@ function ct_init() {
 
     $jetpack_active_modules = get_option('jetpack_active_modules');
     if (
-	(class_exists('Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules)) ||
-	(defined('LANDINGPAGES_CURRENT_VERSION'))
+	(class_exists('Jetpack', false) && $jetpack_active_modules && in_array('comments', $jetpack_active_modules))
+	|| (defined('LANDINGPAGES_CURRENT_VERSION'))
 	|| (defined('WS_PLUGIN__S2MEMBER_PRO_VERSION'))
-    || (defined('WOOCOMMERCE_VERSION'))
+	|| (defined('WOOCOMMERCE_VERSION'))
+	|| (defined('WPCF7_VERSION'))
     ) {
 	    add_action('wp_footer', 'ct_footer_add_cookie', 1);
     }
@@ -1066,26 +1065,12 @@ function ct_unmark_red($message) {
 	* Tests plugin activation status
 	* @return bool 
 */
-function ct_active(){
-    $ct_active = false;
-    foreach (get_option('active_plugins') as $k => $v) {
-	if (preg_match("/cleantalk.php$/", $v))
-	    $ct_active = true;
-    }
-
-    return $ct_active;
-}
-/**
-	* Tests plugin activation status
-	* @return bool 
-*/
 function ct_plugin_active($plugin_name){
-	$active = false;
 	foreach (get_option('active_plugins') as $k => $v) {
 	    if ($plugin_name == $v)
-		    $active = true;
+		    return true;
 	}
-    return $active; 
+	return false;
 }
 
 /**
@@ -1449,27 +1434,10 @@ function ct_contact_form_is_spam($form) {
 
 
 /**
- * Inserts anti-spam hidden to CF7
- */
-function ct_wpcf7_form_elements($html) {
-    global $ct_checkjs_cf7;
-    global $wpdb, $current_user, $ct_checkjs_cf7;
-
-    $options = ct_get_options();
-    if ($options['contact_forms_test'] == 0) {
-        return $html;
-    }
-
-    $html .= ct_add_hidden_fields(null, $ct_checkjs_cf7, true);
-
-    return $html;
-}
-
-/**
  * Test CF7 message for spam
  */
 function ct_wpcf7_spam($spam) {
-    global $wpdb, $current_user, $ct_agent_version, $ct_checkjs_cf7, $ct_cf7_comment;
+    global $wpdb, $current_user, $ct_agent_version, $ct_cf7_comment;
 
     $options = ct_get_options();
     if ($spam === true)
@@ -1479,7 +1447,7 @@ function ct_wpcf7_spam($spam) {
         return $spam;
     }
 
-    $checkjs = js_test($ct_checkjs_cf7, $_POST);
+    $checkjs = js_test('ct_checkjs', $_COOKIE);
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
