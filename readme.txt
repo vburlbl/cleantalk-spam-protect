@@ -37,7 +37,7 @@ We have developed antispam for WordPress that would provide **maximum protection
 
 The anti spam method offered by CleanTalk allows to switch from the methods that trouble the communication (CAPTCHA, question-answer etc.) to a more convenient one.
 
-The CleanTalk is premium anti spam for WordPress, please look at the <a href="http://cleantalk.org/price">pricing</a>. We try to provide the service at the highest level and we can not afford to offer a free version of our service, as this will immediately affect the quality of providing anti spam protection. Paying for a year of service, you save a lot more and get: 
+The CleanTalk is premium anti spam for WordPress, please look at the <a href="http://cleantalk.org/price">pricing</a>. We try to provide anti spam service at the highest level and we can not afford to offer a free version of our service, as this will immediately affect the quality of providing anti spam protection. Paying for a year of anti spam service, you save a lot more and get: 
  
  * 100% protection against spam bots
  * Time and resources saving
@@ -48,17 +48,17 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
  * 24/7 technical support
  * Clear statistics
  * No captcha, puzzles, etc.
- * Free mobile app
+ * Free mobile app to control anti spam function at your website.
 
 = How to protect sites from spam bots without CAPTCHA? =
 The most popular method is CAPTCHA -- the annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots won’t discern these CAPTCHA, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. 
 Sometimes CAPTCHA reminds doodle 2x year old child. For users with vision problems captcha is just an insurmountable obstacle. Users hate captcha. Captcha for users means "hate". Unreadable CAPTCHA stops about 80% of site visitors. After 2 failed attempts to bring it up to 95% reject further attempts. 
-At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource both from bots and visitors. CAPTCHA is not a panacea from spam. Doubts Concerning the Need for CAPTCHA?
+At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource both from spam bots and visitors. CAPTCHA is not a panacea from spam. Doubts concerning the Need for CAPTCHA?
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
 * Apps for iPhone, Android to control anti spam service, comments, signups, contacts. With traffic and spam statistics for last 7 days.
-* Anti-spam apps for most popular CMS on cleantalk.org. 
+* Anti spam apps for most popular CMS on cleantalk.org. 
 
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
