@@ -62,7 +62,6 @@ At the sight of CAPTCHA and after input errors, many visitors leave the resource
 
 = We recommend =
 * Audience engagement plugin <a href="http://wordpress.org/plugins/feedweb/">Feedweb</a>
-* The Best Content Editor plugin <a href="http://wordpress.org/plugins/zedity/">Zedity</a>
 
 == Installation ==
 1. Download, install and activate the plugin. 
@@ -146,17 +145,17 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 * Russian (ru_RU)
 
 == Screenshots ==
-1. Plugin settings screen. 
-1. Android app main screen. 
+1. Anti spam plugin settings. 
+1. Android app main. 
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. 
 
 == Changelog ==
 = 4.4 2014-10-29 =
-  * Improved JS checking for CF7.
+  * Improved anti spam JS test for CF7.
   * Fixed 'noscript' text in FaceBook Like preview in Valenti theme.
 
 = 4.2 2014-10-20 =
-  * Fixed double checks issue for BuddyPress.
+  * Fixed double checks issue for BuddyPress registrations.
   * Increased timeout limits to find the work server.
 
 = 4.1 2014-10-13 =
