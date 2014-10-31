@@ -3,20 +3,21 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 4.4
+  Version: 4.5
   Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-44';
+$ct_agent_version = 'wordpress-45';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
 $ct_session_request_id_label = 'request_id';
 $ct_session_register_ok_label = 'register_ok';
 
+$ct_checkjs_cf7 = 'ct_checkjs_cf7';
 $ct_cf7_comment = '';
 
 $ct_checkjs_jpcf = 'ct_checkjs_jpcf';
@@ -118,6 +119,7 @@ add_action('bp_before_registration_submit_buttons','ct_register_form');
 add_filter('bp_signup_validate', 'ct_registration_errors');
 
 // Contact Form7 
+add_filter('wpcf7_form_elements', 'ct_wpcf7_form_elements');
 add_filter('wpcf7_spam', 'ct_wpcf7_spam');
 
 // JetPack Contact form
@@ -1434,10 +1436,26 @@ function ct_contact_form_is_spam($form) {
 
 
 /**
+ * Inserts anti-spam hidden to CF7
+ */
+function ct_wpcf7_form_elements($html) {
+    global $wpdb, $current_user, $ct_checkjs_cf7;
+
+    $options = ct_get_options();
+    if ($options['contact_forms_test'] == 0) {
+        return $html;
+    }
+
+    $html .= ct_add_hidden_fields(null, $ct_checkjs_cf7, true);
+
+    return $html;
+}
+
+/**
  * Test CF7 message for spam
  */
 function ct_wpcf7_spam($spam) {
-    global $wpdb, $current_user, $ct_agent_version, $ct_cf7_comment;
+    global $wpdb, $current_user, $ct_agent_version, $ct_checkjs_cf7, $ct_cf7_comment;
 
     $options = ct_get_options();
     if ($spam === true)
@@ -1448,6 +1466,9 @@ function ct_wpcf7_spam($spam) {
     }
 
     $checkjs = js_test('ct_checkjs', $_COOKIE);
+    if($checkjs != 1){
+        $checkjs = js_test($ct_checkjs_cf7, $_POST);
+    }
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
