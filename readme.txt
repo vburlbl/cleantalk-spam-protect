@@ -1,21 +1,21 @@
-=== Anti-spam by CleanTalk (no CAPTCHA) ===
+=== Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form 
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form, akismet 
 Requires at least: 3.0
 Tested up to: 4.0 
 Stable tag: 4.4
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No captcha, no spam comments, no spam registrations, no spam contact emails, no spam trackbacks. Cloud, CAPTCHA less, premium antispam for WordPress. 
+No captcha, no spam comments, no spam registrations, no spam contact emails and no spam bots. Cloud, CAPTCHA less, premium antispam for WordPress. 
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
 = Anti spam features =
-1. Stops spam bots comments.
-1. Stops spam bots signups.
-1. Stops spam bots contacts emails.
+1. Stops spam comments.
+1. Stops spam signups.
+1. Stops spam contacts emails.
 1. Stops spam trackbacks.
 
 = Spam protection =
@@ -50,11 +50,6 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
  * No captcha, puzzles, etc.
  * Free mobile app to control anti spam function at your website.
 
-= How to protect sites from spam bots without CAPTCHA? =
-The most popular method is CAPTCHA -- the annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots won’t discern these CAPTCHA, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. 
-Sometimes CAPTCHA reminds doodle 2x year old child. For users with vision problems captcha is just an insurmountable obstacle. Users hate captcha. Captcha for users means "hate". Unreadable CAPTCHA stops about 80% of site visitors. After 2 failed attempts to bring it up to 95% reject further attempts. 
-At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource both from spam bots and visitors. CAPTCHA is not a panacea from spam. Doubts concerning the Need for CAPTCHA?
-
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
 * Apps for iPhone, Android to control anti spam service, comments, signups, contacts. With traffic and spam statistics for last 7 days.
@@ -76,7 +71,7 @@ The setup is done! You can control anti spam plugin by <a href="http://cleantalk
 == Frequently Asked Questions ==
 
 = How does the plugin work with spam comments? =
-Spam comments moves to SPAM folder. First comment from a new author plugin compares with post and previous comments. If the relevance of the comment is good enough it gets approval at the blog without manual approval.
+Spam comments moves to SPAM folder or you can set option to silent ban spam comments.
 
 = How does the plugin stop spam? =
 Plugin uses several simple tests to stop spammers.
@@ -93,10 +88,13 @@ Yes, it will. The plugin compatible with any WordPress themes.
 Please use email **stop_email@example.com** for comments, contacts or signups. Also you can see comments processed by plugin for last 7 days at <a href="http://cleantalk.org/my/show_requests">Control panel</a> or look at folder "Spam" for banned comments.
 
 = Is the plugin effective against spam bots? =
-Plugin Anti-spam by CleanTalk stops up to 100% of spam comments, spam signups (registrations) and spam contact emails. More over, by determining the relevance of the comment text, the plugin stops about 96% spam comments submitted manually via browser. 
+Plugin Anti-spam by CleanTalk stops up to 100% of spam comments, spam signups (registrations) and spam contact emails.
 
 = What about pingback, trackback spam? = 
 Plugin by default pass pingbacks without any checks. All trackbacks will be blocked if the sender have spam activity.
+
+= Can I use CleanTalk with Akismet? =
+Sure, you can use CleanTalk with Akismet. In this case probably you will have bigger false/positive rate (when legitimate comments/signups denies), but you will have stronger antispam protection at website.
 
 = Should I use another anti spam plugins? =
 CleanTalk stops up to 100% of spam bots, so you can disable other anti spam plugins (especially CAPTCHA like anti spam plugins). In some cases several anti-spam plugins can conflict, so it will be better use just one plugin.  
