@@ -699,7 +699,7 @@ function ct_bbp_new_pre_content ($comment) {
         return $comment;
     }
     
-    $checkjs = js_test('ct_checkjs', $_POST);
+    $checkjs = js_test('ct_checkjs', $_COOKIE);
 
     $example = null;
     
