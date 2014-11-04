@@ -148,7 +148,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. 
 
 == Changelog ==
-= 4.5 2014-11-00 =
+= 4.5 2014-11-04 =
   * Fixed CF7 JavaScript bug.
   * Fixed rejects in bbPress guests comments.
 
