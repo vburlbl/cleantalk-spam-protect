@@ -840,7 +840,6 @@ function ct_preprocess_comment($comment) {
     ct_hash($ct_result->id);
 
     if ($ct_result->spam == 1) {
-        $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
         add_filter('pre_comment_approved', 'ct_set_comment_spam');
 
         global $ct_comment;
@@ -868,7 +867,6 @@ function ct_preprocess_comment($comment) {
                     add_action('comment_post', 'ct_mark_red', 11, 2);
                 }
 
-                $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
                 add_filter('pre_comment_approved', 'ct_set_not_approved');
             }
 

@@ -2,6 +2,9 @@
 
 $ct_plugin_basename = 'cleantalk-spam-protect/cleantalk.php';
 
+// Timeout to get app server
+$ct_server_timeout = 2;
+
 /**
  * Admin action 'admin_enqueue_scripts' - Enqueue admin script of reloading admin page after needed AJAX events
  * @param 	string $hook URL of hooked page
@@ -478,7 +481,7 @@ if (!function_exists ( 'ct_plugin_action_links')) {
  * @return array
 */
 function ct_update_option($option_name) {
-    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime, $ct_account_status_check;
+    global $show_ct_notice_online, $ct_notice_online_label, $ct_notice_trial_label, $trial_notice_showtime, $ct_account_status_check, $ct_options, $ct_server_timeout;
 
     if($option_name !== 'cleantalk_settings') {
         return;
@@ -488,23 +491,63 @@ function ct_update_option($option_name) {
     if ($ct_account_status_check > 0 && time() - $ct_account_status_check < 5) {
         return;
     }
+    
+    $key_valid = true;
+    $app_server_error = false;
+    if (function_exists('curl_init') && function_exists('json_decode')) {
+        $api_key = $ct_options['apikey'];
+        if (isset($_POST['cleantalk_settings']['apikey'])) {
+            $api_key = $_POST['cleantalk_settings']['apikey']; 
+        }
+        
+        if (!ct_valid_key($api_key)) {
+            return null;
+        }
 
-    $ct_base_call_result = ct_base_call(array(
-        'message' => 'CleanTalk setup comment',
-        'example' => null,
-        'sender_email' => 'stop_email@example.com',
-        'sender_nickname' => 'CleanTalk',
-        'post_info' => '',
-        'checkjs' => 1
-    ));
-    $ct = $ct_base_call_result['ct'];
-    $ct_result = $ct_base_call_result['ct_result'];
+        $url = 'https://cleantalk.org/app_notice';
+        $server_timeout = $ct_server_timeout;
 
-    if ($ct_result->inactive == 1) {
-        setcookie($ct_notice_online_label, 0, null, '/');
-    } else {
-        setcookie($ct_notice_online_label, time(), strtotime("+14 days"), '/');
+        $data['auth_key'] = $api_key; 
+        $data['param'] = 'notice_validate_key'; 
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $server_timeout);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+
+        // receive server response ...
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // resolve 'Expect: 100-continue' issue
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+        $result = curl_exec($ch);
+        curl_close($ch);
+        if ($result) {
+            $result = json_decode($result, true);
+            if (isset($result['valid']) && $result['valid'] == 0) {
+                $key_valid = false;
+            }
+        }
+        if (!$result || !isset($result['valid'])) {
+            $app_server_error = true;
+        }
+    }
+    
+    if ($key_valid) {
+        // Removes cookie for server errors
+        if ($app_server_error) {
+            setcookie($ct_notice_online_label, null, -1, '/');
+            unset($_COOKIE[$ct_notice_online_label]);
+        } else {
+            setcookie($ct_notice_online_label, time(), strtotime("+14 days"), '/');
+        }
         setcookie($ct_notice_trial_label, (int) 0, strtotime("+$trial_notice_showtime minutes"), '/');
+    } else {
+        setcookie($ct_notice_online_label, 0, null, '/');
     }
 }
 
