@@ -541,7 +541,7 @@ function ct_footer_add_cookie() {
         return false;
     }
 
-    ct_add_hidden_fields(null, 'ct_checkjs', false, true);
+    ct_add_hidden_fields(true, 'ct_checkjs', false, true);
 
     return null;
 }
@@ -699,7 +699,10 @@ function ct_bbp_new_pre_content ($comment) {
         return $comment;
     }
     
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
+    if ($checkjs === null) {
+        $checkjs = js_test('ct_checkjs', $_POST, true);
+    }
 
     $example = null;
     
@@ -782,7 +785,7 @@ function ct_preprocess_comment($comment) {
     //
     if ($ct_jp_comments) {
         $post_info['comment_type'] = 'jetpack_comment'; 
-        $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE, true);
     } else {
         $post_info['comment_type'] = $comment['comment_type'];
         $checkjs = js_test('ct_checkjs', $_POST, true);
@@ -1258,7 +1261,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     // This hack can be helpfull when plugin uses with untested themes&signups plugins.
     //
     if ($checkjs === null) {
-        $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE, true);
         $sender_info['cookie_checkjs_passed'] = $checkjs;
     }
 
@@ -1463,7 +1466,7 @@ function ct_wpcf7_spam($spam) {
         return $spam;
     }
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
     if($checkjs != 1){
         $checkjs = js_test($ct_checkjs_cf7, $_POST);
     }
@@ -1629,7 +1632,7 @@ function ct_check_wplp(){
         if ($options['contact_forms_test'] == 0)
                 return;
 
-        $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE, true);
 
         $post_info['comment_type'] = 'feedback';
         $post_info = json_encode($post_info);
@@ -1693,7 +1696,7 @@ function ct_s2member_registration_test() {
     
     $submit_time = submit_time_test();
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
 
     require_once('cleantalk.class.php');
     
@@ -1772,7 +1775,7 @@ function ct_contact_form_validate () {
         return null;
     }
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
   
     $post_info['comment_type'] = 'feedback_general_contact_form';
     $post_info = json_encode($post_info);
