@@ -727,7 +727,7 @@ function ct_bbp_new_pre_content ($comment) {
     $ct = $ct_base_call_result['ct'];
     $ct_result = $ct_base_call_result['ct_result'];
 
-    if ($ct_result->stop_queue == 1 || $ct_result->spam == 1) {
+    if ($ct_result->stop_queue == 1 || $ct_result->spam == 1 || ($ct_result->allow == 0 && $ct_result->stop_words !== null)) {
         bbp_add_error('bbp_reply_content', $ct_result->comment);
     }
 
