@@ -1366,7 +1366,7 @@ function ct_grunion_contact_form_field_html($r, $field_label) {
             }
         }
 
-        $r .= ct_add_hidden_fields(null, $ct_checkjs_jpcf, true);
+        $r .= ct_add_hidden_fields(true, $ct_checkjs_jpcf, true);
         $ct_jpcf_patched = true;
     }
 
@@ -1447,7 +1447,7 @@ function ct_wpcf7_form_elements($html) {
         return $html;
     }
 
-    $html .= ct_add_hidden_fields(null, $ct_checkjs_cf7, true);
+    $html .= ct_add_hidden_fields(true, $ct_checkjs_cf7, true);
 
     return $html;
 }
@@ -1542,7 +1542,7 @@ function ct_wpcf7_display_message($message, $status) {
  * Inserts anti-spam hidden to Fast Secure contact form
  */
 function ct_si_contact_display_after_fields($string = '', $style = '', $form_errors = array(), $form_id_num = 0) {
-    $string .= ct_add_hidden_fields(null, 'ct_checkjs', true);
+    $string .= ct_add_hidden_fields(true, 'ct_checkjs', true);
     return $string;
 }
 
