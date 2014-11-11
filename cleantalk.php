@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 4.5
+  Version: 4.6
   Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-45';
+$ct_agent_version = 'wordpress-46';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -541,7 +541,7 @@ function ct_footer_add_cookie() {
         return false;
     }
 
-    ct_add_hidden_fields(null, 'ct_checkjs', false, true);
+    ct_add_hidden_fields(true, 'ct_checkjs', false, true);
 
     return null;
 }
@@ -699,7 +699,10 @@ function ct_bbp_new_pre_content ($comment) {
         return $comment;
     }
     
-    $checkjs = js_test('ct_checkjs', $_POST);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
+    if ($checkjs === null) {
+        $checkjs = js_test('ct_checkjs', $_POST, true);
+    }
 
     $example = null;
     
@@ -727,7 +730,7 @@ function ct_bbp_new_pre_content ($comment) {
     $ct = $ct_base_call_result['ct'];
     $ct_result = $ct_base_call_result['ct_result'];
 
-    if ($ct_result->stop_queue == 1 || $ct_result->spam == 1) {
+    if ($ct_result->stop_queue == 1 || $ct_result->spam == 1 || ($ct_result->allow == 0 && $ct_result->stop_words !== null)) {
         bbp_add_error('bbp_reply_content', $ct_result->comment);
     }
 
@@ -782,7 +785,7 @@ function ct_preprocess_comment($comment) {
     //
     if ($ct_jp_comments) {
         $post_info['comment_type'] = 'jetpack_comment'; 
-        $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE, true);
     } else {
         $post_info['comment_type'] = $comment['comment_type'];
         $checkjs = js_test('ct_checkjs', $_POST, true);
@@ -840,7 +843,6 @@ function ct_preprocess_comment($comment) {
     ct_hash($ct_result->id);
 
     if ($ct_result->spam == 1) {
-        $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
         add_filter('pre_comment_approved', 'ct_set_comment_spam');
 
         global $ct_comment;
@@ -868,7 +870,6 @@ function ct_preprocess_comment($comment) {
                     add_action('comment_post', 'ct_mark_red', 11, 2);
                 }
 
-                $comment['comment_content'] = $ct->addCleantalkComment($comment['comment_content'], $ct_result->comment);
                 add_filter('pre_comment_approved', 'ct_set_not_approved');
             }
 
@@ -1260,7 +1261,7 @@ function ct_registration_errors($errors, $sanitized_user_login = null, $user_ema
     // This hack can be helpfull when plugin uses with untested themes&signups plugins.
     //
     if ($checkjs === null) {
-        $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE, true);
         $sender_info['cookie_checkjs_passed'] = $checkjs;
     }
 
@@ -1365,7 +1366,7 @@ function ct_grunion_contact_form_field_html($r, $field_label) {
             }
         }
 
-        $r .= ct_add_hidden_fields(null, $ct_checkjs_jpcf, true);
+        $r .= ct_add_hidden_fields(true, $ct_checkjs_jpcf, true);
         $ct_jpcf_patched = true;
     }
 
@@ -1446,7 +1447,7 @@ function ct_wpcf7_form_elements($html) {
         return $html;
     }
 
-    $html .= ct_add_hidden_fields(null, $ct_checkjs_cf7, true);
+    $html .= ct_add_hidden_fields(true, $ct_checkjs_cf7, true);
 
     return $html;
 }
@@ -1465,7 +1466,7 @@ function ct_wpcf7_spam($spam) {
         return $spam;
     }
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
     if($checkjs != 1){
         $checkjs = js_test($ct_checkjs_cf7, $_POST);
     }
@@ -1541,7 +1542,7 @@ function ct_wpcf7_display_message($message, $status) {
  * Inserts anti-spam hidden to Fast Secure contact form
  */
 function ct_si_contact_display_after_fields($string = '', $style = '', $form_errors = array(), $form_id_num = 0) {
-    $string .= ct_add_hidden_fields(null, 'ct_checkjs', true);
+    $string .= ct_add_hidden_fields(true, 'ct_checkjs', true);
     return $string;
 }
 
@@ -1631,7 +1632,7 @@ function ct_check_wplp(){
         if ($options['contact_forms_test'] == 0)
                 return;
 
-        $checkjs = js_test('ct_checkjs', $_COOKIE);
+        $checkjs = js_test('ct_checkjs', $_COOKIE, true);
 
         $post_info['comment_type'] = 'feedback';
         $post_info = json_encode($post_info);
@@ -1695,7 +1696,7 @@ function ct_s2member_registration_test() {
     
     $submit_time = submit_time_test();
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
 
     require_once('cleantalk.class.php');
     
@@ -1774,7 +1775,7 @@ function ct_contact_form_validate () {
         return null;
     }
 
-    $checkjs = js_test('ct_checkjs', $_COOKIE);
+    $checkjs = js_test('ct_checkjs', $_COOKIE, true);
   
     $post_info['comment_type'] = 'feedback_general_contact_form';
     $post_info = json_encode($post_info);

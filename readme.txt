@@ -1,9 +1,9 @@
 === Anti-spam by CleanTalk ===
 Contributors: znaeff, shagimuratov
-Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, form, akismet 
+Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, akismet 
 Requires at least: 3.0
 Tested up to: 4.0 
-Stable tag: 4.4
+Stable tag: 4.6
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -148,6 +148,17 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. 
 
 == Changelog ==
+= 4.6 2014-11-11 =
+  * Improved anti spam protection on BuddyPress registrations.
+  * Improved anti spam protection on contact forms.
+  * Removed plugin sign from pending, spam comments. To get details about a comment please use Dashboard at cleantalk.org.
+  * Improved Access key validation function. 
+  * Added protection for bbPress comments via stop list. Stop list function is a list to reject comments by prefiled words. To fill the list please use Dashboard at cleantalk.org.
+
+= 4.5 2014-11-04 =
+  * Fixed CF7 JavaScript bug.
+  * Fixed rejects in bbPress guests comments.
+
 = 4.4 2014-10-29 =
   * Improved anti spam JS test for CF7.
   * Fixed 'noscript' text in FaceBook Like preview in Valenti theme.
@@ -413,6 +424,12 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
+= 4.6 2014-11-11 =
+Minor changes in anti spam logic for BuddyPress registrations, contact forms and bbPress guest posting.
+
+= 4.5 2014-11-04 =
+Bug fixes for Contact form 7 and bbPress guests posting.
+
 = 4.4 2014-10-29 =
 Improved JS checking for CF7.
 
