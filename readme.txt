@@ -7,10 +7,10 @@ Stable tag: 4.6
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No captcha, no spam comments, no spam registrations, no spam contact emails, no spam trackbacks. Cloud, CAPTCHA less, premium antispam for WordPress. 
+No captcha, no spam comments, no spam registrations, no spam emails and no spam bots. Cloud, CAPTCHA less, premium antispam for WordPress. 
 
 == Description ==
-No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
+No CAPTCHA, no questions, no counting animals, no puzzles, no math, no spam pingbacks and no spam bots.
 
 = Anti spam features =
 1. Stops spam comments.
