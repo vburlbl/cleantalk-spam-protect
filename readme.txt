@@ -1,4 +1,4 @@
-=== Anti-spam by CleanTalk (CAPTCHA less) ===
+=== Anti-spam by CleanTalk (no CAPTCHA) ===
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, akismet 
 Requires at least: 3.0
@@ -7,7 +7,7 @@ Stable tag: 4.6
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Cloud, light, easy setup, premium anti-spam for comments, registrations, contact forms and no spam bots. All in one captcha less WordPress anti-spam. 
+No captcha, no spam comments, no spam registrations, no spam contact emails, no spam trackbacks. Cloud, CAPTCHA less, premium antispam for WordPress. 
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
@@ -49,6 +49,11 @@ The CleanTalk is premium anti spam for WordPress, please look at the <a href="ht
  * Clear statistics
  * No captcha, puzzles, etc.
  * Free mobile app to control anti spam function at your website.
+
+= How to protect sites from spam bots without CAPTCHA? =
+The most popular method is CAPTCHA -- the annoying picture with curved and sloping symbols, which are offered to the visitor to fill in. It is supposed that spam bots wonâ€™t discern these CAPTCHA, but a visitor will. CAPTCHA provokes great irritation, but if one wants to speak out, he has to fill in these symbols time after time, making mistakes and starting once again. 
+Sometimes CAPTCHA reminds doodle 2x year old child. For users with vision problems captcha is just an insurmountable obstacle. Users hate captcha. Captcha for users means "hate". Unreadable CAPTCHA stops about 80% of site visitors. After 2 failed attempts to bring it up to 95% reject further attempts. 
+At the sight of CAPTCHA and after input errors, many visitors leave the resource. Thus, CAPTCHA helps to protect the resource both from bots and visitors. CAPTCHA is not a panacea from spam. Doubts Concerning the Need for CAPTCHA?
 
 = Additional features =
 * Online, daily and weekly anti spam reports traffic VS spam. 
