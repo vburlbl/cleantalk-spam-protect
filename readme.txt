@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 No spam comments, no spam registrations, no spam emails, no captcha and no spam bots. Cloud, CAPTCHA less, premium anti-spam for WordPress. 
 
 == Description ==
-No CAPTCHA, no questions, no counting animals, no puzzles, no math, no spam pingbacks and no spam bots.
+No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
 = Anti spam features =
 1. Stops spam comments.
