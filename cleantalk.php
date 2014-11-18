@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 4.7
+  Version: 4.8
   Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-47';
+$ct_agent_version = 'wordpress-48';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -559,13 +559,16 @@ function ct_add_hidden_fields($random_key = false, $field_name = 'ct_checkjs', $
     if ($cookie_check) { 
 			$html = '
 <script type="text/javascript">
-function ctSetCookie(c_name, value) {
-    document.cookie = c_name + "=" + escape(value) + "; path=/";
+function ctSetCookie(c_name, value, def_value) {
+    console.log(value);
+    console.log(def_value);
+    console.log(escape(value.replace(/^def_value$/, value)));
+    document.cookie = c_name + "=" + escape(value.replace(/^def_value$/, value)) + "; path=/";
 }
-ctSetCookie("%s", "%s");
+ctSetCookie("%s", "%s", "%s");
 </script>
 ';      
-		$html = sprintf($html, $field_name, $ct_checkjs_key);
+		$html = sprintf($html, $field_name, $ct_checkjs_key, $ct_checkjs_def);
     } else {
         $ct_input_challenge = sprintf("'%s'", $ct_checkjs_key);
 
