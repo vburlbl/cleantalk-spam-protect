@@ -560,9 +560,6 @@ function ct_add_hidden_fields($random_key = false, $field_name = 'ct_checkjs', $
 			$html = '
 <script type="text/javascript">
 function ctSetCookie(c_name, value, def_value) {
-    console.log(value);
-    console.log(def_value);
-    console.log(escape(value.replace(/^def_value$/, value)));
     document.cookie = c_name + "=" + escape(value.replace(/^def_value$/, value)) + "; path=/";
 }
 ctSetCookie("%s", "%s", "%s");
