@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 4.6
+  Version: 4.8
   Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-46';
+$ct_agent_version = 'wordpress-48';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -559,13 +559,13 @@ function ct_add_hidden_fields($random_key = false, $field_name = 'ct_checkjs', $
     if ($cookie_check) { 
 			$html = '
 <script type="text/javascript">
-function ctSetCookie(c_name, value) {
-    document.cookie = c_name + "=" + escape(value) + "; path=/";
+function ctSetCookie(c_name, value, def_value) {
+    document.cookie = c_name + "=" + escape(value.replace(/^def_value$/, value)) + "; path=/";
 }
-ctSetCookie("%s", "%s");
+ctSetCookie("%s", "%s", "%s");
 </script>
 ';      
-		$html = sprintf($html, $field_name, $ct_checkjs_key);
+		$html = sprintf($html, $field_name, $ct_checkjs_key, $ct_checkjs_def);
     } else {
         $ct_input_challenge = sprintf("'%s'", $ct_checkjs_key);
 
@@ -917,7 +917,7 @@ function js_test($field_name = 'ct_checkjs', $data = null, $random_key = false) 
 
     if (isset($data[$field_name])) {
 	    $js_post_value = $data[$field_name];
-       
+
         //
         // Random key check
         //
@@ -1390,7 +1390,7 @@ function ct_contact_form_is_spam($form) {
            $js_field_name = $k; 
     }
     
-    $checkjs = js_test($js_field_name, $_POST);
+    $checkjs = js_test($js_field_name, $_POST, true);
 
     $sender_info = array(
 	'sender_url' => @$form['comment_author_url']
@@ -1557,7 +1557,7 @@ function ct_si_contact_form_validate($form_errors = array(), $form_id_num = 0) {
     if ($options['contact_forms_test'] == 0)
 	return $form_errors;
 
-    $checkjs = js_test('ct_checkjs', $_POST);
+    $checkjs = js_test('ct_checkjs', $_POST, true);
 
     $post_info['comment_type'] = 'feedback';
     $post_info = json_encode($post_info);
