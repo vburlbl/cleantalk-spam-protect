@@ -155,7 +155,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Setup Android/iOS app to have push notices when new legitiamte comments/registrations or contactcs appears on the website. 
 
 == Changelog ==
-= 4.9 2014-11-19 =
+= 4.8 2014-11-19 =
   * Improved anti spam protection for BuddyPress registrations and custom contact forms. 
 
 = 4.7 2014-11-16 =
@@ -437,7 +437,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
-= 4.9 2014-11-19 =
+= 4.8 2014-11-19 =
 Improved anti spam protection for BuddyPress registrations and custom contact forms. 
 
 = 4.7 2014-11-16 =
