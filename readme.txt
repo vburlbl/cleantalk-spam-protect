@@ -2,7 +2,7 @@
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, akismet, capcha, form 
 Requires at least: 3.0
-Tested up to: 4.0 
+Tested up to: 4.0.1 
 Stable tag: 4.9
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
