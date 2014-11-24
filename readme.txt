@@ -152,7 +152,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Anti spam stopped spam bot at the CAPTCHA less registration form. The plugin provide explanation to visitor and websites about eache rejected comment/registration or contact message. 
 1. Use anti spam analytics tool for each website in service Dashboard to have information about spam/legitimate statistics. 
 1. Use anti spam log to control anti spam plugin. 
-1. Setup Android/iOS app main to have notices about new legitiamte comments/registrations or contactcs. 
+1. Setup Android/iOS app to have push notices when new legitiamte comments/registrations or contactcs appears on the website. 
 
 == Changelog ==
 = 4.9 2014-11-19 =
