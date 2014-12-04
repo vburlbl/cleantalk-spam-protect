@@ -1818,7 +1818,7 @@ function ct_contact_form_validate () {
             $subject = $v;
         }
 
-        if (!$contact_form && preg_match("/(contact|form|feedback|subscribe)/", $k) && !preg_match("/^ct_checkjs/", $k)) {
+        if (!$contact_form && preg_match("/(contact|form|feedback|subscribe|action)/", $k) && !preg_match("/^ct_checkjs/", $k)) {
             $contact_form = true;
         }
     }
