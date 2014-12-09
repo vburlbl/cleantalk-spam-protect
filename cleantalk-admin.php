@@ -109,8 +109,6 @@ function ct_admin_init() {
     add_settings_section('cleantalk_settings_main', __($ct_plugin_name, 'cleantalk'), 'ct_section_settings_main', 'cleantalk');
     add_settings_section('cleantalk_settings_anti_spam', __('Anti-spam settings', 'cleantalk'), 'ct_section_settings_anti_spam', 'cleantalk');
     add_settings_field('cleantalk_apikey', __('Access key', 'cleantalk'), 'ct_input_apikey', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_autoPubRevelantMess', __('Publish relevant comments', 'cleantalk'), 'ct_input_autoPubRevelantMess', 'cleantalk', 'cleantalk_settings_main');
-    add_settings_field('cleantalk_ssl_on', __('Use secure (SSL) connection to CleanTalk cloud', 'cleantalk'), 'ct_radio_ssl_on', 'cleantalk', 'cleantalk_settings_main');
     add_settings_field('cleantalk_remove_old_spam', __('Automatically delete spam comments', 'cleantalk'), 'ct_input_remove_old_spam', 'cleantalk', 'cleantalk_settings_main');
     
     add_settings_field('cleantalk_registrations_test', __('Registration forms', 'cleantalk'), 'ct_input_registrations_test', 'cleantalk', 'cleantalk_settings_anti_spam');
@@ -131,35 +129,6 @@ function ct_section_settings_main() {
  */
 function ct_section_settings_anti_spam() {
     return true;
-}
-
-/**
- * @author Artem Leontiev
- * Admin callback function - Displays inputs of 'Publicate relevant comments' plugin parameter
- *
- * @return null
- */
-function ct_input_autoPubRevelantMess () {
-    global $ct_options;
-   
-    $value = $ct_options['autoPubRevelantMess'];
-    echo "<input type='radio' id='cleantalk_autoPubRevelantMess1' name='cleantalk_settings[autoPubRevelantMess]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess1'> " . __('Yes') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_autoPubRevelantMess0' name='cleantalk_settings[autoPubRevelantMess]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_autoPubRevelantMess0'> " . __('No') . "</label>";
-    admin_addDescriptionsFields(__('Relevant (not spam) comments from new authors will be automatic published at the blog', 'cleantalk'));
-}
-/**
- * Admin callback function - Display secure connection options 
- *
- * @return null
- */
-function ct_radio_ssl_on() {
-    global $ct_options;
-    
-    $value = $ct_options['ssl_on'];
-    echo "<input type='radio' id='cleantalk_ssl_on1' name='cleantalk_settings[ssl_on]' value='1' " . ($value == '1' ? 'checked' : '') . " /><label for='cleantalk_ssl_on1'> " . __('Yes') . "</label>";
-    echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    echo "<input type='radio' id='cleantalk_ssl_on0' name='cleantalk_settings[ssl_on]' value='0' " . ($value == '0' ? 'checked' : '') . " /><label for='cleantalk_ssl_on0'> " . __('No') . "</label>";
 }
 
 /**
@@ -306,19 +275,19 @@ function admin_notice_message(){
 
     $show_notice = true;
     if ($show_notice && ct_valid_key($options['apikey']) === false) {
-        echo '<div class="updated"><h3>' . __("Please enter the Access Key in <a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a> settings to enable protection from spam!", 'cleantalk') . '</h3></div>';
+        echo '<div class="updated"><h3>' . sprintf(__("Please enter Access Key in %s settings to enable anti spam protection!", 'cleantalk'), "<a href=\"options-general.php?page=cleantalk\">CleanTalk plugin</a>") . '</h3></div>';
         $show_notice = false;
     }
 
     if ($show_notice && $show_ct_notice_trial) {
-        echo '<div class="updated"><h3>' . __("<a href=\"options-general.php?page=cleantalk\">$ct_plugin_name</a> trial period ends, please upgrade to <a href=\"http://cleantalk.org/my/bill/recharge?utm_source=wp-backend&utm_medium=cpc&utm_campaign=WP%20backend%20trial$user_token\" target=\"_blank\"><b>premium version</b></a>!", 'cleantalk') . '</h3></div>';
+        echo '<div class="updated"><h3>' . sprintf(__("%s trial period ends, please upgrade to %s!", 'cleantalk'), "<a href=\"options-general.php?page=cleantalk\">$ct_plugin_name</a>", "<a href=\"http://cleantalk.org/my/bill/recharge?utm_source=wp-backend&utm_medium=cpc&utm_campaign=WP%20backend%20trial$user_token\" target=\"_blank\"><b>premium version</b></a>") . '</h3></div>';
         $show_notice = false;
     }
 
     if ($show_notice && $show_ct_notice_online != '') {
         echo '<div class="updated"><h3><b>';
         if($show_ct_notice_online === 'Y'){
-                echo __("Please don’t forget to disable CAPTCHA if you have it!", 'cleantalk');
+                echo __("Don’t forget to disable CAPTCHA if you have it!", 'cleantalk');
         }
         
         if($show_ct_notice_online === 'N'){

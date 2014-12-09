@@ -292,7 +292,7 @@ function ct_def_options() {
         'registrations_test' => '1', 
         'comments_test' => '1', 
         'contact_forms_test' => '1', 
-        'general_contact_forms_test' => '0', // Antispam test for unsupported and untested contact forms 
+        'general_contact_forms_test' => '1', // Antispam test for unsupported and untested contact forms 
         'remove_old_spam' => '0',
         'spam_store_days' => '15', // Days before delete comments from folder Spam 
         'ssl_on' => 0, // Secure connection to servers 
@@ -538,7 +538,7 @@ function ct_comment_form($post_id) {
  */
 function ct_footer_add_cookie() {
     if (ct_is_user_enable() === false) {
-        return false;
+#        return false;
     }
 
     ct_add_hidden_fields(true, 'ct_checkjs', false, true);
