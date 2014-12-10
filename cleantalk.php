@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 4.8
+  Version: 4.10
   Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-48';
+$ct_agent_version = 'wordpress-410';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -292,7 +292,7 @@ function ct_def_options() {
         'registrations_test' => '1', 
         'comments_test' => '1', 
         'contact_forms_test' => '1', 
-        'general_contact_forms_test' => '0', // Antispam test for unsupported and untested contact forms 
+        'general_contact_forms_test' => '1', // Antispam test for unsupported and untested contact forms 
         'remove_old_spam' => '0',
         'spam_store_days' => '15', // Days before delete comments from folder Spam 
         'ssl_on' => 0, // Secure connection to servers 
@@ -538,7 +538,7 @@ function ct_comment_form($post_id) {
  */
 function ct_footer_add_cookie() {
     if (ct_is_user_enable() === false) {
-        return false;
+#        return false;
     }
 
     ct_add_hidden_fields(true, 'ct_checkjs', false, true);
@@ -1468,7 +1468,7 @@ function ct_wpcf7_spam($spam) {
 
     $checkjs = js_test('ct_checkjs', $_COOKIE, true);
     if($checkjs != 1){
-        $checkjs = js_test($ct_checkjs_cf7, $_POST);
+        $checkjs = js_test($ct_checkjs_cf7, $_POST, true);
     }
 
     $post_info['comment_type'] = 'feedback';
@@ -1613,7 +1613,7 @@ function ct_comment_text($comment_text) {
         $ct_hash = get_comment_meta($comment->comment_ID, 'ct_hash', true);
 
         if ($ct_hash !== '' && $_COOKIE[$ct_approved_request_id_label] == $ct_hash) {
-            $comment_text .= '<br /><br /> <em class="comment-awaiting-moderation">' . __('Comment is approved. Anti-spam by CleanTalk.', 'cleantalk') . '</em>'; 
+            $comment_text .= '<br /><br /> <em class="comment-awaiting-moderation">' . __('Comment approved. Anti-spam by CleanTalk.', 'cleantalk') . '</em>'; 
         }
     }
 
@@ -1818,7 +1818,7 @@ function ct_contact_form_validate () {
             $subject = $v;
         }
 
-        if (!$contact_form && preg_match("/(contact|form|feedback)/", $k) && !preg_match("/^ct_checkjs/", $k)) {
+        if (!$contact_form && preg_match("/(contact|form|feedback|subscribe|action)/", $k) && !preg_match("/^ct_checkjs/", $k)) {
             $contact_form = true;
         }
     }

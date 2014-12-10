@@ -2,8 +2,8 @@
 Contributors: znaeff, shagimuratov
 Tags: antispam, anti-spam, anti spam, spam, spammers, captcha, comments, registration, contact form, blacklist, math, signup, formidable, bot, spam bots, spammy, s2member, wordpress, support, BuddyPress, bbpress, landing pages, fast secure contact form, WooCommerce, jetpack, cf7, akismet, capcha, form 
 Requires at least: 3.0
-Tested up to: 4.0 
-Stable tag: 4.8
+Tested up to: 4.0.1 
+Stable tag: 4.10
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -155,7 +155,16 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 1. Setup Android/iOS app to have push notices when new legitiamte comments/registrations or contactcs appears on the website. 
 
 == Changelog ==
-= 4.9 2014-11-19 =
+= 4.10 2014-12-10 =
+  * Improved anti spam protection for custom contact/registration/subscribe forms.
+  * Option 'Custom contact forms' enabled by default for new setups.
+  * Removed settings "Publish relevant comments", "Use encrypted (SSL) connection".
+  * Added translation to Danish (thank you for Mikkel at KreativJul.dk).
+
+= 4.9 2014-11-24 =
+  * Fixed anti spam test for Contact Form 7. 
+
+= 4.8 2014-11-19 =
   * Improved anti spam protection for BuddyPress registrations and custom contact forms. 
 
 = 4.7 2014-11-16 =
@@ -437,7 +446,13 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
   * First version
 
 == Upgrade Notice ==
-= 4.9 2014-11-19 =
+= 4.10 2014-12-10 =
+Minor improvements for custom contact/registration/subscribe forms.
+
+= 4.9 2014-11-24 =
+Minor bug fix for Contact form 7.
+
+= 4.8 2014-11-19 =
 Improved anti spam protection for BuddyPress registrations and custom contact forms. 
 
 = 4.7 2014-11-16 =
