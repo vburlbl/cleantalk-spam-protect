@@ -3,14 +3,14 @@
   Plugin Name: Anti-spam by CleanTalk
   Plugin URI: http://cleantalk.org
   Description:  Cloud antispam for comments, registrations and contacts. The plugin doesn't use CAPTCHA, Q&A, math, counting animals or quiz to stop spam bots. 
-  Version: 4.10
+  Version: 4.11
   Author: СleanTalk <welcome@cleantalk.org>
   Author URI: http://cleantalk.org
  */
 
 define('CLEANTALK_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-$ct_agent_version = 'wordpress-410';
+$ct_agent_version = 'wordpress-411';
 $ct_plugin_name = 'Anti-spam by CleanTalk';
 $ct_checkjs_frm = 'ct_checkjs_frm';
 $ct_checkjs_register_form = 'ct_checkjs_register_form';
@@ -1787,9 +1787,19 @@ function ct_contact_form_validate () {
     $sender_nickname = null;
     $subject = '';
     $message = '';
-    $contact_form = false;
+    $contact_form = true;
 
+    $skip_params = array(
+	    'ipn_track_id', // PayPal IPN #
+	    'txn_type', // PayPal transaction type
+    );
+    $_POST['txn_type'] = 123;
     foreach ($_POST as $k => $v) {
+        if (in_array($k, $skip_params) || preg_match("/^ct_checkjs/", $k)) {
+            $contact_form = false;
+            break;
+        }
+
         if ($sender_email === null && isset($v)) {
             if (is_string($v) && preg_match("/^\S+@\S+\.\S+$/", $v)) {
                 $sender_email = $v;
@@ -1816,10 +1826,6 @@ function ct_contact_form_validate () {
         }
         if ($subject === '' && ct_get_data_from_submit($k, 'subject')) {
             $subject = $v;
-        }
-
-        if (!$contact_form && preg_match("/(contact|form|feedback|subscribe|action)/", $k) && !preg_match("/^ct_checkjs/", $k)) {
-            $contact_form = true;
         }
     }
 
