@@ -145,6 +145,7 @@ WordPress 3.0 at least. PHP 4, 5 with CURL or file_get_contents() function and e
 
 = Translations =
 * Spain (es_ES) - thanks to Andrew Kurtis and <a href="http://www.webhostinghub.com/index-c.html">WebHostingHub</a>
+* Danish (da_DK)
 * Russian (ru_RU)
 
 == Screenshots ==
