@@ -31,7 +31,7 @@ Spam is one of the most irritating factors. Spam become every year more and conv
 = Anti spam plugin info = 
 CleanTalk is an anti spam protection **4 in 1 for WordPress** that protects login, comment, contact and WooCommerce forms all at once. You don't need to install separate anti spam plugins for each form. This allows your blog to work faster and save resources. After installation **you will forget about spam**, CleanTalk plugin will do all the work. You won't have to deal with spam, CleanTalk will do this for you automatically.
 
-CleanTalk is a transparent anti spam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see anti spam statistics wherever whenever.
+CleanTalk is a transparent anti spam protection, we provide detailed statistics of all entering comments and logins. You can always be sure that **there are no errors**. We have developed a mobile app for you to see anti spam statistics wherever.
 
 We have developed antispam for WordPress that would provide **maximum protection from spam bots** and you can provide for your visitors **a simple and convenient form of comments/registrations without annoying CAPTCHAs and puzzles**. Used to detect spam multistage test that allows us to block up to 100% of spam bots.
 
