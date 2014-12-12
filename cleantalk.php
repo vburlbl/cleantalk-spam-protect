@@ -1793,7 +1793,6 @@ function ct_contact_form_validate () {
 	    'ipn_track_id', // PayPal IPN #
 	    'txn_type', // PayPal transaction type
     );
-    $_POST['txn_type'] = 123;
     foreach ($_POST as $k => $v) {
         if (in_array($k, $skip_params) || preg_match("/^ct_checkjs/", $k)) {
             $contact_form = false;
