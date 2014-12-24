@@ -92,13 +92,13 @@ function ct_admin_init() {
 
     $show_ct_notice_online = '';
     if (isset($_COOKIE[$ct_notice_online_label])) {
-        if ($_COOKIE[$ct_notice_online_label] !== 0 && time() - $_COOKIE[$ct_notice_online_label] <= 5) {
+        if ($_COOKIE[$ct_notice_online_label] !== '0' && time() - $_COOKIE[$ct_notice_online_label] <= 5) {
             $show_ct_notice_online = 'Y';
 	    } else {
             $show_ct_notice_online = '';
         }
 
-        if ($_COOKIE[$ct_notice_online_label] === 0) {
+        if ($_COOKIE[$ct_notice_online_label] === '0') {
             $show_ct_notice_online = 'N';
 	    }
     }
@@ -455,6 +455,7 @@ function ct_update_option($option_name) {
     if($option_name !== 'cleantalk_settings') {
         return;
     }
+
 
     // Skip test call if the function executet during account status check
     if ($ct_account_status_check > 0 && time() - $ct_account_status_check < 5) {
