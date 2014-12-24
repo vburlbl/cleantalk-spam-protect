@@ -92,17 +92,18 @@ function ct_admin_init() {
 
     $show_ct_notice_online = '';
     if (isset($_COOKIE[$ct_notice_online_label])) {
-        if ($_COOKIE[$ct_notice_online_label] != 0 && time() - $_COOKIE[$ct_notice_online_label] <= 5) {
+        if ($_COOKIE[$ct_notice_online_label] !== 0 && time() - $_COOKIE[$ct_notice_online_label] <= 5) {
             $show_ct_notice_online = 'Y';
 	    } else {
             $show_ct_notice_online = '';
         }
 
-        if ($_COOKIE[$ct_notice_online_label] == 0) {
+        if ($_COOKIE[$ct_notice_online_label] === 0) {
             $show_ct_notice_online = 'N';
 	    }
     }
 
+//    var_dump($show_ct_notice_online, $_COOKIE[$ct_notice_online_label], $ct_notice_online_label);
     ct_init_session();
     
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
