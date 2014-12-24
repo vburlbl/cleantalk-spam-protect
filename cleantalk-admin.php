@@ -103,7 +103,6 @@ function ct_admin_init() {
 	    }
     }
 
-//    var_dump($show_ct_notice_online, $_COOKIE[$ct_notice_online_label], $ct_notice_online_label);
     ct_init_session();
     
     register_setting('cleantalk_settings', 'cleantalk_settings', 'ct_settings_validate');
