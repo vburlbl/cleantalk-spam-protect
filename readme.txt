@@ -7,7 +7,7 @@ Stable tag: 4.11
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Anti-spam plugin protects comments, registrations, contacts, booking, subscriptions and any WordPress forms. No captcha and no spam bots. Max power, all-in-one, premium anti-spam plugin. 
+Anti-spam plugin filters comments spam, registrations spam, contacts spam, protects any WordPress forms. Max power, all-in-one, premium anti-spam plugin. 
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
