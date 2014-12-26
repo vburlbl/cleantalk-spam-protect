@@ -1,6 +1,6 @@
 === Anti-spam by CleanTalk (no CAPTCHA) ===
 Contributors: znaeff, shagimuratov
-Tags: Akismet, anti spam, antispam, bbpress spam, buddypress spam, capcha, captcha antispam, cf7 spam, comments spam, contact form spam, fast secure contact form spam, form, Formidable spam, jetpack spam, landing pages, math, registration spam, s2member, signup, signup spam, spam, spammers, spammy, WooCommerce spam, wordpress spam
+Tags: Akismet, anti spam, antispam, bbpress spam, buddypress spam, capcha, captcha antispam, cf7 spam, comments spam, contact form spam, fast secure contact form spam, form, Formidable spam, jetpack spam, landing pages, math, registration spam, s2member, signup spam, spam, spammers, spammy, WooCommerce spam, wordpress spam
 Requires at least: 3.0
 Tested up to: 4.1 
 Stable tag: 4.11
