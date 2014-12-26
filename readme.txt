@@ -7,16 +7,18 @@ Stable tag: 4.11
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-No spam comments, no spam registrations, no spam emails, no captcha and no spam bots. Cloud, CAPTCHA less, premium anti-spam for WordPress. 
+Anti-spam plugin protects comments, registrations, contacts, booking, subscriptions and any WordPress forms. No captcha and no spam bots. Max power, all-in-one, premium anti-spam plugin. 
 
 == Description ==
 No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam bots.
 
 = Anti spam features =
 1. Stops spam comments.
-1. Stops spam signups.
-1. Stops spam contacts emails.
-1. Stops spam trackbacks.
+1. Stops spam registrations.
+1. Stops spam contact emails.
+1. Stops spam orders.
+1. Stops spam bookings.
+1. Stops spam subscriptions.
 
 = Spam protection =
 * WordPress, JetPack comments.
@@ -24,6 +26,7 @@ No CAPTCHA, no questions, no counting animals, no puzzles, no math and no spam b
 * Formidable forms, Contact form 7, JetPack Contact form, Fast Secure Contact form, Ninja forms, Landing pages and any themes/custom contact form.
 * WooCommerce review form.
 * WordPress Landing Pages.
+* Any WordPress form (with enabled anti-spam option 'Custom contact forms').
 
 = Cloud antispam for WordPress. CAPTCHA less, no spam comments, no spam registrations, no spam contact emails, no spam trackbacks =
 Spam is one of the most irritating factors. Spam become every year more and conventional anti spam can no longer handle all the spam bots. CleanTalk prevents spam and automatically blocks it. You'll be surprised of effective protection against spam.
